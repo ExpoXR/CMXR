@@ -18,8 +18,8 @@ A WordPress plugin for creating and managing canvas-based orb background animati
 
 ## Requirements
 
-- WordPress 6.0+
-- PHP 7.4+
+- WordPress 6.9+
+- PHP 8.0+
 - Elementor (optional — any CSS ID works)
 
 ## Installation
