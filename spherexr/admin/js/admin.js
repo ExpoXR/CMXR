@@ -99,8 +99,8 @@
 				var targetId = btn.getAttribute('data-target');
 				var target = document.getElementById(targetId);
 				if (!target) return;
-				var isHidden = target.style.display === 'none' || !target.style.display;
-				target.style.display = isHidden ? 'block' : 'none';
+				var isHidden = target.classList.contains('is-hidden');
+				target.classList.toggle('is-hidden', !isHidden);
 				btn.textContent = isHidden ? 'Hide Config' : 'Show Config';
 			});
 		});
@@ -352,9 +352,28 @@
 		_modalRaf = requestAnimationFrame(tick);
 	}
 
+	function relocateAdminNotices() {
+		var wrap = document.querySelector('.spherexr-wrap');
+		if (!wrap) return;
+		var noticesZone = wrap.querySelector('.sxr-admin-notices');
+		if (!noticesZone) return;
+		var wpbody = document.getElementById('wpbody-content');
+		if (!wpbody) return;
+		var selectors = [
+			'.notice', '.updated', '.update-nag',
+			'.notice-success', '.notice-error', '.notice-warning', '.notice-info',
+		];
+		wpbody.querySelectorAll(selectors.join(', ')).forEach(function (notice) {
+			if (!wrap.contains(notice)) {
+				noticesZone.appendChild(notice);
+			}
+		});
+	}
+
 	if (document.readyState === 'loading') {
-		document.addEventListener('DOMContentLoaded', init);
+		document.addEventListener('DOMContentLoaded', function () { init(); relocateAdminNotices(); });
 	} else {
 		init();
+		relocateAdminNotices();
 	}
 })();

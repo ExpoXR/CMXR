@@ -8,6 +8,8 @@
 	);
 	?>
 
+	<div class="sxr-admin-notices"></div>
+
 	<!-- System Info -->
 	<div class="sxr-page-card">
 		<h2 class="sxr-section-title"><?php esc_html_e( 'System Info', 'spherexr' ); ?></h2>
@@ -60,7 +62,7 @@
 							<?php esc_html_e( 'Edit', 'spherexr' ); ?>
 						</a>
 					</div>
-					<pre class="spherexr-json-dump spherexr-debug-json" id="json-<?php echo esc_attr( $anim['id'] ); ?>" style="display:none;"><?php echo esc_html( wp_json_encode( $anim['config'], JSON_PRETTY_PRINT ) ); ?></pre>
+					<pre class="spherexr-json-dump spherexr-debug-json is-hidden" id="json-<?php echo esc_attr( $anim['id'] ); ?>"><?php echo esc_html( wp_json_encode( $anim['config'], JSON_PRETTY_PRINT ) ); ?></pre>
 				</div>
 			<?php endforeach; ?>
 		<?php endif; ?>
@@ -70,7 +72,7 @@
 	<div class="sxr-page-card">
 		<h2 class="sxr-section-title"><?php esc_html_e( 'Browser Compatibility', 'spherexr' ); ?></h2>
 		<p class="description"><?php esc_html_e( 'Checked in browser at runtime. Open browser console on any page with SphereXR animations for a detailed report.', 'spherexr' ); ?></p>
-		<table class="widefat fixed striped spherexr-debug-table" style="margin-top:12px;">
+		<table class="widefat fixed striped spherexr-debug-table sxr-mt-12">
 			<thead><tr><th><?php esc_html_e( 'Feature', 'spherexr' ); ?></th><th><?php esc_html_e( 'Required', 'spherexr' ); ?></th></tr></thead>
 			<tbody>
 				<tr><td>Canvas 2D</td><td><?php esc_html_e( 'Yes', 'spherexr' ); ?></td></tr>
@@ -81,5 +83,7 @@
 			</tbody>
 		</table>
 	</div>
+
+	<?php SphereXR_Dashboard::render_footer(); ?>
 
 </div>
