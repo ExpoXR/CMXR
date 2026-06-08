@@ -5,7 +5,17 @@
 		<a href="<?php echo esc_url( admin_url( 'admin.php?page=spherexr' ) ); ?>" class="spherexr-back-link">
 			&#8592; <?php esc_html_e( 'All Animations', 'spherexr' ); ?>
 		</a>
-		<h1><?php echo $is_new ? esc_html__( 'New Animation', 'spherexr' ) : esc_html( $post->post_title ); ?></h1>
+		<div class="spherexr-config-meta">
+			<input type="text" id="sxr-title" class="spherexr-config-title-input"
+				value="<?php echo esc_attr( $is_new ? '' : $post->post_title ); ?>"
+				placeholder="<?php esc_attr_e( 'Animation Name', 'spherexr' ); ?>">
+			<div class="spherexr-config-id-row">
+				<span class="spherexr-config-id-hash">#</span>
+				<input type="text" id="sxr-anim-id" class="spherexr-config-id-input"
+					placeholder="hero-orbs"
+					value="<?php echo esc_attr( $config['animation_id'] ?? '' ); ?>">
+			</div>
+		</div>
 		<div class="spherexr-config-actions">
 			<span class="spherexr-save-status"></span>
 			<button id="spherexr-save-btn" class="button button-primary" data-post-id="<?php echo $is_new ? '0' : esc_attr( $post->ID ); ?>">
@@ -14,32 +24,24 @@
 		</div>
 	</div>
 
+	<div class="sxr-admin-notices"></div>
+
 	<?php
 	// Pass config + settings to JS via data attribute
 	$js_data = array(
-		'postId'   => $is_new ? 0 : (int) $post->ID,
-		'isNew'    => $is_new,
-		'config'   => $config,
-		'settings' => get_option( 'spherexr_settings', array() ),
-		'restUrl'  => esc_url_raw( rest_url( 'spherexr/v1' ) ),
-		'nonce'    => wp_create_nonce( 'wp_rest' ),
+		'postId'      => $is_new ? 0 : (int) $post->ID,
+		'isNew'       => $is_new,
+		'config'      => $config,
+		'settings'    => get_option( 'spherexr_settings', array() ),
+		'restUrl'     => esc_url_raw( rest_url( 'spherexr/v1' ) ),
+		'nonce'       => wp_create_nonce( 'wp_rest' ),
+		'breakpoints' => $breakpoints,
 	);
 	?>
 	<div id="spherexr-configurator" data-config="<?php echo esc_attr( wp_json_encode( $js_data ) ); ?>">
 
 		<!-- Global bar -->
 		<div class="spherexr-global-bar">
-			<label>
-				<?php esc_html_e( 'Animation ID', 'spherexr' ); ?>
-				<input type="text" id="sxr-anim-id" placeholder="hero-orbs" value="<?php echo esc_attr( $config['animation_id'] ?? '' ); ?>">
-				<span class="sxr-hint"><?php esc_html_e( 'Use this as CSS ID on any Elementor section', 'spherexr' ); ?></span>
-			</label>
-
-			<label>
-				<?php esc_html_e( 'Title', 'spherexr' ); ?>
-				<input type="text" id="sxr-title" value="<?php echo esc_attr( $is_new ? '' : $post->post_title ); ?>">
-			</label>
-
 			<label>
 				<?php esc_html_e( 'Preview BG', 'spherexr' ); ?>
 				<?php
@@ -129,7 +131,10 @@
 			<div class="sxr-panel sxr-panel-center">
 				<div class="sxr-preview-label">
 					<span><?php esc_html_e( 'Live Preview', 'spherexr' ); ?></span>
-					<div class="sxr-preview-size-row">
+					<div class="sxr-breakpoint-picker">
+						<!-- Populated by JS from breakpoints data -->
+					</div>
+					<div class="sxr-preview-size-row sxr-custom-size is-hidden">
 						<input type="number" id="sxr-preview-w" min="100" max="3000" placeholder="W" value="<?php echo esc_attr( $config['global']['preview_w'] ?? '' ); ?>">
 						<span>×</span>
 						<input type="number" id="sxr-preview-h" min="100" max="2000" placeholder="H" value="<?php echo esc_attr( $config['global']['preview_h'] ?? '' ); ?>">
@@ -150,7 +155,7 @@
 						<p><?php esc_html_e( 'Select an orb from the list to configure it.', 'spherexr' ); ?></p>
 					</div>
 
-					<div class="sxr-orb-fields" style="display:none;">
+					<div class="sxr-orb-fields is-hidden">
 						<!-- Tabs -->
 						<div class="sxr-tabs">
 							<button class="sxr-tab is-active" data-tab="shape"><?php esc_html_e( 'Shape', 'spherexr' ); ?></button>
@@ -343,4 +348,5 @@
 		</div><!-- /.spherexr-config-body -->
 	</div><!-- /#spherexr-configurator -->
 
+	<?php SphereXR_Dashboard::render_footer(); ?>
 </div><!-- /.wrap -->

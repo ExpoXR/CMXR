@@ -24,6 +24,17 @@ class SphereXR_Dashboard {
 		<?php
 	}
 
+	public static function render_footer() {
+		?>
+		<div class="sxr-page-footer">
+			<span class="sxr-page-footer-brand">SphereXR</span>
+			<span class="sxr-page-footer-sep"><?php esc_html_e( 'by', 'spherexr' ); ?></span>
+			<a href="https://expoxr.com" target="_blank" rel="noopener" class="sxr-page-footer-link">ExpoXR</a>
+			<span class="sxr-page-footer-version">v<?php echo esc_html( SPHEREXR_VERSION ); ?></span>
+		</div>
+		<?php
+	}
+
 	public function render() {
 		if ( ! current_user_can( 'edit_posts' ) ) {
 			wp_die( esc_html__( 'You do not have permission to access this page.', 'spherexr' ) );

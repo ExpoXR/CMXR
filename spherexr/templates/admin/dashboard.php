@@ -9,6 +9,8 @@
 		</a>
 	</div>
 
+	<div class="sxr-admin-notices"></div>
+
 	<?php if ( empty( $animations ) ) : ?>
 		<div class="spherexr-empty-state">
 			<div class="spherexr-empty-icon">&#9711;</div>
@@ -77,5 +79,7 @@
 			</tbody>
 		</table>
 	<?php endif; ?>
+
+	<?php SphereXR_Dashboard::render_footer(); ?>
 
 </div>

@@ -18,11 +18,58 @@
 
 .spherexr-back-link:hover { color: var(--sxr-accent); }
 
-.spherexr-config-header h1 {
-	margin: 0;
+.spherexr-config-meta {
 	flex: 1;
-	font-size: 18px;
+	display: flex;
+	flex-direction: column;
+	gap: 3px;
+	min-width: 0;
+}
+
+.spherexr-config-meta input[type="text"] {
+	border: 1px solid transparent;
+	background: transparent;
+	padding: 2px 4px;
+	border-radius: 3px;
+	width: 100%;
+	box-sizing: border-box;
+	transition: border-color 0.15s, background 0.15s;
+}
+
+.spherexr-config-meta input[type="text"]:hover {
+	border-color: var(--sxr-border);
+}
+
+.spherexr-config-meta input[type="text"]:focus {
+	outline: none;
+	border-color: var(--sxr-accent);
+	background: var(--sxr-surface);
+}
+
+.spherexr-config-title-input {
+	font-size: 17px;
+	font-weight: 600;
 	color: var(--sxr-text);
+	margin: 0;
+}
+
+.spherexr-config-id-row {
+	display: flex;
+	align-items: center;
+	gap: 2px;
+}
+
+.spherexr-config-id-hash {
+	font-size: 12px;
+	color: var(--sxr-text-muted);
+	font-family: monospace;
+	flex-shrink: 0;
+}
+
+.spherexr-config-id-input {
+	font-size: 12px;
+	color: var(--sxr-text-muted);
+	font-family: monospace;
 }
 
 .spherexr-config-actions {
@@ -218,6 +265,39 @@
 	background: rgba(0,0,0,0.45);
 	border-bottom: 1px solid rgba(0,0,0,0.15);
 	flex-shrink: 0;
+}
+
+.sxr-breakpoint-picker {
+	display: flex;
+	align-items: center;
+	gap: 4px;
+}
+
+.sxr-bp-btn {
+	font-size: 10px !important;
+	padding: 1px 8px !important;
+	height: auto !important;
+	min-height: 0 !important;
+	line-height: 1.7 !important;
+	color: rgba(255,255,255,0.75) !important;
+	border-color: rgba(255,255,255,0.35) !important;
+	background: rgba(255,255,255,0.1) !important;
+	box-shadow: none !important;
+	text-transform: none;
+	letter-spacing: 0;
+	transition: background 0.15s, color 0.15s;
+}
+
+.sxr-bp-btn:hover {
+	color: #fff !important;
+	border-color: rgba(255,255,255,0.6) !important;
+	background: rgba(255,255,255,0.2) !important;
+}
+
+.sxr-bp-btn.is-active {
+	background: var(--sxr-accent) !important;
+	color: #fff !important;
+	border-color: var(--sxr-accent) !important;
 }
 
 .sxr-preview-size-row {

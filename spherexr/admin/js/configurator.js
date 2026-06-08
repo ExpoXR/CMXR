@@ -9,12 +9,13 @@
 	var container = document.getElementById('spherexr-configurator');
 	if (!container) return;
 
-	var raw     = JSON.parse(container.getAttribute('data-config') || '{}');
-	var postId  = raw.postId || 0;
-	var isNew   = raw.isNew || false;
-	var config  = raw.config || {};
-	var restUrl = raw.restUrl || '';
-	var nonce   = raw.nonce || '';
+	var raw        = JSON.parse(container.getAttribute('data-config') || '{}');
+	var postId     = raw.postId || 0;
+	var isNew      = raw.isNew || false;
+	var config     = raw.config || {};
+	var restUrl    = raw.restUrl || '';
+	var nonce      = raw.nonce || '';
+	var breakpoints = raw.breakpoints || [];
 
 	// Ensure orbs array exists
 	config.orbs = config.orbs || [];
@@ -194,8 +195,8 @@
 	/* Preview size                                                         */
 	/* ------------------------------------------------------------------ */
 
-	var previewSizeW      = document.getElementById('sxr-preview-w');
-	var previewSizeH      = document.getElementById('sxr-preview-h');
+	var previewSizeW       = document.getElementById('sxr-preview-w');
+	var previewSizeH       = document.getElementById('sxr-preview-h');
 	var previewSizeFillBtn = document.getElementById('sxr-preview-size-fill');
 	var previewContainerEl = document.getElementById('sxr-preview-container');
 
@@ -217,6 +218,54 @@
 		resizePreview();
 	}
 
+	function renderBreakpointPicker() {
+		var picker = document.querySelector('.sxr-breakpoint-picker');
+		if (!picker) return;
+		var customSizeRow = document.querySelector('.sxr-custom-size');
+		var savedW = (config.global && config.global.preview_w) || 0;
+		var savedH = (config.global && config.global.preview_h) || 0;
+		var activeSet = false;
+
+		breakpoints.forEach(function (bp) {
+			var btn = document.createElement('button');
+			btn.type = 'button';
+			btn.className = 'sxr-bp-btn button button-small';
+			btn.textContent = bp.label;
+			btn.addEventListener('click', function () {
+				document.querySelectorAll('.sxr-bp-btn').forEach(function (b) { b.classList.remove('is-active'); });
+				btn.classList.add('is-active');
+				if (customSizeRow) customSizeRow.classList.add('is-hidden');
+				applyPreviewSize(bp.w, bp.h);
+			});
+			if (savedW === bp.w && savedH === bp.h) {
+				btn.classList.add('is-active');
+				activeSet = true;
+			}
+			picker.appendChild(btn);
+		});
+
+		var customBtn = document.createElement('button');
+		customBtn.type = 'button';
+		customBtn.className = 'sxr-bp-btn button button-small';
+		customBtn.textContent = 'Custom';
+		customBtn.addEventListener('click', function () {
+			document.querySelectorAll('.sxr-bp-btn').forEach(function (b) { b.classList.remove('is-active'); });
+			customBtn.classList.add('is-active');
+			if (customSizeRow) customSizeRow.classList.remove('is-hidden');
+		});
+		picker.appendChild(customBtn);
+
+		if (!activeSet && savedW > 0 && savedH > 0) {
+			customBtn.classList.add('is-active');
+			if (customSizeRow) customSizeRow.classList.remove('is-hidden');
+			if (previewSizeW) previewSizeW.value = savedW;
+			if (previewSizeH) previewSizeH.value = savedH;
+			applyPreviewSize(savedW, savedH);
+		} else if (activeSet) {
+			applyPreviewSize(savedW, savedH);
+		}
+	}
+
 	if (previewSizeW) {
 		previewSizeW.addEventListener('change', function () {
 			applyPreviewSize(parseInt(previewSizeW.value) || 0, parseInt(previewSizeH.value) || 0);
@@ -229,18 +278,11 @@
 	}
 	if (previewSizeFillBtn) {
 		previewSizeFillBtn.addEventListener('click', function () {
+			document.querySelectorAll('.sxr-bp-btn').forEach(function (b) { b.classList.remove('is-active'); });
 			if (previewSizeW) previewSizeW.value = '';
 			if (previewSizeH) previewSizeH.value = '';
 			applyPreviewSize(0, 0);
 		});
-	}
-
-	var initPW = (config.global && config.global.preview_w) || 0;
-	var initPH = (config.global && config.global.preview_h) || 0;
-	if (initPW > 0 && initPH > 0) {
-		if (previewSizeW) previewSizeW.value = initPW;
-		if (previewSizeH) previewSizeH.value = initPH;
-		applyPreviewSize(initPW, initPH);
 	}
 
 	/* ------------------------------------------------------------------ */
@@ -298,8 +340,8 @@
 					} else {
 						var fieldsEl = document.querySelector('.sxr-orb-fields');
 						var noSelEl  = document.querySelector('.sxr-no-selection');
-						if (fieldsEl) fieldsEl.style.display = 'none';
-						if (noSelEl)  noSelEl.style.display  = '';
+						if (fieldsEl) fieldsEl.classList.add('is-hidden');
+						if (noSelEl)  noSelEl.classList.remove('is-hidden');
 					}
 					refreshPreview();
 					return;
@@ -360,13 +402,13 @@
 		var orb        = config.orbs[idx];
 
 		if (!orb) {
-			if (fieldsEl) fieldsEl.style.display = 'none';
-			if (noSelEl) noSelEl.style.display = '';
+			if (fieldsEl) fieldsEl.classList.add('is-hidden');
+			if (noSelEl) noSelEl.classList.remove('is-hidden');
 			return;
 		}
 
-		if (fieldsEl) fieldsEl.style.display = '';
-		if (noSelEl) noSelEl.style.display = 'none';
+		if (fieldsEl) fieldsEl.classList.remove('is-hidden');
+		if (noSelEl) noSelEl.classList.add('is-hidden');
 
 		// Shape
 		document.querySelectorAll('[name="sxr-orb-shape"]').forEach(function (r) {
@@ -746,6 +788,7 @@
 
 	startPreview();
 	renderOrbList();
+	renderBreakpointPicker();
 	if (config.orbs.length > 0) selectOrb(0);
 
 })();

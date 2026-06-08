@@ -39,6 +39,18 @@ class SphereXR_Configurator {
 			);
 		}
 
+		$breakpoints = array(
+			array( 'key' => 'mobile',  'label' => 'Mobile',  'w' => 375,  'h' => 667  ),
+			array( 'key' => 'tablet',  'label' => 'Tablet',  'w' => 768,  'h' => 1024 ),
+			array( 'key' => 'desktop', 'label' => 'Desktop', 'w' => 1440, 'h' => 900  ),
+		);
+		if ( defined( 'ELEMENTOR_VERSION' ) ) {
+			$bp_lg = (int) get_option( 'elementor_viewport_lg', 1025 );
+			$bp_md = (int) get_option( 'elementor_viewport_md', 768  );
+			$breakpoints[2]['w'] = $bp_lg;
+			$breakpoints[1]['w'] = $bp_md;
+		}
+
 		include SPHEREXR_PLUGIN_DIR . 'templates/admin/configurator.php';
 	}
 }
