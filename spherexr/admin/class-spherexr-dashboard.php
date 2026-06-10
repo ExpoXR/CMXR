@@ -4,33 +4,44 @@ if ( ! defined( 'ABSPATH' ) ) exit;
 class SphereXR_Dashboard {
 
 	/**
-	 * Shared admin page header — breadcrumb style for subpages.
+	 * Shared branded admin page header (gradient banner + quick actions).
 	 *
 	 * @param string $page_title Current page name (e.g. "Settings").
 	 * @param string $actions_html Optional escaped HTML for right-side actions.
 	 */
 	public static function render_header( $page_title, $actions_html = '' ) {
-		?>
-		<div class="spherexr-header">
-			<h1 class="spherexr-logo">
-				<a href="<?php echo esc_url( admin_url( 'admin.php?page=spherexr' ) ); ?>">SphereXR</a>
-			</h1>
-			<span class="spherexr-header-sep">›</span>
-			<span class="spherexr-page-title"><?php echo esc_html( $page_title ); ?></span>
-			<?php if ( $actions_html ) : ?>
-				<div class="spherexr-header-actions"><?php echo $actions_html; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></div>
-			<?php endif; ?>
-		</div>
-		<?php
+		$header_actions = $actions_html;
+		include SPHEREXR_PLUGIN_DIR . 'templates/admin/partials/header.php';
 	}
 
+	/**
+	 * Shared ExpoXR-family branding footer.
+	 */
 	public static function render_footer() {
 		?>
-		<div class="sxr-page-footer">
-			<span class="sxr-page-footer-brand">SphereXR</span>
-			<span class="sxr-page-footer-sep"><?php esc_html_e( 'by', 'spherexr' ); ?></span>
-			<a href="https://expoxr.com" target="_blank" rel="noopener" class="sxr-page-footer-link">ExpoXR</a>
-			<span class="sxr-page-footer-version">v<?php echo esc_html( SPHEREXR_VERSION ); ?></span>
+		<div class="spherexr-admin-footer">
+			<div class="spherexr-footer-content">
+				<div class="spherexr-footer-branding">
+					<?php
+					// phpcs:ignore PluginCheck.CodeAnalysis.ImageFunctions.NonEnqueuedImage -- Plugin logo for admin footer
+					printf(
+						'<img src="%s" alt="%s" class="spherexr-footer-logo" loading="lazy">',
+						esc_url( SPHEREXR_PLUGIN_URL . 'assets/img/ExpoXR-Logo.png' ),
+						esc_attr__( 'ExpoXR Logo', 'spherexr' )
+					);
+					?>
+					<p class="spherexr-footer-text">
+						<?php esc_html_e( 'SphereXR is part of the', 'spherexr' ); ?> <strong><?php esc_html_e( 'ExpoXR Family', 'spherexr' ); ?></strong> -
+						<?php esc_html_e( 'XR solutions for the modern web', 'spherexr' ); ?>
+						<span class="spherexr-footer-version">v<?php echo esc_html( SPHEREXR_VERSION ); ?></span>
+					</p>
+				</div>
+				<div class="spherexr-footer-links">
+					<a href="https://expoxr.com" target="_blank" rel="noopener"><?php esc_html_e( 'Visit ExpoXR.com', 'spherexr' ); ?></a>
+					<a href="https://expoxr.com/spherexr/documentation/" target="_blank" rel="noopener"><?php esc_html_e( 'Documentation', 'spherexr' ); ?></a>
+					<a href="https://expoxr.com/support/" target="_blank" rel="noopener"><?php esc_html_e( 'Support', 'spherexr' ); ?></a>
+				</div>
+			</div>
 		</div>
 		<?php
 	}

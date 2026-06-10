@@ -3,7 +3,7 @@
  * Plugin Name:       SphereXR
  * Plugin URI:        https://expoxr.com/
  * Description:       Create and manage canvas-based orb background animations. Attach to any Elementor section by CSS ID.
- * Version:           1.0.0
+ * Version:           1.1.0
  * Author:            Ayal Othman
  * Author URI:        https://expoxr.com
  * Requires at least: 6.0
@@ -18,7 +18,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'SPHEREXR_VERSION', '1.0.0' );
+define( 'SPHEREXR_VERSION', '1.1.0' );
 define( 'SPHEREXR_PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
 define( 'SPHEREXR_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
 define( 'SPHEREXR_PLUGIN_FILE', __FILE__ );

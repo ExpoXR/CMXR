@@ -192,7 +192,8 @@ class SphereXR_REST {
 		}
 
 		if ( $config ) {
-			$config['animation_id'] = sanitize_title( $new_title );
+			// Suffix with the new post ID so repeated duplicates get unique IDs.
+			$config['animation_id'] = sanitize_title( $post->post_title ) . '-copy-' . $new_id;
 			// Re-validate the copied config so stale/invalid data can't propagate.
 			$clean = SphereXR_CPT::sanitize_config( $config );
 			update_post_meta( $new_id, '_spherexr_config', wp_json_encode( $clean ?: $config ) );

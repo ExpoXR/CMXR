@@ -1,15 +1,12 @@
 <?php if ( ! defined( 'ABSPATH' ) ) exit; ?>
 <div class="wrap spherexr-wrap">
 
-	<div class="spherexr-header">
-		<h1 class="spherexr-logo">SphereXR</h1>
-		<p class="spherexr-tagline"><?php esc_html_e( 'Canvas Orb Background Animations', 'spherexr' ); ?></p>
-		<a href="<?php echo esc_url( admin_url( 'admin.php?page=spherexr-new' ) ); ?>" class="button button-primary spherexr-btn-new">
-			+ <?php esc_html_e( 'New Animation', 'spherexr' ); ?>
-		</a>
-	</div>
-
-	<div class="sxr-admin-notices"></div>
+	<?php
+	SphereXR_Dashboard::render_header(
+		__( 'SphereXR Dashboard', 'spherexr' ),
+		'<a href="' . esc_url( admin_url( 'admin.php?page=spherexr-new' ) ) . '" class="button button-primary">+ ' . esc_html__( 'New Animation', 'spherexr' ) . '</a>'
+	);
+	?>
 
 	<?php if ( empty( $animations ) ) : ?>
 		<div class="spherexr-empty-state">

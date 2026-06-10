@@ -50,9 +50,18 @@ class SphereXR_Admin {
 			array( new SphereXR_Debug(), 'render' )
 		);
 
+		add_submenu_page(
+			'spherexr',
+			__( 'ExploreXR', 'spherexr' ),
+			__( 'ExploreXR', 'spherexr' ),
+			'edit_posts',
+			'spherexr-explorexr',
+			array( new SphereXR_ExploreXR(), 'render' )
+		);
+
 		// Hidden page for editing an existing animation (no submenu entry)
 		add_submenu_page(
-			null,
+			'',
 			__( 'Edit Animation', 'spherexr' ),
 			'',
 			'edit_posts',
@@ -67,6 +76,7 @@ class SphereXR_Admin {
 			'spherexr_page_spherexr-new',
 			'spherexr_page_spherexr-settings',
 			'spherexr_page_spherexr-debug',
+			'spherexr_page_spherexr-explorexr',
 			'admin_page_spherexr-edit',
 		);
 

@@ -21,10 +21,11 @@ WordPress plugin for canvas-based orb background animations. Animations attach t
 |-------|------|------|
 | `SphereXR_Loader` | `includes/class-spherexr-loader.php` | Bootstraps all hooks |
 | `SphereXR_Admin` | `admin/class-spherexr-admin.php` | Menu registration + asset enqueuing |
-| `SphereXR_Dashboard` | `admin/class-spherexr-dashboard.php` | Animation list page. Also contains `static render_header()` shared by all admin pages |
+| `SphereXR_Dashboard` | `admin/class-spherexr-dashboard.php` | Animation list page. Also contains `static render_header()` / `static render_footer()` shared by all admin pages |
 | `SphereXR_Configurator` | `admin/class-spherexr-configurator.php` | Editor page controller |
 | `SphereXR_Settings` | `admin/class-spherexr-settings.php` | WP Settings API registration |
 | `SphereXR_Debug` | `admin/class-spherexr-debug.php` | Debug/diagnostic page |
+| `SphereXR_ExploreXR` | `admin/class-spherexr-explorexr.php` | ExploreXR (Free and Premium) promo page |
 | `SphereXR_CPT` | `includes/class-spherexr-cpt.php` | CPT registration + `sanitize_config()` |
 | `SphereXR_REST` | `includes/class-spherexr-rest.php` | REST endpoints at `spherexr/v1` |
 | `SphereXR_Public` | `includes/class-spherexr-public.php` | Frontend config injection + detect script |
@@ -32,8 +33,9 @@ WordPress plugin for canvas-based orb background animations. Animations attach t
 ### Admin UI Conventions
 
 - All admin pages use `.spherexr-wrap` root wrapper
-- Subpages (Settings, Debug) use `SphereXR_Dashboard::render_header( $title, $actions_html )` for the breadcrumb header
-- Dashboard uses its own header layout (logo + tagline + CTA)
+- All pages except the configurator use `SphereXR_Dashboard::render_header( $title, $actions_html )` — branded ExpoXR gradient banner + quick-actions bar (template: `templates/admin/partials/header.php`). The partial ends with `<hr class="wp-header-end">` so WP core places admin notices below the header — keep this marker
+- Configurator keeps its slim editor toolbar; it has a `screen-reader-text` h1 + `wp-header-end` above it for notice placement
+- All pages end with `SphereXR_Dashboard::render_footer()` — ExpoXR family branding footer
 - CSS variables defined in `admin/css/admin.css` `:root` block — use them for all new styles
 - Card component: `.sxr-page-card` (white surface, border, shadow)
 - Section headings: `.sxr-section-title`

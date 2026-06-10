@@ -7,8 +7,6 @@
 	);
 	?>
 
-	<div class="sxr-admin-notices"></div>
-
 	<div class="sxr-page-card">
 		<?php settings_errors( 'spherexr_settings_group' ); ?>
 		<form method="post" action="options.php" class="spherexr-settings-form">

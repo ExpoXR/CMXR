@@ -8,8 +8,6 @@
 	);
 	?>
 
-	<div class="sxr-admin-notices"></div>
-
 	<!-- System Info -->
 	<div class="sxr-page-card">
 		<h2 class="sxr-section-title"><?php esc_html_e( 'System Info', 'spherexr' ); ?></h2>

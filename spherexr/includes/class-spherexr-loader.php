@@ -21,6 +21,7 @@ class SphereXR_Loader {
 		require_once SPHEREXR_PLUGIN_DIR . 'admin/class-spherexr-configurator.php';
 		require_once SPHEREXR_PLUGIN_DIR . 'admin/class-spherexr-settings.php';
 		require_once SPHEREXR_PLUGIN_DIR . 'admin/class-spherexr-debug.php';
+		require_once SPHEREXR_PLUGIN_DIR . 'admin/class-spherexr-explorexr.php';
 	}
 
 	private function set_locale() {

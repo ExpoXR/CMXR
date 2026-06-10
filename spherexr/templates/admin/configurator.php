@@ -1,6 +1,9 @@
 <?php if ( ! defined( 'ABSPATH' ) ) exit; ?>
 <div class="wrap spherexr-wrap spherexr-configurator-wrap">
 
+	<h1 class="screen-reader-text"><?php echo $is_new ? esc_html__( 'New Animation', 'spherexr' ) : esc_html__( 'Edit Animation', 'spherexr' ); ?></h1>
+	<hr class="wp-header-end">
+
 	<div class="spherexr-config-header">
 		<a href="<?php echo esc_url( admin_url( 'admin.php?page=spherexr' ) ); ?>" class="spherexr-back-link">
 			&#8592; <?php esc_html_e( 'All Animations', 'spherexr' ); ?>
@@ -23,8 +26,6 @@
 			</button>
 		</div>
 	</div>
-
-	<div class="sxr-admin-notices"></div>
 
 	<?php
 	// Pass config + settings to JS via data attribute

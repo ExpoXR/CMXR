@@ -76,12 +76,13 @@ class SphereXR_CPT {
 			'global'       => array(
 				'speed'       => self::clamp_float( $global['speed'] ?? 1.0, 0.1, 10.0 ),
 				'safe_margin' => self::clamp_int( $global['safe_margin'] ?? 5, 0, 30 ),
-				'blend_mode'  => in_array( $global['blend_mode'] ?? 'screen', $allowed_blend, true )
-				                 ? $global['blend_mode'] : 'screen',
+				'blend_mode'  => self::sanitize_enum( $global['blend_mode'] ?? 'screen', $allowed_blend, 'screen' ),
+				'preview_bg'  => self::sanitize_preview_bg( $global['preview_bg'] ?? 'transparent' ),
+				'preview_w'   => self::sanitize_preview_dim( $global['preview_w'] ?? null, 3000 ),
+				'preview_h'   => self::sanitize_preview_dim( $global['preview_h'] ?? null, 2000 ),
 				'interactivity' => array(
 					'enabled'  => ! empty( $interactivity['enabled'] ),
-					'mode'     => in_array( $interactivity['mode'] ?? 'parallax', $allowed_modes, true )
-					              ? $interactivity['mode'] : 'parallax',
+					'mode'     => self::sanitize_enum( $interactivity['mode'] ?? 'parallax', $allowed_modes, 'parallax' ),
 					'strength' => self::clamp_float( $interactivity['strength'] ?? 0.5, 0.0, 1.0 ),
 					'radius'   => self::clamp_int( $interactivity['radius'] ?? 30, 5, 80 ),
 				),
@@ -97,29 +98,24 @@ class SphereXR_CPT {
 
 			$sanitized_orb = array(
 				'id'         => sanitize_key( $orb['id'] ?? uniqid( 'o' ) ),
-				'shape'      => in_array( $orb['shape'] ?? 'circle', $allowed_shapes, true )
-				               ? $orb['shape'] : 'circle',
+				'shape'      => self::sanitize_enum( $orb['shape'] ?? 'circle', $allowed_shapes, 'circle' ),
 				'color'      => sanitize_hex_color( $orb['color'] ?? '#38a3d7' ) ?: '#38a3d7',
-				'color_mode' => in_array( $orb['color_mode'] ?? 'solid', $allowed_cmodes, true )
-				               ? $orb['color_mode'] : 'solid',
+				'color_mode' => self::sanitize_enum( $orb['color_mode'] ?? 'solid', $allowed_cmodes, 'solid' ),
 				'color_b'    => sanitize_hex_color( $orb['color_b'] ?? '' ) ?: '',
 				'size'       => array(
 					'w'    => self::clamp_float( $size['w'] ?? 40, 1, 200 ),
 					'h'    => self::clamp_float( $size['h'] ?? 40, 1, 200 ),
-					'unit' => in_array( $size['unit'] ?? 'percent', $allowed_units, true )
-					          ? $size['unit'] : 'percent',
+					'unit' => self::sanitize_enum( $size['unit'] ?? 'percent', $allowed_units, 'percent' ),
 				),
 				'position' => array(
 					'x'    => self::clamp_float( $pos['x'] ?? 50, 0, 100 ),
 					'y'    => self::clamp_float( $pos['y'] ?? 50, 0, 100 ),
-					'unit' => in_array( $pos['unit'] ?? 'percent', $allowed_units, true )
-					          ? $pos['unit'] : 'percent',
+					'unit' => self::sanitize_enum( $pos['unit'] ?? 'percent', $allowed_units, 'percent' ),
 				),
 				'blur'    => self::clamp_int( $orb['blur'] ?? 72, 0, 200 ),
 				'opacity' => self::clamp_float( $orb['opacity'] ?? 0.8, 0.0, 1.0 ),
 				'animation' => array(
-					'type'        => in_array( $anim['type'] ?? 'drift', $allowed_anims, true )
-					                 ? $anim['type'] : 'drift',
+					'type'        => self::sanitize_enum( $anim['type'] ?? 'drift', $allowed_anims, 'drift' ),
 					'amplitude_x' => self::clamp_float( $anim['amplitude_x'] ?? 5, 0, 50 ),
 					'amplitude_y' => self::clamp_float( $anim['amplitude_y'] ?? 5, 0, 50 ),
 					'frequency_x' => self::clamp_float( $anim['frequency_x'] ?? 0.4, 0.05, 5.0 ),
@@ -133,6 +129,37 @@ class SphereXR_CPT {
 		}
 
 		return $config;
+	}
+
+	/**
+	 * Return $val if it is in the allowed list, otherwise $default.
+	 */
+	private static function sanitize_enum( $val, $allowed, $default ) {
+		return in_array( $val, $allowed, true ) ? $val : $default;
+	}
+
+	/**
+	 * Editor preview background: 'transparent', a hex color, or a safe
+	 * rgb()/rgba() string. Anything else falls back to 'transparent'.
+	 */
+	private static function sanitize_preview_bg( $val ) {
+		$val = is_string( $val ) ? trim( $val ) : '';
+		if ( '' === $val || 'transparent' === $val ) return 'transparent';
+		$hex = sanitize_hex_color( $val );
+		if ( $hex ) return $hex;
+		if ( preg_match( '/^rgba?\(\s*[\d.]+\s*,\s*[\d.]+\s*,\s*[\d.]+\s*(,\s*[\d.]+\s*)?\)$/i', $val ) ) {
+			return $val;
+		}
+		return 'transparent';
+	}
+
+	/**
+	 * Editor preview size: null (auto/fill — the editor also sends 0 for
+	 * "fill") or a clamped pixel value.
+	 */
+	private static function sanitize_preview_dim( $val, $max ) {
+		if ( null === $val || '' === $val || ! (int) $val ) return null;
+		return self::clamp_int( $val, 100, $max );
 	}
 
 	private static function clamp_float( $val, $min, $max ) {
