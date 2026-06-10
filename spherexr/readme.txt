@@ -101,6 +101,7 @@ Up to 20 orbs per animation.
 * Fixed: preview background and preview size are now preserved when saving an animation
 * Fixed: duplicating an animation multiple times now produces unique animation IDs
 * Fixed: PHP 8.1+ deprecation notice from the hidden edit-animation admin page
+* Fixed: config sanitization returned null instead of the default for blend mode, shape, color mode, units and animation type when the field was missing
 
 = 1.0.0 =
 * Initial release
