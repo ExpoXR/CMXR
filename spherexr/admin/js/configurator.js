@@ -706,21 +706,34 @@
 	var previewRaf     = 0;
 	var previewState   = { w: 0, h: 0, dpr: 1, time: 0, lastTime: 0, running: false };
 
-	// Pointer state for live interactivity (mirrors public engine, simplified)
-	var ptr = { mx: 0, my: 0, tx: 0, ty: 0, hover: 0, targetHover: 0 };
+	// Pointer state for live interactivity (mirrors public engine spherexr-engine.js)
+	var ptr = { mx: 0, my: 0, tx: 0, ty: 0, hover: 0, targetHover: 0, lastPX: -1, lastPY: -1 };
 
 	if (previewCanvas) {
-		previewCanvas.addEventListener('pointerenter', function () { ptr.targetHover = 0.72; });
-		previewCanvas.addEventListener('pointerleave', function () {
-			ptr.targetHover = 0; ptr.tx = 0; ptr.ty = 0;
-		});
+		previewCanvas.addEventListener('pointerenter', function () {
+			ptr.targetHover = 0.72;
+		}, { passive: true });
+
 		previewCanvas.addEventListener('pointermove', function (e) {
 			var rect = previewCanvas.getBoundingClientRect();
 			if (!rect.width || !rect.height) return;
+			// Velocity-driven hover boost — identical to engine onPointerMove()
+			if (ptr.lastPX >= 0) {
+				var dx  = e.clientX - ptr.lastPX;
+				var dy  = e.clientY - ptr.lastPY;
+				var vel = Math.min(Math.sqrt(dx * dx + dy * dy) / 30, 1);
+				ptr.targetHover = 0.72 + vel * 0.28;
+			}
+			ptr.lastPX = e.clientX;
+			ptr.lastPY = e.clientY;
 			ptr.tx = (e.clientX - rect.left) / rect.width  - 0.5;
 			ptr.ty = (e.clientY - rect.top)  / rect.height - 0.5;
-			ptr.targetHover = 0.72;
-		});
+		}, { passive: true });
+
+		previewCanvas.addEventListener('pointerleave', function () {
+			ptr.targetHover = 0; ptr.tx = 0; ptr.ty = 0;
+			ptr.lastPX = -1; ptr.lastPY = -1;
+		}, { passive: true });
 	}
 
 	function resizePreview() {
@@ -742,7 +755,14 @@
 		var state = previewState;
 		var dt = Math.min(40, Math.max(0, now - (state.lastTime || now)));
 		state.lastTime = now;
-		state.time += dt * 0.001 * (config.global && config.global.speed || 1.0);
+
+		// Ease pointer state toward targets — same spring factors as the engine
+		ptr.mx += (ptr.tx - ptr.mx) * 0.055;
+		ptr.my += (ptr.ty - ptr.my) * 0.055;
+		ptr.hover += (ptr.targetHover - ptr.hover) * 0.045;
+
+		var speed = (config.global && config.global.speed) || 1.0;
+		state.time += dt * 0.001 * speed * (1 + ptr.hover * 0.35);
 
 		var w = state.w, h = state.h, t = state.time;
 		previewCtx.setTransform(state.dpr, 0, 0, state.dpr, 0, 0);
@@ -751,19 +771,15 @@
 		var blendMode = config.global && config.global.blend_mode || 'screen';
 		var safeMargin = (config.global && config.global.safe_margin) || 0;
 
-		// Ease pointer state toward targets (spring) for smooth interactivity
-		ptr.mx += (ptr.tx - ptr.mx) * 0.08;
-		ptr.my += (ptr.ty - ptr.my) * 0.08;
-		ptr.hover += (ptr.targetHover - ptr.hover) * 0.06;
-
+		// Interactivity — mirrors spherexr-engine.js draw()
 		var inter    = (config.global && config.global.interactivity) || {};
-		var iOn      = inter.enabled && inter.mode && inter.mode !== 'none';
-		var iMode    = iOn ? inter.mode : 'none';
-		var iStr     = iOn ? (inter.strength || 0) : 0;
+		var iEnabled = inter.enabled && inter.mode !== 'none';
+		var iMode    = iEnabled ? inter.mode : 'none';
+		var iStr     = inter.strength || 0.5;
 		var iRad     = inter.radius || 30;
-		var mx       = iOn ? ptr.mx : 0;
-		var my       = iOn ? ptr.my : 0;
-		var hover    = iOn ? ptr.hover : 0;
+		var mx       = ptr.mx;
+		var my       = ptr.my;
+		var hover    = ptr.hover;
 
 		previewCtx.globalCompositeOperation = blendMode;
 

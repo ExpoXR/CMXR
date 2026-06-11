@@ -219,16 +219,26 @@
 		var wrap = document.getElementById('sxr-dash-modal-canvas-wrap');
 
 		var ms = { w: 0, h: 0, dpr: 1, time: 0, lastTime: 0 };
-		var ptr = { mx: 0, my: 0, tx: 0, ty: 0, hover: 0, targetHover: 0 };
+		var ptr = { mx: 0, my: 0, tx: 0, ty: 0, hover: 0, targetHover: 0, lastPX: -1, lastPY: -1 };
 
 		canvas.onpointerenter = function () { ptr.targetHover = 0.72; };
-		canvas.onpointerleave = function () { ptr.targetHover = 0; ptr.tx = 0; ptr.ty = 0; };
 		canvas.onpointermove = function (e) {
 			var rect = canvas.getBoundingClientRect();
 			if (!rect.width || !rect.height) return;
+			if (ptr.lastPX >= 0) {
+				var dx  = e.clientX - ptr.lastPX;
+				var dy  = e.clientY - ptr.lastPY;
+				var vel = Math.min(Math.sqrt(dx * dx + dy * dy) / 30, 1);
+				ptr.targetHover = 0.72 + vel * 0.28;
+			}
+			ptr.lastPX = e.clientX;
+			ptr.lastPY = e.clientY;
 			ptr.tx = (e.clientX - rect.left) / rect.width  - 0.5;
 			ptr.ty = (e.clientY - rect.top)  / rect.height - 0.5;
-			ptr.targetHover = 0.72;
+		};
+		canvas.onpointerleave = function () {
+			ptr.targetHover = 0; ptr.tx = 0; ptr.ty = 0;
+			ptr.lastPX = -1; ptr.lastPY = -1;
 		};
 
 		function resize() {
@@ -242,7 +252,14 @@
 		function tick(now) {
 			var dt = Math.min(40, Math.max(0, now - (ms.lastTime || now)));
 			ms.lastTime = now;
-			ms.time += dt * 0.001 * ((config.global && config.global.speed) || 1.0);
+
+			// Ease pointer state — same spring factors as spherexr-engine.js
+			ptr.mx += (ptr.tx - ptr.mx) * 0.055;
+			ptr.my += (ptr.ty - ptr.my) * 0.055;
+			ptr.hover += (ptr.targetHover - ptr.hover) * 0.045;
+
+			var speed = (config.global && config.global.speed) || 1.0;
+			ms.time += dt * 0.001 * speed * (1 + ptr.hover * 0.35);
 
 			var w = ms.w, h = ms.h, t = ms.time;
 			ctx.setTransform(ms.dpr, 0, 0, ms.dpr, 0, 0);
@@ -251,18 +268,14 @@
 			var blendMode  = (config.global && config.global.blend_mode)  || 'screen';
 			var safeMargin = (config.global && config.global.safe_margin) || 0;
 
-			ptr.mx += (ptr.tx - ptr.mx) * 0.08;
-			ptr.my += (ptr.ty - ptr.my) * 0.08;
-			ptr.hover += (ptr.targetHover - ptr.hover) * 0.06;
-
-			var inter = (config.global && config.global.interactivity) || {};
-			var iOn   = inter.enabled && inter.mode && inter.mode !== 'none';
-			var iMode = iOn ? inter.mode : 'none';
-			var iStr  = iOn ? (inter.strength || 0) : 0;
-			var iRad  = inter.radius || 30;
-			var mx    = iOn ? ptr.mx : 0;
-			var my    = iOn ? ptr.my : 0;
-			var hover = iOn ? ptr.hover : 0;
+			var inter    = (config.global && config.global.interactivity) || {};
+			var iEnabled = inter.enabled && inter.mode !== 'none';
+			var iMode    = iEnabled ? inter.mode : 'none';
+			var iStr     = inter.strength || 0.5;
+			var iRad     = inter.radius || 30;
+			var mx       = ptr.mx;
+			var my       = ptr.my;
+			var hover    = ptr.hover;
 
 			ctx.globalCompositeOperation = blendMode;
 
