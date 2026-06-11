@@ -3,7 +3,7 @@
 /* ---- Top bar ---- */
 .spherexr-config-header {
 	display: flex;
-	align-items: center;
+	align-items: flex-end;
 	gap: 16px;
 	padding: 14px 0 16px;
 	border-bottom: 1px solid var(--sxr-border);
@@ -11,9 +11,11 @@
 }
 
 .spherexr-back-link {
+	display: inline-block;
 	color: var(--sxr-text-muted);
 	font-size: 13px;
 	text-decoration: none;
+	margin-bottom: 6px;
 }
 
 .spherexr-back-link:hover { color: var(--sxr-accent); }
@@ -22,7 +24,7 @@
 	flex: 1;
 	display: flex;
 	flex-direction: column;
-	gap: 3px;
+	gap: 4px;
 	min-width: 0;
 }
 
@@ -47,10 +49,17 @@
 }
 
 .spherexr-config-title-input {
-	font-size: 17px;
-	font-weight: 600;
+	font-size: 24px;
+	font-weight: 700;
+	line-height: 1.2;
 	color: var(--sxr-text);
 	margin: 0;
+	padding: 4px 6px;
+}
+
+.spherexr-config-title-input::placeholder {
+	color: var(--sxr-text-muted);
+	font-weight: 600;
 }
 
 .spherexr-config-id-row {
@@ -86,13 +95,49 @@
 /* ---- Global bar ---- */
 .spherexr-global-bar {
 	display: flex;
-	align-items: center;
-	gap: 20px;
-	padding: 12px 16px;
+	flex-direction: column;
+	gap: 0;
 	background: var(--sxr-surface-2);
 	border-bottom: 1px solid var(--sxr-border);
+}
+
+/* Global bar tab strip */
+.sxr-global-tabs {
+	display: flex;
+	gap: 2px;
+	padding: 0 12px;
+	border-bottom: 1px solid var(--sxr-border);
+	background: var(--sxr-surface);
+}
+
+.sxr-global-tab {
+	background: none;
+	border: none;
+	padding: 9px 16px;
+	font-size: 12px;
+	font-weight: 600;
+	cursor: pointer;
+	color: var(--sxr-text-muted);
+	border-bottom: 2px solid transparent;
+	margin-bottom: -1px;
+	transition: color 0.15s, border-color 0.15s;
+}
+
+.sxr-global-tab:hover { color: var(--sxr-text); }
+.sxr-global-tab.is-active { color: var(--sxr-accent); border-bottom-color: var(--sxr-accent); }
+
+.sxr-global-panes {
+	padding: 12px 16px;
+}
+
+.sxr-global-pane {
+	display: none;
+	align-items: center;
+	gap: 20px;
 	flex-wrap: wrap;
 }
+
+.sxr-global-pane.is-active { display: flex; }
 
 .spherexr-global-bar label {
 	display: flex;
@@ -158,7 +203,7 @@
 /* ---- Body layout ---- */
 .spherexr-config-body {
 	display: grid;
-	grid-template-columns: 220px 1fr 280px;
+	grid-template-columns: 220px minmax(0, 1fr) 340px;
 	height: calc(100vh - 200px);
 	min-height: 500px;
 	border: 1px solid var(--sxr-border);
@@ -178,8 +223,8 @@
 .sxr-panel-center {
 	display: flex;
 	flex-direction: column;
-	background: transparent; /* Default — overridden by JS from config.global.preview_bg */
-	overflow: auto;
+	background: var(--sxr-surface-2);
+	overflow: hidden;
 }
 
 .sxr-panel-right {
@@ -256,21 +301,40 @@
 .sxr-preview-label {
 	display: flex;
 	align-items: center;
-	justify-content: space-between;
-	padding: 6px 12px;
+	gap: 12px;
+	padding: 7px 12px;
 	font-size: 11px;
-	color: rgba(255,255,255,0.75);
+	color: var(--sxr-text-muted);
 	text-transform: uppercase;
 	letter-spacing: 0.05em;
-	background: rgba(0,0,0,0.45);
-	border-bottom: 1px solid rgba(0,0,0,0.15);
+	background: var(--sxr-surface);
+	border-bottom: 1px solid var(--sxr-border);
 	flex-shrink: 0;
 }
+
+.sxr-preview-label-title {
+	font-weight: 600;
+}
+
+.sxr-preview-dims {
+	font-size: 11px;
+	font-weight: 600;
+	letter-spacing: 0;
+	text-transform: none;
+	color: var(--sxr-accent);
+	background: var(--sxr-accent-muted);
+	border-radius: 10px;
+	padding: 1px 9px;
+	white-space: nowrap;
+}
+
+.sxr-preview-dims:empty { display: none; }
 
 .sxr-breakpoint-picker {
 	display: flex;
 	align-items: center;
 	gap: 4px;
+	margin-left: auto;
 }
 
 /* Scoped under the preview label so we override WP's .button without !important */
@@ -280,19 +344,10 @@
 	height: auto;
 	min-height: 0;
 	line-height: 1.7;
-	color: rgba(255,255,255,0.75);
-	border-color: rgba(255,255,255,0.35);
-	background: rgba(255,255,255,0.1);
 	box-shadow: none;
 	text-transform: none;
 	letter-spacing: 0;
 	transition: background 0.15s, color 0.15s;
-}
-
-.sxr-preview-label .sxr-breakpoint-picker .sxr-bp-btn:hover {
-	color: #fff;
-	border-color: rgba(255,255,255,0.6);
-	background: rgba(255,255,255,0.2);
 }
 
 .sxr-preview-label .sxr-breakpoint-picker .sxr-bp-btn.is-active {
@@ -311,21 +366,17 @@
 	width: 52px;
 	padding: 2px 4px;
 	font-size: 11px;
-	border: 1px solid rgba(255,255,255,0.35);
+	border: 1px solid var(--sxr-border);
 	border-radius: var(--sxr-radius-sm);
-	background: rgba(255,255,255,0.12);
-	color: rgba(255,255,255,0.9);
+	background: var(--sxr-surface);
+	color: var(--sxr-text);
 	text-align: center;
 	text-transform: none;
 	letter-spacing: 0;
 }
 
-.sxr-preview-size-row input[type="number"]::placeholder {
-	color: rgba(255,255,255,0.45);
-}
-
 .sxr-preview-size-row > span {
-	color: rgba(255,255,255,0.6);
+	color: var(--sxr-text-muted);
 	font-size: 11px;
 }
 
@@ -335,18 +386,40 @@
 	height: auto;
 	min-height: 0;
 	line-height: 1.7;
-	color: rgba(255,255,255,0.75);
-	border-color: rgba(255,255,255,0.35);
-	background: rgba(255,255,255,0.1);
 	box-shadow: none;
 	text-transform: none;
 	letter-spacing: 0;
 }
 
+/* Stage = neutral surround that frames the device-sized preview */
+.sxr-preview-stage {
+	flex: 1;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	padding: 20px;
+	overflow: auto;
+	min-height: 0;
+}
+
 #sxr-preview-container {
 	flex: 1;
+	align-self: stretch;
 	position: relative;
 	overflow: hidden;
+	background: transparent; /* Overridden by JS from config.global.preview_bg */
+	border: 1px solid var(--sxr-border);
+	border-radius: var(--sxr-radius);
+	box-shadow: 0 4px 18px rgba(0, 0, 0, 0.12);
+}
+
+/* When a fixed breakpoint size is applied, JS sets explicit px + flex:none,
+   so the frame no longer stretches and its edges read clearly. */
+#sxr-preview-container.is-sized {
+	flex: none;
+	align-self: center;
+	max-width: 100%;
+	max-height: 100%;
 }
 
 #sxr-preview-canvas {
@@ -381,17 +454,23 @@
 	display: flex;
 	border-bottom: 1px solid var(--sxr-border);
 	flex-wrap: wrap;
+	position: sticky;
+	top: 0;
+	background: var(--sxr-surface);
+	z-index: 2;
 }
 
 .sxr-tab {
 	background: none;
 	border: none;
-	padding: 8px 12px;
+	padding: 8px 10px;
 	font-size: 12px;
+	line-height: 1.3;
 	cursor: pointer;
 	color: var(--sxr-text-muted);
 	border-bottom: 2px solid transparent;
 	margin-bottom: -1px;
+	white-space: nowrap;
 	transition: color 0.15s;
 }
 

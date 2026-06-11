@@ -70,8 +70,11 @@ class SphereXR_Admin {
 		);
 	}
 
-	public function enqueue_assets( $hook ) {
-		$spherexr_pages = array(
+	/**
+	 * Admin page hook suffixes (= current_screen IDs) owned by SphereXR.
+	 */
+	private static function page_hooks() {
+		return array(
 			'toplevel_page_spherexr',
 			'spherexr_page_spherexr-new',
 			'spherexr_page_spherexr-settings',
@@ -79,8 +82,25 @@ class SphereXR_Admin {
 			'spherexr_page_spherexr-explorexr',
 			'admin_page_spherexr-edit',
 		);
+	}
 
-		if ( ! in_array( $hook, $spherexr_pages, true ) ) return;
+	/**
+	 * Hide admin notices emitted by WordPress core and other plugins on
+	 * SphereXR's own admin screens to keep the branded UI clean. SphereXR's
+	 * Settings feedback is rendered via settings_errors() directly in the
+	 * template, so it is unaffected.
+	 */
+	public function suppress_foreign_notices() {
+		$screen = get_current_screen();
+		if ( ! $screen || ! in_array( $screen->id, self::page_hooks(), true ) ) return;
+
+		remove_all_actions( 'admin_notices' );
+		remove_all_actions( 'all_admin_notices' );
+		remove_all_actions( 'user_admin_notices' );
+	}
+
+	public function enqueue_assets( $hook ) {
+		if ( ! in_array( $hook, self::page_hooks(), true ) ) return;
 
 		wp_enqueue_style(
 			'spherexr-admin',

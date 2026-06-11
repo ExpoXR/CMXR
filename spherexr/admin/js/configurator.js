@@ -121,11 +121,39 @@
 		});
 	}
 
+	/* ---- Animation ID (auto-generated from name, still editable) ---- */
+	var ID_PREFIX = 'spherexr_';
+	var titleInput = document.getElementById('sxr-title');
 	var animIdInput = document.getElementById('sxr-anim-id');
+	// Treat a pre-existing (saved) ID as user-owned so we never clobber it.
+	var idTouched = !!(config.animation_id);
+
+	function slugify(str) {
+		return String(str)
+			.toLowerCase()
+			.replace(/[^a-z0-9\-_]+/g, '-')   // non-alphanumerics -> hyphen
+			.replace(/-+/g, '-')              // collapse repeats
+			.replace(/^[-_]+|[-_]+$/g, '');   // trim leading/trailing separators
+	}
+
+	function applyId(value) {
+		config.animation_id = value;
+		if (animIdInput) animIdInput.value = value;
+	}
+
+	if (titleInput) {
+		titleInput.addEventListener('input', function () {
+			if (idTouched) return;
+			var slug = slugify(titleInput.value);
+			applyId(slug ? ID_PREFIX + slug : '');
+		});
+	}
+
 	if (animIdInput) {
 		animIdInput.addEventListener('change', function () {
-			config.animation_id = animIdInput.value.replace(/[^a-z0-9\-_]/gi, '-').toLowerCase();
-			animIdInput.value = config.animation_id;
+			idTouched = true;
+			var clean = slugify(animIdInput.value.replace(/^spherexr_/i, ''));
+			applyId(clean ? ID_PREFIX + clean : '');
 		});
 	}
 
@@ -148,6 +176,7 @@
 		interMode.addEventListener('change', function () {
 			config.global.interactivity = config.global.interactivity || {};
 			config.global.interactivity.mode = interMode.value;
+			refreshPreview();
 		});
 	}
 
@@ -161,10 +190,11 @@
 	var previewBgHex  = document.getElementById('sxr-preview-bg-hex');
 	var previewBgText = document.getElementById('sxr-preview-bg-text');
 	var previewBgBtn  = document.getElementById('sxr-preview-bg-transparent');
-	var previewPanel  = document.querySelector('.sxr-panel-center');
+	var previewFrameEl = document.getElementById('sxr-preview-container');
 
 	function applyPreviewBg(value) {
-		if (previewPanel) previewPanel.style.background = value;
+		// Background lives on the framed device preview, not the surrounding stage.
+		if (previewFrameEl) previewFrameEl.style.background = value;
 		config.global = config.global || {};
 		config.global.preview_bg = value;
 	}
@@ -202,20 +232,24 @@
 	var previewSizeFillBtn = document.getElementById('sxr-preview-size-fill');
 	var previewContainerEl = document.getElementById('sxr-preview-container');
 
+	var previewDimsEl = document.getElementById('sxr-preview-dims');
+
 	function applyPreviewSize(w, h) {
 		config.global = config.global || {};
 		if (w > 0 && h > 0) {
 			previewContainerEl.style.width  = w + 'px';
 			previewContainerEl.style.height = h + 'px';
-			previewContainerEl.style.flex   = 'none';
+			previewContainerEl.classList.add('is-sized');
 			config.global.preview_w = w;
 			config.global.preview_h = h;
+			if (previewDimsEl) previewDimsEl.textContent = w + ' × ' + h;
 		} else {
 			previewContainerEl.style.width  = '';
 			previewContainerEl.style.height = '';
-			previewContainerEl.style.flex   = '';
+			previewContainerEl.classList.remove('is-sized');
 			config.global.preview_w = 0;
 			config.global.preview_h = 0;
+			if (previewDimsEl) previewDimsEl.textContent = 'Fill';
 		}
 		resizePreview();
 	}
@@ -647,6 +681,22 @@
 		});
 	});
 
+	// Global bar tabs (Background / Motion / Interaction)
+	document.querySelectorAll('.sxr-global-tab').forEach(function (tab) {
+		tab.addEventListener('click', function () {
+			var name = tab.getAttribute('data-gtab');
+			document.querySelectorAll('.sxr-global-tab').forEach(function (t) {
+				t.classList.remove('is-active');
+				t.setAttribute('aria-selected', 'false');
+			});
+			document.querySelectorAll('.sxr-global-pane').forEach(function (p) { p.classList.remove('is-active'); });
+			tab.classList.add('is-active');
+			tab.setAttribute('aria-selected', 'true');
+			var pane = document.querySelector('[data-gpane="' + name + '"]');
+			if (pane) pane.classList.add('is-active');
+		});
+	});
+
 	/* ------------------------------------------------------------------ */
 	/* Preview engine (mirrors public engine logic, simplified)            */
 	/* ------------------------------------------------------------------ */
@@ -655,6 +705,23 @@
 	var previewCtx     = previewCanvas ? previewCanvas.getContext('2d', { alpha: true }) : null;
 	var previewRaf     = 0;
 	var previewState   = { w: 0, h: 0, dpr: 1, time: 0, lastTime: 0, running: false };
+
+	// Pointer state for live interactivity (mirrors public engine, simplified)
+	var ptr = { mx: 0, my: 0, tx: 0, ty: 0, hover: 0, targetHover: 0 };
+
+	if (previewCanvas) {
+		previewCanvas.addEventListener('pointerenter', function () { ptr.targetHover = 0.72; });
+		previewCanvas.addEventListener('pointerleave', function () {
+			ptr.targetHover = 0; ptr.tx = 0; ptr.ty = 0;
+		});
+		previewCanvas.addEventListener('pointermove', function (e) {
+			var rect = previewCanvas.getBoundingClientRect();
+			if (!rect.width || !rect.height) return;
+			ptr.tx = (e.clientX - rect.left) / rect.width  - 0.5;
+			ptr.ty = (e.clientY - rect.top)  / rect.height - 0.5;
+			ptr.targetHover = 0.72;
+		});
+	}
 
 	function resizePreview() {
 		if (!previewCanvas) return;
@@ -684,6 +751,20 @@
 		var blendMode = config.global && config.global.blend_mode || 'screen';
 		var safeMargin = (config.global && config.global.safe_margin) || 0;
 
+		// Ease pointer state toward targets (spring) for smooth interactivity
+		ptr.mx += (ptr.tx - ptr.mx) * 0.08;
+		ptr.my += (ptr.ty - ptr.my) * 0.08;
+		ptr.hover += (ptr.targetHover - ptr.hover) * 0.06;
+
+		var inter    = (config.global && config.global.interactivity) || {};
+		var iOn      = inter.enabled && inter.mode && inter.mode !== 'none';
+		var iMode    = iOn ? inter.mode : 'none';
+		var iStr     = iOn ? (inter.strength || 0) : 0;
+		var iRad     = inter.radius || 30;
+		var mx       = iOn ? ptr.mx : 0;
+		var my       = iOn ? ptr.my : 0;
+		var hover    = iOn ? ptr.hover : 0;
+
 		previewCtx.globalCompositeOperation = blendMode;
 
 		var orbs = config.orbs || [];
@@ -691,7 +772,7 @@
 			var orb   = orbs[i];
 			var seed  = Core.hashSeed(orb.id);
 			var scale = Core.computeOrbScale(orb, t);
-			var pos   = Core.computeOrbPos(orb, seed, t, w, h, safeMargin, 0, 0, 0, 'none', 0, 0);
+			var pos   = Core.computeOrbPos(orb, seed, t, w, h, safeMargin, mx, my, hover, iMode, iStr, iRad);
 			Core.drawOrb(previewCtx, orb, pos, scale, t, seed);
 		}
 

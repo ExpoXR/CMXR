@@ -5,17 +5,17 @@
 	<hr class="wp-header-end">
 
 	<div class="spherexr-config-header">
-		<a href="<?php echo esc_url( admin_url( 'admin.php?page=spherexr' ) ); ?>" class="spherexr-back-link">
-			&#8592; <?php esc_html_e( 'All Animations', 'spherexr' ); ?>
-		</a>
 		<div class="spherexr-config-meta">
+			<a href="<?php echo esc_url( admin_url( 'admin.php?page=spherexr' ) ); ?>" class="spherexr-back-link">
+				&#8592; <?php esc_html_e( 'All Animations', 'spherexr' ); ?>
+			</a>
 			<input type="text" id="sxr-title" class="spherexr-config-title-input"
 				value="<?php echo esc_attr( $is_new ? '' : $post->post_title ); ?>"
 				placeholder="<?php esc_attr_e( 'Animation Name', 'spherexr' ); ?>">
 			<div class="spherexr-config-id-row">
 				<span class="spherexr-config-id-hash">#</span>
 				<input type="text" id="sxr-anim-id" class="spherexr-config-id-input"
-					placeholder="hero-orbs"
+					placeholder="spherexr_hero-orbs"
 					value="<?php echo esc_attr( $config['animation_id'] ?? '' ); ?>">
 			</div>
 		</div>
@@ -43,74 +43,94 @@
 
 		<!-- Global bar -->
 		<div class="spherexr-global-bar">
-			<label>
-				<?php esc_html_e( 'Preview BG', 'spherexr' ); ?>
-				<?php
-				$preview_bg_val = $config['global']['preview_bg'] ?? 'transparent';
-				$preview_bg_hex = sanitize_hex_color( $preview_bg_val );
-				if ( ! $preview_bg_hex ) { $preview_bg_hex = '#0f0c1a'; }
-				?>
-				<div class="sxr-preview-bg-row">
-					<input type="color" id="sxr-preview-bg-hex" value="<?php echo esc_attr( $preview_bg_hex ); ?>">
-					<input type="text" id="sxr-preview-bg-text" value="<?php echo esc_attr( $preview_bg_val ); ?>" placeholder="rgba(0,0,0,0.8)">
-					<button type="button" id="sxr-preview-bg-transparent" class="button button-small"><?php esc_html_e( 'Transparent', 'spherexr' ); ?></button>
+			<div class="sxr-global-tabs" role="tablist">
+				<button type="button" class="sxr-global-tab is-active" data-gtab="background" role="tab" aria-selected="true"><?php esc_html_e( 'Background', 'spherexr' ); ?></button>
+				<button type="button" class="sxr-global-tab" data-gtab="motion" role="tab" aria-selected="false"><?php esc_html_e( 'Motion', 'spherexr' ); ?></button>
+				<button type="button" class="sxr-global-tab" data-gtab="interaction" role="tab" aria-selected="false"><?php esc_html_e( 'Interaction', 'spherexr' ); ?></button>
+			</div>
+
+			<div class="sxr-global-panes">
+
+				<!-- Background pane -->
+				<div class="sxr-global-pane is-active" data-gpane="background" role="tabpanel">
+					<label>
+						<?php esc_html_e( 'Preview BG', 'spherexr' ); ?>
+						<?php
+						$preview_bg_val = $config['global']['preview_bg'] ?? 'transparent';
+						$preview_bg_hex = sanitize_hex_color( $preview_bg_val );
+						if ( ! $preview_bg_hex ) { $preview_bg_hex = '#ffffff'; }
+						?>
+						<div class="sxr-preview-bg-row">
+							<input type="color" id="sxr-preview-bg-hex" value="<?php echo esc_attr( $preview_bg_hex ); ?>">
+							<input type="text" id="sxr-preview-bg-text" value="<?php echo esc_attr( $preview_bg_val ); ?>" placeholder="rgba(0,0,0,0.8)">
+							<button type="button" id="sxr-preview-bg-transparent" class="button button-small"><?php esc_html_e( 'Transparent', 'spherexr' ); ?></button>
+						</div>
+					</label>
 				</div>
-			</label>
 
-			<label>
-				<?php esc_html_e( 'Speed', 'spherexr' ); ?>
-				<div class="sxr-slider-row">
-					<input type="range" id="sxr-speed" min="0.1" max="5" step="0.1" value="<?php echo esc_attr( $config['global']['speed'] ?? 1.0 ); ?>">
-					<input type="number" class="sxr-num" id="sxr-speed-num" min="0.1" max="5" step="0.1" value="<?php echo esc_attr( $config['global']['speed'] ?? 1.0 ); ?>">
+				<!-- Motion pane -->
+				<div class="sxr-global-pane" data-gpane="motion" role="tabpanel">
+					<label>
+						<?php esc_html_e( 'Speed', 'spherexr' ); ?>
+						<div class="sxr-slider-row">
+							<input type="range" id="sxr-speed" min="0.1" max="5" step="0.1" value="<?php echo esc_attr( $config['global']['speed'] ?? 1.0 ); ?>">
+							<input type="number" class="sxr-num" id="sxr-speed-num" min="0.1" max="5" step="0.1" value="<?php echo esc_attr( $config['global']['speed'] ?? 1.0 ); ?>">
+						</div>
+					</label>
+
+					<label>
+						<?php esc_html_e( 'Safe Margin', 'spherexr' ); ?>
+						<div class="sxr-slider-row">
+							<input type="range" id="sxr-safe-margin" min="0" max="30" step="1" value="<?php echo esc_attr( $config['global']['safe_margin'] ?? 5 ); ?>">
+							<input type="number" class="sxr-num" id="sxr-safe-margin-num" min="0" max="30" step="1" value="<?php echo esc_attr( $config['global']['safe_margin'] ?? 5 ); ?>">
+							<span>%</span>
+						</div>
+					</label>
+
+					<label>
+						<?php esc_html_e( 'Blend Mode', 'spherexr' ); ?>
+						<select id="sxr-blend-mode">
+							<?php foreach ( SphereXR_Schema::BLEND_MODES as $bm ) : ?>
+								<option value="<?php echo esc_attr( $bm ); ?>" <?php selected( $config['global']['blend_mode'] ?? 'screen', $bm ); ?>><?php echo esc_html( $bm ); ?></option>
+							<?php endforeach; ?>
+						</select>
+					</label>
 				</div>
-			</label>
 
-			<label>
-				<?php esc_html_e( 'Safe Margin', 'spherexr' ); ?>
-				<div class="sxr-slider-row">
-					<input type="range" id="sxr-safe-margin" min="0" max="30" step="1" value="<?php echo esc_attr( $config['global']['safe_margin'] ?? 5 ); ?>">
-					<input type="number" class="sxr-num" id="sxr-safe-margin-num" min="0" max="30" step="1" value="<?php echo esc_attr( $config['global']['safe_margin'] ?? 5 ); ?>">
-					<span>%</span>
-				</div>
-			</label>
+				<!-- Interaction pane -->
+				<div class="sxr-global-pane" data-gpane="interaction" role="tabpanel">
+					<label class="sxr-interactivity-toggle">
+						<input type="checkbox" id="sxr-interactivity-enabled" <?php checked( ! empty( $config['global']['interactivity']['enabled'] ) ); ?>>
+						<?php esc_html_e( 'Enable Interactivity', 'spherexr' ); ?>
+					</label>
 
-			<label>
-				<?php esc_html_e( 'Blend Mode', 'spherexr' ); ?>
-				<select id="sxr-blend-mode">
-					<?php foreach ( SphereXR_Schema::BLEND_MODES as $bm ) : ?>
-						<option value="<?php echo esc_attr( $bm ); ?>" <?php selected( $config['global']['blend_mode'] ?? 'screen', $bm ); ?>><?php echo esc_html( $bm ); ?></option>
-					<?php endforeach; ?>
-				</select>
-			</label>
-
-			<label class="sxr-interactivity-toggle">
-				<input type="checkbox" id="sxr-interactivity-enabled" <?php checked( ! empty( $config['global']['interactivity']['enabled'] ) ); ?>>
-				<?php esc_html_e( 'Interactivity', 'spherexr' ); ?>
-			</label>
-
-			<div class="sxr-interactivity-fields" id="sxr-interactivity-fields">
-				<label>
-					<?php esc_html_e( 'Mode', 'spherexr' ); ?>
-					<select id="sxr-interact-mode">
-						<?php foreach ( SphereXR_Schema::INTERACTIVITY_MODES as $m ) : ?>
-							<option value="<?php echo esc_attr( $m ); ?>" <?php selected( $config['global']['interactivity']['mode'] ?? 'parallax', $m ); ?>><?php echo esc_html( $m ); ?></option>
-						<?php endforeach; ?>
-					</select>
-				</label>
-				<label>
-					<?php esc_html_e( 'Strength', 'spherexr' ); ?>
-					<div class="sxr-slider-row">
-						<input type="range" id="sxr-interact-strength" min="0" max="1" step="0.05" value="<?php echo esc_attr( $config['global']['interactivity']['strength'] ?? 0.5 ); ?>">
-						<input type="number" class="sxr-num" id="sxr-interact-strength-num" min="0" max="1" step="0.05" value="<?php echo esc_attr( $config['global']['interactivity']['strength'] ?? 0.5 ); ?>">
+					<div class="sxr-interactivity-fields" id="sxr-interactivity-fields">
+						<label>
+							<?php esc_html_e( 'Mode', 'spherexr' ); ?>
+							<select id="sxr-interact-mode">
+								<?php foreach ( SphereXR_Schema::INTERACTIVITY_MODES as $m ) : ?>
+									<option value="<?php echo esc_attr( $m ); ?>" <?php selected( $config['global']['interactivity']['mode'] ?? 'parallax', $m ); ?>><?php echo esc_html( ucfirst( $m ) ); ?></option>
+								<?php endforeach; ?>
+							</select>
+						</label>
+						<label>
+							<?php esc_html_e( 'Strength', 'spherexr' ); ?>
+							<div class="sxr-slider-row">
+								<input type="range" id="sxr-interact-strength" min="0" max="1" step="0.05" value="<?php echo esc_attr( $config['global']['interactivity']['strength'] ?? 0.5 ); ?>">
+								<input type="number" class="sxr-num" id="sxr-interact-strength-num" min="0" max="1" step="0.05" value="<?php echo esc_attr( $config['global']['interactivity']['strength'] ?? 0.5 ); ?>">
+							</div>
+						</label>
+						<label>
+							<?php esc_html_e( 'Radius (%)', 'spherexr' ); ?>
+							<div class="sxr-slider-row">
+								<input type="range" id="sxr-interact-radius" min="5" max="80" step="1" value="<?php echo esc_attr( $config['global']['interactivity']['radius'] ?? 30 ); ?>">
+								<input type="number" class="sxr-num" id="sxr-interact-radius-num" min="5" max="80" step="1" value="<?php echo esc_attr( $config['global']['interactivity']['radius'] ?? 30 ); ?>">
+							</div>
+						</label>
+						<p class="sxr-hint"><?php esc_html_e( 'Move your mouse over the preview to test interaction.', 'spherexr' ); ?></p>
 					</div>
-				</label>
-				<label>
-					<?php esc_html_e( 'Radius (%)', 'spherexr' ); ?>
-					<div class="sxr-slider-row">
-						<input type="range" id="sxr-interact-radius" min="5" max="80" step="1" value="<?php echo esc_attr( $config['global']['interactivity']['radius'] ?? 30 ); ?>">
-						<input type="number" class="sxr-num" id="sxr-interact-radius-num" min="5" max="80" step="1" value="<?php echo esc_attr( $config['global']['interactivity']['radius'] ?? 30 ); ?>">
-					</div>
-				</label>
+				</div>
+
 			</div>
 		</div>
 		<!-- /Global bar -->
@@ -132,7 +152,8 @@
 			<!-- Center: Canvas preview -->
 			<div class="sxr-panel sxr-panel-center">
 				<div class="sxr-preview-label">
-					<span><?php esc_html_e( 'Live Preview', 'spherexr' ); ?></span>
+					<span class="sxr-preview-label-title"><?php esc_html_e( 'Live Preview', 'spherexr' ); ?></span>
+					<span class="sxr-preview-dims" id="sxr-preview-dims"></span>
 					<div class="sxr-breakpoint-picker">
 						<!-- Populated by JS from breakpoints data -->
 					</div>
@@ -144,9 +165,11 @@
 						<button type="button" id="sxr-preview-size-fill" class="button button-small"><?php esc_html_e( 'Fill', 'spherexr' ); ?></button>
 					</div>
 				</div>
-				<div id="sxr-preview-container">
-					<canvas id="sxr-preview-canvas" aria-hidden="true"></canvas>
-					<div class="sxr-preview-placeholder"><?php esc_html_e( 'Add orbs to preview', 'spherexr' ); ?></div>
+				<div class="sxr-preview-stage">
+					<div id="sxr-preview-container">
+						<canvas id="sxr-preview-canvas" aria-hidden="true"></canvas>
+						<div class="sxr-preview-placeholder"><?php esc_html_e( 'Add orbs to preview', 'spherexr' ); ?></div>
+					</div>
 				</div>
 			</div>
 
