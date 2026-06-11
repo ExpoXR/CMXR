@@ -33,6 +33,7 @@ class SphereXR_Loader {
 		$admin = new SphereXR_Admin();
 		add_action( 'admin_menu', array( $admin, 'add_menu_pages' ) );
 		add_action( 'admin_enqueue_scripts', array( $admin, 'enqueue_assets' ) );
+		add_action( 'in_admin_header', array( $admin, 'suppress_foreign_notices' ), 1 );
 
 		$cpt = new SphereXR_CPT();
 		add_action( 'init', array( $cpt, 'register' ) );
