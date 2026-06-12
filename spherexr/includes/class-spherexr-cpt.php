@@ -63,6 +63,8 @@ class SphereXR_CPT {
 		$allowed_anims  = SphereXR_Schema::ANIM_TYPES;
 		$allowed_units  = SphereXR_Schema::UNITS;
 		$allowed_cmodes = SphereXR_Schema::COLOR_MODES;
+		$allowed_canims = SphereXR_Schema::COLOR_ANIMATIONS;
+		$allowed_dirs   = SphereXR_Schema::INTERACTION_DIRECTIONS;
 
 		$animation_id = sanitize_title( $raw['animation_id'] ?? '' );
 		if ( ! $animation_id ) return false;
@@ -100,6 +102,11 @@ class SphereXR_CPT {
 			$anim = $orb['animation'] ?? array();
 			$size = $orb['size'] ?? array();
 			$pos  = $orb['position'] ?? array();
+			$color_stops = self::sanitize_color_stops(
+				$orb['color_stops'] ?? array(),
+				$orb['color'] ?? '#38a3d7',
+				$orb['color_b'] ?? '#8bb84a'
+			);
 
 			$sanitized_orb = array(
 				'id'         => sanitize_key( $orb['id'] ?? uniqid( 'o' ) ),
@@ -107,6 +114,8 @@ class SphereXR_CPT {
 				'color'      => sanitize_hex_color( $orb['color'] ?? '#38a3d7' ) ?: '#38a3d7',
 				'color_mode' => self::sanitize_enum( $orb['color_mode'] ?? 'solid', $allowed_cmodes, 'solid' ),
 				'color_b'    => sanitize_hex_color( $orb['color_b'] ?? '' ) ?: '',
+				'color_stops' => $color_stops,
+				'color_animation' => self::sanitize_enum( $orb['color_animation'] ?? 'none', $allowed_canims, 'none' ),
 				'size'       => array(
 					'w'    => self::clamp_float( $size['w'] ?? 40, 1, 200 ),
 					'h'    => self::clamp_float( $size['h'] ?? 40, 1, 200 ),
@@ -127,8 +136,9 @@ class SphereXR_CPT {
 					'frequency_y' => self::clamp_float( $anim['frequency_y'] ?? 0.5, 0.05, 5.0 ),
 					'phase'       => self::clamp_float( $anim['phase'] ?? 0.0, 0.0, 6.2832 ),
 				),
-				'parallax'  => self::clamp_float( $orb['parallax'] ?? 0.5, 0.0, 1.0 ),
-				'rotation'  => self::clamp_float( $orb['rotation'] ?? 0.0, 0.0, 360.0 ),
+				'parallax'              => self::clamp_float( $orb['parallax'] ?? 0.5, 0.0, 1.0 ),
+				'interaction_direction' => self::sanitize_enum( $orb['interaction_direction'] ?? 'normal', $allowed_dirs, 'normal' ),
+				'rotation'              => self::clamp_float( $orb['rotation'] ?? 0.0, 0.0, 360.0 ),
 			);
 
 			$config['orbs'][] = $sanitized_orb;
@@ -166,6 +176,22 @@ class SphereXR_CPT {
 	private static function sanitize_preview_dim( $val, $max ) {
 		if ( null === $val || '' === $val || ! (int) $val ) return null;
 		return self::clamp_int( $val, 100, $max );
+	}
+
+	private static function sanitize_color_stops( $raw_stops, $fallback_a, $fallback_b ) {
+		$stops = array();
+		foreach ( array_slice( (array) $raw_stops, 0, 5 ) as $stop ) {
+			$hex = sanitize_hex_color( $stop );
+			if ( $hex ) $stops[] = $hex;
+		}
+
+		if ( empty( $stops ) ) {
+			$primary = sanitize_hex_color( $fallback_a ) ?: '#38a3d7';
+			$secondary = sanitize_hex_color( $fallback_b ) ?: '#8bb84a';
+			$stops = array( $primary, $secondary );
+		}
+
+		return array_values( array_slice( $stops, 0, 5 ) );
 	}
 
 	private static function clamp_float( $val, $min, $max ) {

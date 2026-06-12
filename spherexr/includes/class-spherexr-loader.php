@@ -30,6 +30,9 @@ class SphereXR_Loader {
 	}
 
 	private function define_admin_hooks() {
+		// Early instantiation so admin_post_* hooks register before admin_menu fires.
+		new SphereXR_Settings();
+
 		$admin = new SphereXR_Admin();
 		add_action( 'admin_menu', array( $admin, 'add_menu_pages' ) );
 		add_action( 'admin_enqueue_scripts', array( $admin, 'enqueue_assets' ) );

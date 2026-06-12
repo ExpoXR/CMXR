@@ -19,7 +19,22 @@
 
 	if (!found.length) return;
 
-	var debug = cfg.settings && cfg.settings.debugMode;
+	var debug = !!(cfg.settings && (cfg.settings.debugMode || cfg.settings.wpDebug || cfg.settings.scriptDebug));
+	window.SphereXRDebug = window.SphereXRDebug || {
+		enabled: debug,
+		log: function () {
+			if (!this.enabled || !window.console) return;
+			console.log.apply(console, arguments);
+		},
+		warn: function () {
+			if (!this.enabled || !window.console) return;
+			console.warn.apply(console, arguments);
+		},
+		error: function () {
+			if (!this.enabled || !window.console) return;
+			console.error.apply(console, arguments);
+		},
+	};
 
 	// Pass configs + global settings to engine
 	window.SphereXRAnimations = found;
@@ -30,7 +45,7 @@
 		var link = document.createElement('link');
 		link.rel  = 'stylesheet';
 		link.href = cfg.cssUrl;
-		link.onerror = function () { if (debug && window.console) console.error('[SphereXR] Failed to load CSS:', cfg.cssUrl); };
+		link.onerror = function () { window.SphereXRDebug.error('[SphereXR] Failed to load CSS:', cfg.cssUrl); };
 		document.head.appendChild(link);
 	}
 
@@ -40,14 +55,12 @@
 		var script = document.createElement('script');
 		script.src = src;
 		script.async = false;
-		script.onerror = function () { if (window.console) console.error('[SphereXR] Failed to load ' + label + ':', src); };
+		script.onerror = function () { window.SphereXRDebug.error('[SphereXR] Failed to load ' + label + ':', src); };
 		document.head.appendChild(script);
 	}
 
 	if (cfg.coreUrl)   injectScript(cfg.coreUrl, 'core');
 	if (cfg.engineUrl) injectScript(cfg.engineUrl, 'engine');
 
-	if (debug && window.console) {
-		console.log('[SphereXR] Found ' + found.length + ' animation(s) on page:', found.map(function (a) { return '#' + a.animation_id; }));
-	}
+	window.SphereXRDebug.log('[SphereXR] Found ' + found.length + ' animation(s) on page:', found.map(function (a) { return '#' + a.animation_id; }));
 })();

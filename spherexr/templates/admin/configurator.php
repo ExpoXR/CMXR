@@ -4,19 +4,37 @@
 	<h1 class="screen-reader-text"><?php echo $is_new ? esc_html__( 'New Animation', 'spherexr' ) : esc_html__( 'Edit Animation', 'spherexr' ); ?></h1>
 	<hr class="wp-header-end">
 
+	<div class="sxr-studio-hero">
+			<div>
+				<span class="sxr-studio-kicker"><?php esc_html_e( 'ExpoXR', 'spherexr' ); ?></span>
+				<h2><?php echo $is_new ? esc_html__( 'New Animation', 'spherexr' ) : esc_html__( 'Edit Animation', 'spherexr' ); ?></h2>
+			</div>
+		</div>
+		<div class="sxr-studio-meta">
+			<span><?php esc_html_e( 'Canvas Background Builder', 'spherexr' ); ?></span>
+			<span>v<?php echo esc_html( SPHEREXR_VERSION ); ?></span>
+		</div>
+	</div>
+
 	<div class="spherexr-config-header">
 		<div class="spherexr-config-meta">
 			<a href="<?php echo esc_url( admin_url( 'admin.php?page=spherexr' ) ); ?>" class="spherexr-back-link">
-				&#8592; <?php esc_html_e( 'All Animations', 'spherexr' ); ?>
+				&larr; <?php esc_html_e( 'All Animations', 'spherexr' ); ?>
 			</a>
-			<input type="text" id="sxr-title" class="spherexr-config-title-input"
-				value="<?php echo esc_attr( $is_new ? '' : $post->post_title ); ?>"
-				placeholder="<?php esc_attr_e( 'Animation Name', 'spherexr' ); ?>">
+			<div class="sxr-title-row">
+				<label for="sxr-title"><?php esc_html_e( 'Animation Name', 'spherexr' ); ?></label>
+				<input type="text" id="sxr-title" class="spherexr-config-title-input"
+					value="<?php echo esc_attr( $is_new ? '' : $post->post_title ); ?>"
+					placeholder="<?php esc_attr_e( 'Hero background', 'spherexr' ); ?>">
+			</div>
 			<div class="spherexr-config-id-row">
-				<span class="spherexr-config-id-hash">#</span>
-				<input type="text" id="sxr-anim-id" class="spherexr-config-id-input"
-					placeholder="spherexr_hero-orbs"
-					value="<?php echo esc_attr( $config['animation_id'] ?? '' ); ?>">
+				<label for="sxr-anim-id"><?php esc_html_e( 'CSS Target ID', 'spherexr' ); ?></label>
+				<div class="sxr-id-control">
+					<span class="spherexr-config-id-hash">#</span>
+					<input type="text" id="sxr-anim-id" class="spherexr-config-id-input"
+						placeholder="spherexr_hero-orbs"
+						value="<?php echo esc_attr( $config['animation_id'] ?? '' ); ?>">
+				</div>
 			</div>
 		</div>
 		<div class="spherexr-config-actions">
@@ -29,8 +47,7 @@
 
 	<?php
 	// Pass config + settings to JS via data attribute
-	// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound
-	$js_data = array(
+	$spherexr_js_data = array(
 		'postId'      => $is_new ? 0 : (int) $post->ID,
 		'isNew'       => $is_new,
 		'config'      => $config,
@@ -40,7 +57,7 @@
 		'breakpoints' => $breakpoints,
 	);
 	?>
-	<div id="spherexr-configurator" data-config="<?php echo esc_attr( wp_json_encode( $js_data ) ); ?>">
+	<div id="spherexr-configurator" class="spherexr-configurator" data-config="<?php echo esc_attr( wp_json_encode( $spherexr_js_data ) ); ?>">
 
 		<!-- Global bar -->
 		<div class="spherexr-global-bar">
@@ -55,17 +72,15 @@
 				<!-- Background pane -->
 				<div class="sxr-global-pane is-active" data-gpane="background" role="tabpanel">
 					<label>
-						<?php esc_html_e( 'Preview BG', 'spherexr' ); ?>
+						<?php esc_html_e( 'Background Color', 'spherexr' ); ?>
 						<?php
-						// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound
-						$preview_bg_val = $config['global']['preview_bg'] ?? 'transparent';
-						// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound
-						$preview_bg_hex = sanitize_hex_color( $preview_bg_val );
-						if ( ! $preview_bg_hex ) { $preview_bg_hex = '#ffffff'; }
+						$spherexr_preview_bg_val = $config['global']['preview_bg'] ?? 'transparent';
+						$spherexr_preview_bg_hex = sanitize_hex_color( $spherexr_preview_bg_val );
+						if ( ! $spherexr_preview_bg_hex ) { $spherexr_preview_bg_hex = '#ffffff'; }
 						?>
 						<div class="sxr-preview-bg-row">
-							<input type="color" id="sxr-preview-bg-hex" value="<?php echo esc_attr( $preview_bg_hex ); ?>">
-							<input type="text" id="sxr-preview-bg-text" value="<?php echo esc_attr( $preview_bg_val ); ?>" placeholder="rgba(0,0,0,0.8)">
+							<input type="color" id="sxr-preview-bg-hex" value="<?php echo esc_attr( $spherexr_preview_bg_hex ); ?>">
+							<input type="text" id="sxr-preview-bg-text" value="<?php echo esc_attr( $spherexr_preview_bg_val ); ?>" placeholder="rgba(0,0,0,0.8)">
 							<button type="button" id="sxr-preview-bg-transparent" class="button button-small"><?php esc_html_e( 'Transparent', 'spherexr' ); ?></button>
 						</div>
 					</label>
@@ -143,13 +158,19 @@
 			<!-- Left: Orb list -->
 			<div class="sxr-panel sxr-panel-left">
 				<div class="sxr-panel-header">
-					<h3><?php esc_html_e( 'Orbs', 'spherexr' ); ?></h3>
-					<button id="sxr-add-orb-btn" class="button button-small">+ <?php esc_html_e( 'Add Orb', 'spherexr' ); ?></button>
+					<h3><?php esc_html_e( 'Shapes', 'spherexr' ); ?></h3>
+					<button id="sxr-add-orb-btn" class="button button-small">+ <?php esc_html_e( 'Add Shape', 'spherexr' ); ?></button>
 				</div>
 				<p class="sxr-orb-list-hint"><?php esc_html_e( 'Top = above others · drag to reorder', 'spherexr' ); ?></p>
 				<ul id="sxr-orb-list" class="sxr-orb-list">
 					<!-- Populated by JS -->
 				</ul>
+				<div id="sxr-orb-empty" class="sxr-orb-empty">
+					<div class="sxr-orb-empty-icon"></div>
+					<strong><?php esc_html_e( 'Start with a shape', 'spherexr' ); ?></strong>
+					<p><?php esc_html_e( 'Add one visual layer, then tune color, motion, and position.', 'spherexr' ); ?></p>
+					<button type="button" id="sxr-add-first-shape-btn" class="button button-primary"><?php esc_html_e( 'Add First Shape', 'spherexr' ); ?></button>
+				</div>
 			</div>
 
 			<!-- Center: Canvas preview -->
@@ -171,7 +192,7 @@
 				<div class="sxr-preview-stage">
 					<div id="sxr-preview-container">
 						<canvas id="sxr-preview-canvas" aria-hidden="true"></canvas>
-						<div class="sxr-preview-placeholder"><?php esc_html_e( 'Add orbs to preview', 'spherexr' ); ?></div>
+						<div class="sxr-preview-placeholder"><?php esc_html_e( 'Add a shape to preview', 'spherexr' ); ?></div>
 					</div>
 				</div>
 			</div>
@@ -195,20 +216,20 @@
 
 						<!-- Shape tab -->
 						<div class="sxr-tab-pane is-active" data-pane="shape" id="sxr-pane-shape" role="tabpanel">
-							<div class="sxr-shape-grid">
-								<?php foreach ( array(
-									'circle'  => __( 'Circle', 'spherexr' ),
-									'double'  => __( 'Double', 'spherexr' ),
-									'triple'  => __( 'Triple', 'spherexr' ),
-									'blob'    => __( 'Blob', 'spherexr' ),
-								) as $val => $label ) : // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound ?>
-									<label class="sxr-shape-option">
-										<input type="radio" name="sxr-orb-shape" value="<?php echo esc_attr( $val ); ?>">
-										<span class="sxr-shape-preview sxr-shape-<?php echo esc_attr( $val ); ?>"></span>
-										<span><?php echo esc_html( $label ); ?></span>
-									</label>
-								<?php endforeach; ?>
-							</div>
+							<?php foreach ( SphereXR_Schema::get_shape_groups() as $shape_group ) : // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound ?>
+								<div class="sxr-shape-group">
+									<h4><?php echo esc_html( $shape_group['label'] ); ?></h4>
+									<div class="sxr-shape-grid">
+										<?php foreach ( $shape_group['shapes'] as $val => $label ) : // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound ?>
+											<label class="sxr-shape-option">
+												<input type="radio" name="sxr-orb-shape" value="<?php echo esc_attr( $val ); ?>">
+												<span class="sxr-shape-preview sxr-shape-<?php echo esc_attr( $val ); ?>"></span>
+												<span><?php echo esc_html( $label ); ?></span>
+											</label>
+										<?php endforeach; ?>
+									</div>
+								</div>
+							<?php endforeach; ?>
 
 							<div class="sxr-field">
 								<label><?php esc_html_e( 'Blur', 'spherexr' ); ?></label>
@@ -245,6 +266,20 @@
 							<div class="sxr-field sxr-color-b-field">
 								<label><?php esc_html_e( 'Secondary Color', 'spherexr' ); ?></label>
 								<input type="text" id="sxr-orb-color-b" class="sxr-color-picker" value="#8bb84a">
+							</div>
+							<div class="sxr-field sxr-gradient-colors-field">
+								<label><?php esc_html_e( 'Gradient Colors', 'spherexr' ); ?></label>
+								<div id="sxr-gradient-colors" class="sxr-gradient-colors"></div>
+								<button type="button" id="sxr-add-gradient-color" class="button button-small"><?php esc_html_e( 'Add Color', 'spherexr' ); ?></button>
+								<p class="description"><?php esc_html_e( 'Use up to 5 colors. First two stay synced with Primary and Secondary.', 'spherexr' ); ?></p>
+							</div>
+							<div class="sxr-field sxr-color-animation-field">
+								<label><?php esc_html_e( 'Color Animation', 'spherexr' ); ?></label>
+								<select id="sxr-orb-color-animation">
+									<?php foreach ( SphereXR_Schema::get_color_animation_labels() as $spherexr_animation => $spherexr_label ) : ?>
+										<option value="<?php echo esc_attr( $spherexr_animation ); ?>"><?php echo esc_html( $spherexr_label ); ?></option>
+									<?php endforeach; ?>
+								</select>
 							</div>
 						</div>
 
@@ -367,6 +402,15 @@
 
 						<!-- Interaction tab -->
 						<div class="sxr-tab-pane" data-pane="interact" id="sxr-pane-interact" role="tabpanel">
+							<div class="sxr-field">
+								<label><?php esc_html_e( 'Interaction Direction', 'spherexr' ); ?></label>
+								<select id="sxr-orb-interaction-direction">
+									<?php foreach ( SphereXR_Schema::get_interaction_direction_labels() as $spherexr_direction => $spherexr_label ) : ?>
+										<option value="<?php echo esc_attr( $spherexr_direction ); ?>"><?php echo esc_html( $spherexr_label ); ?></option>
+									<?php endforeach; ?>
+								</select>
+								<p class="description"><?php esc_html_e( 'Normal follows the global interaction behavior. Reverse flips this layer response.', 'spherexr' ); ?></p>
+							</div>
 							<div class="sxr-field">
 								<label><?php esc_html_e( 'Parallax Depth', 'spherexr' ); ?></label>
 								<div class="sxr-slider-row">

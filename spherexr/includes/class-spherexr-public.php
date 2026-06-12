@@ -33,6 +33,8 @@ class SphereXR_Public {
 				'dprCap'    => (float) ( $settings['dpr_cap'] ?? 1.75 ),
 				'ioThresh'  => (float) ( $settings['intersection_threshold'] ?? 0.01 ),
 				'debugMode' => ! empty( $settings['debug_mode'] ),
+				'wpDebug'   => defined( 'WP_DEBUG' ) && WP_DEBUG,
+				'scriptDebug' => defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG,
 			),
 		);
 

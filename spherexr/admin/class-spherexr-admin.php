@@ -43,15 +43,6 @@ class SphereXR_Admin {
 
 		add_submenu_page(
 			'spherexr',
-			__( 'Debug', 'spherexr' ),
-			__( 'Debug', 'spherexr' ),
-			'manage_options',
-			'spherexr-debug',
-			array( new SphereXR_Debug(), 'render' )
-		);
-
-		add_submenu_page(
-			'spherexr',
 			__( 'ExploreXR', 'spherexr' ),
 			__( 'ExploreXR', 'spherexr' ),
 			'edit_posts',
@@ -78,7 +69,6 @@ class SphereXR_Admin {
 			'toplevel_page_spherexr',
 			'spherexr_page_spherexr-new',
 			'spherexr_page_spherexr-settings',
-			'spherexr_page_spherexr-debug',
 			'spherexr_page_spherexr-explorexr',
 			'admin_page_spherexr-edit',
 		);
@@ -126,10 +116,34 @@ class SphereXR_Admin {
 			true
 		);
 
+		$settings = get_option( 'spherexr_settings', array() );
 		wp_localize_script( 'spherexr-admin', 'SphereXRAdmin', array(
-			'restUrl' => esc_url_raw( rest_url( 'spherexr/v1' ) ),
-			'nonce'   => wp_create_nonce( 'wp_rest' ),
-			'version' => SPHEREXR_VERSION,
+			'restUrl'   => esc_url_raw( rest_url( 'spherexr/v1' ) ),
+			'nonce'     => wp_create_nonce( 'wp_rest' ),
+			'version'   => SPHEREXR_VERSION,
+			'debugMode' => ! empty( $settings['debug_mode'] ),
+			'wpDebug'   => defined( 'WP_DEBUG' ) && WP_DEBUG,
+			'scriptDebug' => defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG,
+			'strings'   => array(
+				'save'                  => __( 'Save', 'spherexr' ),
+				'saving'                => __( 'Saving...', 'spherexr' ),
+				'saved'                 => __( 'Saved', 'spherexr' ),
+				'savedStatus'           => __( 'Saved!', 'spherexr' ),
+				'error'                 => __( 'Error', 'spherexr' ),
+				'errorSaving'           => __( 'Error saving.', 'spherexr' ),
+				'newAnimation'          => __( 'New Animation', 'spherexr' ),
+				'copied'                => __( 'Copied:', 'spherexr' ),
+				'animationActivated'    => __( 'Animation activated.', 'spherexr' ),
+				'animationDeactivated'  => __( 'Animation deactivated.', 'spherexr' ),
+				'active'                => __( 'Active', 'spherexr' ),
+				'inactive'              => __( 'Inactive', 'spherexr' ),
+				'duplicatedReloading'   => __( 'Duplicated. Reloading...', 'spherexr' ),
+				'animationDeleted'      => __( 'Animation deleted.', 'spherexr' ),
+				'hideConfig'            => __( 'Hide Config', 'spherexr' ),
+				'showConfig'            => __( 'Show Config', 'spherexr' ),
+				'custom'                => __( 'Custom', 'spherexr' ),
+				'fill'                  => __( 'Fill', 'spherexr' ),
+			),
 		) );
 
 		// Configurator pages get extra assets

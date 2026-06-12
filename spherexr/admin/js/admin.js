@@ -5,7 +5,29 @@
 	var api = window.SphereXRAdmin || {};
 	var restUrl = api.restUrl || '';
 	var nonce = api.nonce || '';
+	var strings = api.strings || {};
+	var DEBUG = !!(api.debugMode || api.wpDebug || api.scriptDebug);
 	var Core = window.SphereXRCore;
+
+	window.SphereXRDebug = window.SphereXRDebug || {
+		enabled: DEBUG,
+		log: function () {
+			if (!this.enabled || !window.console) return;
+			console.log.apply(console, arguments);
+		},
+		warn: function () {
+			if (!this.enabled || !window.console) return;
+			console.warn.apply(console, arguments);
+		},
+		error: function () {
+			if (!this.enabled || !window.console) return;
+			console.error.apply(console, arguments);
+		},
+	};
+
+	function sxrText(key, fallback) {
+		return strings[key] || fallback;
+	}
 
 	function apiFetch(path, method, body) {
 		return fetch(restUrl + path, {
@@ -37,7 +59,7 @@
 				var text = btn.getAttribute('data-copy');
 				if (navigator.clipboard) {
 					navigator.clipboard.writeText(text).then(function () {
-						showNotice('Copied: ' + text);
+						showNotice(sxrText('copied', 'Copied:') + ' ' + text);
 					});
 				} else {
 					var ta = document.createElement('textarea');
@@ -46,7 +68,7 @@
 					ta.select();
 					document.execCommand('copy');
 					ta.remove();
-					showNotice('Copied: ' + text);
+					showNotice(sxrText('copied', 'Copied:') + ' ' + text);
 				}
 			});
 		});
@@ -58,8 +80,8 @@
 				apiFetch('/animations/' + postId + '/toggle', 'POST').then(function (data) {
 					if (data.id) {
 						btn.classList.toggle('is-active', data.active);
-						btn.textContent = data.active ? 'Active' : 'Inactive';
-						showNotice(data.active ? 'Animation activated.' : 'Animation deactivated.');
+						btn.textContent = data.active ? sxrText('active', 'Active') : sxrText('inactive', 'Inactive');
+						showNotice(data.active ? sxrText('animationActivated', 'Animation activated.') : sxrText('animationDeactivated', 'Animation deactivated.'));
 					}
 				});
 			});
@@ -71,7 +93,7 @@
 				var postId = btn.getAttribute('data-post-id');
 				apiFetch('/animations/' + postId + '/duplicate', 'POST').then(function (data) {
 					if (data.id) {
-						showNotice('Duplicated. Reloading…');
+						showNotice(sxrText('duplicatedReloading', 'Duplicated. Reloading...'));
 						setTimeout(function () { location.reload(); }, 800);
 					}
 				});
@@ -88,7 +110,7 @@
 					if (data.deleted) {
 						var row = btn.closest('tr');
 						if (row) row.remove();
-						showNotice('Animation deleted.');
+						showNotice(sxrText('animationDeleted', 'Animation deleted.'));
 					}
 				});
 			});
@@ -102,7 +124,7 @@
 				if (!target) return;
 				var isHidden = target.classList.contains('is-hidden');
 				target.classList.toggle('is-hidden', !isHidden);
-				btn.textContent = isHidden ? 'Hide Config' : 'Show Config';
+				btn.textContent = isHidden ? sxrText('hideConfig', 'Hide Config') : sxrText('showConfig', 'Show Config');
 			});
 		});
 
@@ -121,6 +143,8 @@
 	/* ------------------------------------------------------------------ */
 
 	var _modalRaf = 0;
+	var _modalPointer = null;
+	var _modalResizeObserver = null;
 
 	function injectPreviewModal() {
 		if (document.getElementById('sxr-dash-modal')) return;
@@ -134,7 +158,7 @@
 					'<div id="sxr-dash-modal-bg-row">' +
 						'<input type="color" id="sxr-dash-modal-bg-hex" value="#ffffff" title="Background color">' +
 						'<input type="text"  id="sxr-dash-modal-bg-text" value="transparent" placeholder="rgba()">' +
-						'<button id="sxr-dash-modal-bg-transparent" title="Transparent">&#9633;</button>' +
+						'<button id="sxr-dash-modal-bg-transparent" class="button button-small spherexr-preview-btn" title="Transparent">Reset</button>' +
 					'</div>' +
 					'<button id="sxr-dash-modal-close" title="Close">&times;</button>' +
 				'</div>' +
@@ -180,6 +204,8 @@
 		var modal = document.getElementById('sxr-dash-modal');
 		if (modal) modal.style.display = 'none';
 		if (_modalRaf) { cancelAnimationFrame(_modalRaf); _modalRaf = 0; }
+		if (_modalPointer) { _modalPointer.dispose(); _modalPointer = null; }
+		if (_modalResizeObserver) { _modalResizeObserver.disconnect(); _modalResizeObserver = null; }
 	}
 
 	function openPreviewModal(postId, title) {
@@ -211,35 +237,36 @@
 
 	function startModalPreview(config) {
 		if (_modalRaf) { cancelAnimationFrame(_modalRaf); _modalRaf = 0; }
+		if (_modalPointer) { _modalPointer.dispose(); _modalPointer = null; }
+		if (_modalResizeObserver) { _modalResizeObserver.disconnect(); _modalResizeObserver = null; }
 		if (!Core) return;
 
 		var canvas = document.getElementById('sxr-dash-modal-canvas');
-		if (!canvas) return;
-		var ctx  = canvas.getContext('2d', { alpha: true });
 		var wrap = document.getElementById('sxr-dash-modal-canvas-wrap');
+		if (!canvas || !wrap) return;
+		var ctx  = canvas.getContext('2d', { alpha: true });
 
 		var ms = { w: 0, h: 0, dpr: 1, time: 0, lastTime: 0 };
-		var ptr = { mx: 0, my: 0, tx: 0, ty: 0, hover: 0, targetHover: 0, lastPX: -1, lastPY: -1 };
-
-		canvas.onpointerenter = function () { ptr.targetHover = 0.72; };
-		canvas.onpointermove = function (e) {
-			var rect = canvas.getBoundingClientRect();
-			if (!rect.width || !rect.height) return;
-			if (ptr.lastPX >= 0) {
-				var dx  = e.clientX - ptr.lastPX;
-				var dy  = e.clientY - ptr.lastPY;
-				var vel = Math.min(Math.sqrt(dx * dx + dy * dy) / 30, 1);
-				ptr.targetHover = 0.72 + vel * 0.28;
-			}
-			ptr.lastPX = e.clientX;
-			ptr.lastPY = e.clientY;
-			ptr.tx = (e.clientX - rect.left) / rect.width  - 0.5;
-			ptr.ty = (e.clientY - rect.top)  / rect.height - 0.5;
-		};
-		canvas.onpointerleave = function () {
-			ptr.targetHover = 0; ptr.tx = 0; ptr.ty = 0;
-			ptr.lastPX = -1; ptr.lastPY = -1;
-		};
+		var ptr = Core.createPointerTracker(wrap, null, {
+			debug: DEBUG,
+			scope: 'dashboard-modal',
+			label: config.animation_id || 'preview',
+			getState: function () {
+				var inter = (config.global && config.global.interactivity) || {};
+				return {
+					animationId: config.animation_id || '',
+					orbs: (config.orbs || []).length,
+					canvas: { width: ms.w, height: ms.h, dpr: ms.dpr },
+					interactivity: {
+						enabled: inter.enabled !== false,
+						mode: inter.mode || 'parallax',
+						strength: inter.strength || 0.5,
+						radius: inter.radius || 30,
+					},
+				};
+			},
+		});
+		_modalPointer = ptr;
 
 		function resize() {
 			ms.w   = wrap.clientWidth  || 800;
@@ -247,16 +274,14 @@
 			ms.dpr = Math.min(window.devicePixelRatio || 1, 1.75);
 			canvas.width  = Math.round(ms.w * ms.dpr);
 			canvas.height = Math.round(ms.h * ms.dpr);
+			window.SphereXRDebug.log('[SphereXR dashboard-modal] resize', { width: ms.w, height: ms.h, dpr: ms.dpr });
 		}
 
 		function tick(now) {
 			var dt = Math.min(40, Math.max(0, now - (ms.lastTime || now)));
 			ms.lastTime = now;
 
-			// Ease pointer state — same spring factors as spherexr-engine.js
-			ptr.mx += (ptr.tx - ptr.mx) * 0.055;
-			ptr.my += (ptr.ty - ptr.my) * 0.055;
-			ptr.hover += (ptr.targetHover - ptr.hover) * 0.045;
+			ptr.update();
 
 			var speed = (config.global && config.global.speed) || 1.0;
 			ms.time += dt * 0.001 * speed * (1 + ptr.hover * 0.35);
@@ -269,7 +294,7 @@
 			var safeMargin = (config.global && config.global.safe_margin) || 0;
 
 			var inter    = (config.global && config.global.interactivity) || {};
-			var iEnabled = inter.enabled && inter.mode !== 'none';
+			var iEnabled = (inter.enabled !== false) && inter.mode !== 'none';
 			var iMode    = iEnabled ? inter.mode : 'none';
 			var iStr     = inter.strength || 0.5;
 			var iRad     = inter.radius || 30;
@@ -294,7 +319,8 @@
 
 		resize();
 		if (typeof ResizeObserver !== 'undefined') {
-			new ResizeObserver(function () { resize(); }).observe(wrap);
+			_modalResizeObserver = new ResizeObserver(function () { resize(); });
+			_modalResizeObserver.observe(wrap);
 		}
 
 		_modalRaf = requestAnimationFrame(tick);

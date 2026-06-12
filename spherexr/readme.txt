@@ -3,12 +3,12 @@ Contributors: ayalothman
 Tags: animation, canvas, background, orbs, elementor
 Requires at least: 6.0
 Tested up to: 7.0
-Stable tag: 1.1.0
+Stable tag: 1.0.0
 Requires PHP: 7.4
 License: GPL-2.0-or-later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
-Canvas-based orb background animations for WordPress. Attach to any element by CSS ID — no coding required.
+Create interactive HTML5 canvas orb background animations for WordPress, Elementor, Gutenberg, and any theme with a visual editor.
 
 == Description ==
 
@@ -93,16 +93,6 @@ Up to 20 orbs per animation.
 
 == Changelog ==
 
-= 1.1.0 =
-* New: branded ExpoXR admin header with quick actions bar on all plugin pages
-* New: ExpoXR family footer on all plugin pages
-* New: ExploreXR (Free and Premium) page introducing the ExploreXR plugin
-* Fixed: WordPress admin notices no longer overlap the plugin page header
-* Fixed: preview background and preview size are now preserved when saving an animation
-* Fixed: duplicating an animation multiple times now produces unique animation IDs
-* Fixed: PHP 8.1+ deprecation notice from the hidden edit-animation admin page
-* Fixed: config sanitization returned null instead of the default for blend mode, shape, color mode, units and animation type when the field was missing
-
 = 1.0.0 =
 * Initial release
 * Canvas-based orb animations with 6 animation types
@@ -120,9 +110,6 @@ Up to 20 orbs per animation.
 * WordPress 6.0+ and PHP 7.4+ compatible
 
 == Upgrade Notice ==
-
-= 1.1.0 =
-Refreshed admin UI, admin notice fix, and preview settings persistence fix. No data migration required.
 
 = 1.0.0 =
 Initial release — no upgrade steps required.

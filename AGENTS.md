@@ -110,6 +110,6 @@ wp_enqueue_scripts (priority 20)
                           └── requestAnimationFrame render loop
 ```
 
-## 1.1 Agent Communication
+## Agent Communication
 
 Caveman skill is installed and available in `.claude/skills/caveman/`. Use terse exact technical communication when active. Do not let terse wording weaken security warnings, irreversible-action confirmations, or release instructions.

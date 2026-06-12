@@ -25,7 +25,7 @@ WordPress plugin for canvas-based orb background animations. Animations attach t
 | `SphereXR_Admin` | `admin/class-spherexr-admin.php` | Menu registration + asset enqueuing |
 | `SphereXR_Dashboard` | `admin/class-spherexr-dashboard.php` | Animation list page. Also contains `static render_header()` / `static render_footer()` shared by all admin pages |
 | `SphereXR_Configurator` | `admin/class-spherexr-configurator.php` | Editor page controller |
-| `SphereXR_Settings` | `admin/class-spherexr-settings.php` | WP Settings API registration |
+| `SphereXR_Settings` | `admin/class-spherexr-settings.php` | WP Settings API + `admin_post_*` handlers for export, import, cache clear. Uses static `$hooked` guard — instantiated twice (early in loader + inside `add_menu_pages()`), guard prevents double-registration |
 | `SphereXR_Debug` | `admin/class-spherexr-debug.php` | Debug/diagnostic page |
 | `SphereXR_ExploreXR` | `admin/class-spherexr-explorexr.php` | ExploreXR (Free and Premium) promo page |
 | `SphereXR_CPT` | `includes/class-spherexr-cpt.php` | CPT registration + `sanitize_config()` |
@@ -104,6 +104,16 @@ POST   /animations/{id}/duplicate
 POST   /animations/{id}/toggle
 ```
 
+## Settings Page — Tools
+
+Settings page (`admin.php?page=spherexr-settings`) includes three tool cards below the settings form:
+
+- **Cache** — POSTs to `admin-post.php?action=spherexr_clear_cache`. Deletes `_transient_spherexr_*` rows from `wp_options` and clears object cache. Redirects with `?sxr_notice=cache_cleared`.
+- **Export** — POSTs to `admin-post.php?action=spherexr_export`. Streams a `spherexr-export-YYYY-MM-DD.json` download. Format: `{ plugin, version, exported_at, animations: [{title, status, config}] }`.
+- **Import** — multipart POST to `admin-post.php?action=spherexr_import`. Accepts the export bundle format or a bare array. Each animation is sanitized via `SphereXR_CPT::sanitize_config()`. Creates new posts (never overwrites). Redirects with `?sxr_notice=imported&sxr_import_count=N&sxr_fail_count=M`.
+
+All three handlers are in `SphereXR_Settings` and registered via `admin_post_{action}` hooks. The early `new SphereXR_Settings()` in the loader ensures these hooks fire before `admin_menu`. The `$hooked` static guard prevents double-registration when the class is instantiated a second time inside `add_menu_pages()`.
+
 ## Key Constraints
 
 - Max 20 orbs per animation (hard cap in `SphereXR_CPT::sanitize_config()`)
@@ -111,6 +121,7 @@ POST   /animations/{id}/toggle
 - Position max of 100 when unit is `percent` — this is a known limitation for non-percent units (existing behavior)
 - Canvas uses `z-index: -1` and parent uses `isolation: isolate` — do not change this or orbs appear above content
 - Engine pauses when container is off-screen (IntersectionObserver) and respects `prefers-reduced-motion`
+- `SphereXR_Settings` uses a static `$hooked` flag to prevent double hook registration (instantiated twice per request) — do not add `admin_post_*` or `admin_init` hooks in `__construct()` without this guard
 
 ## CSS Variable Reference
 

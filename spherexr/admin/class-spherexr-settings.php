@@ -5,8 +5,16 @@ class SphereXR_Settings {
 
 	const OPTION_KEY = 'spherexr_settings';
 
+	private static $hooked = false;
+
 	public function __construct() {
-		add_action( 'admin_init', array( $this, 'register_settings' ) );
+		if ( ! self::$hooked ) {
+			self::$hooked = true;
+			add_action( 'admin_init', array( $this, 'register_settings' ) );
+			add_action( 'admin_post_spherexr_clear_cache', array( $this, 'handle_clear_cache' ) );
+			add_action( 'admin_post_spherexr_export',      array( $this, 'handle_export' ) );
+			add_action( 'admin_post_spherexr_import',      array( $this, 'handle_import' ) );
+		}
 	}
 
 	public function register_settings() {
@@ -108,6 +116,140 @@ class SphereXR_Settings {
 		}
 		include SPHEREXR_PLUGIN_DIR . 'templates/admin/settings.php';
 	}
+
+	// -------------------------------------------------------------------------
+	// Tool handlers
+	// -------------------------------------------------------------------------
+
+	public function handle_clear_cache() {
+		check_admin_referer( 'spherexr_clear_cache' );
+		if ( ! current_user_can( 'manage_options' ) ) {
+			wp_die( esc_html__( 'You do not have permission to perform this action.', 'spherexr' ) );
+		}
+
+		global $wpdb;
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+		$wpdb->query(
+			$wpdb->prepare(
+				"DELETE FROM {$wpdb->options} WHERE option_name LIKE %s OR option_name LIKE %s",
+				$wpdb->esc_like( '_transient_spherexr_' ) . '%',
+				$wpdb->esc_like( '_transient_timeout_spherexr_' ) . '%'
+			)
+		);
+		wp_cache_flush();
+
+		wp_safe_redirect( add_query_arg( 'sxr_notice', 'cache_cleared', admin_url( 'admin.php?page=spherexr-settings' ) ) );
+		exit;
+	}
+
+	public function handle_export() {
+		check_admin_referer( 'spherexr_export' );
+		if ( ! current_user_can( 'manage_options' ) ) {
+			wp_die( esc_html__( 'You do not have permission to perform this action.', 'spherexr' ) );
+		}
+
+		$posts = get_posts( array(
+			'post_type'   => 'spherexr_animation',
+			'post_status' => array( 'publish', 'draft' ),
+			'numberposts' => -1,
+		) );
+
+		$animations = array();
+		foreach ( $posts as $post ) {
+			$raw    = get_post_meta( $post->ID, '_spherexr_config', true );
+			$config = $raw ? json_decode( $raw, true ) : array();
+			$animations[] = array(
+				'title'  => $post->post_title,
+				'status' => $post->post_status,
+				'config' => $config,
+			);
+		}
+
+		$payload  = array(
+			'plugin'      => 'spherexr',
+			'version'     => SPHEREXR_VERSION,
+			'exported_at' => gmdate( 'Y-m-d\TH:i:s\Z' ),
+			'animations'  => $animations,
+		);
+		$filename = 'spherexr-export-' . gmdate( 'Y-m-d' ) . '.json';
+
+		header( 'Content-Type: application/json; charset=utf-8' );
+		header( 'Content-Disposition: attachment; filename="' . $filename . '"' );
+		header( 'Cache-Control: no-cache, no-store, must-revalidate' );
+		// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- JSON encoded data, binary download, exit follows.
+		echo wp_json_encode( $payload, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE );
+		exit;
+	}
+
+	public function handle_import() {
+		check_admin_referer( 'spherexr_import' );
+		if ( ! current_user_can( 'manage_options' ) ) {
+			wp_die( esc_html__( 'You do not have permission to perform this action.', 'spherexr' ) );
+		}
+
+		$redirect_base = admin_url( 'admin.php?page=spherexr-settings' );
+
+		// phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- tmp_name is a file path, not user content.
+		$tmp = $_FILES['spherexr_import_file']['tmp_name'] ?? '';
+		if ( ! $tmp || ! is_uploaded_file( $tmp ) ) {
+			wp_safe_redirect( add_query_arg( 'sxr_notice', 'import_error', $redirect_base ) );
+			exit;
+		}
+
+		// phpcs:ignore WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents -- reading uploaded tmp file.
+		$raw = file_get_contents( $tmp );
+		if ( ! $raw ) {
+			wp_safe_redirect( add_query_arg( 'sxr_notice', 'import_error', $redirect_base ) );
+			exit;
+		}
+
+		$data = json_decode( $raw, true );
+		if ( ! is_array( $data ) ) {
+			wp_safe_redirect( add_query_arg( 'sxr_notice', 'import_error', $redirect_base ) );
+			exit;
+		}
+
+		// Accept both the export bundle format { animations: [...] } and a bare array.
+		$animations = isset( $data['animations'] ) && is_array( $data['animations'] ) ? $data['animations'] : $data;
+
+		$imported = 0;
+		$failed   = 0;
+		foreach ( $animations as $item ) {
+			if ( ! is_array( $item ) || empty( $item['config'] ) ) {
+				$failed++;
+				continue;
+			}
+			$clean = SphereXR_CPT::sanitize_config( $item['config'] );
+			if ( ! $clean ) {
+				$failed++;
+				continue;
+			}
+			$title   = sanitize_text_field( $item['title'] ?? __( 'Imported Animation', 'spherexr' ) );
+			$status  = ( isset( $item['status'] ) && 'draft' === $item['status'] ) ? 'draft' : 'publish';
+			$post_id = wp_insert_post( array(
+				'post_title'  => $title,
+				'post_type'   => 'spherexr_animation',
+				'post_status' => $status,
+			), true );
+			if ( is_wp_error( $post_id ) ) {
+				$failed++;
+				continue;
+			}
+			update_post_meta( $post_id, '_spherexr_config', wp_json_encode( $clean ) );
+			$imported++;
+		}
+
+		wp_safe_redirect( add_query_arg( array(
+			'sxr_notice'       => 'imported',
+			'sxr_import_count' => $imported,
+			'sxr_fail_count'   => $failed,
+		), $redirect_base ) );
+		exit;
+	}
+
+	// -------------------------------------------------------------------------
+	// Field renderers
+	// -------------------------------------------------------------------------
 
 	public function field_dpr_cap() {
 		$opts = get_option( self::OPTION_KEY, array() );

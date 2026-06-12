@@ -18,6 +18,29 @@
 	var restUrl    = raw.restUrl || '';
 	var nonce      = raw.nonce || '';
 	var breakpoints = raw.breakpoints || [];
+	var settings   = raw.settings || {};
+	var adminApi   = window.SphereXRAdmin || {};
+	var strings    = adminApi.strings || {};
+	var DEBUG      = !!(settings.debug_mode || adminApi.debugMode || adminApi.wpDebug || adminApi.scriptDebug);
+	var Logger     = window.SphereXRDebug || {
+		enabled: DEBUG,
+		log: function () {
+			if (!this.enabled || !window.console) return;
+			console.log.apply(console, arguments);
+		},
+		warn: function () {
+			if (!this.enabled || !window.console) return;
+			console.warn.apply(console, arguments);
+		},
+		error: function () {
+			if (!this.enabled || !window.console) return;
+			console.error.apply(console, arguments);
+		},
+	};
+
+	function sxrText(key, fallback) {
+		return strings[key] || fallback;
+	}
 
 	// Ensure orbs array exists
 	config.orbs = config.orbs || [];
@@ -34,7 +57,12 @@
 			method: method || 'GET',
 			headers: { 'Content-Type': 'application/json', 'X-WP-Nonce': nonce },
 			body: body ? JSON.stringify(body) : undefined,
-		}).then(function (r) { return r.json(); });
+		}).then(function (r) {
+			return r.json().catch(function () { return {}; }).then(function (data) {
+				if (!r.ok) throw data;
+				return data;
+			});
+		});
 	}
 
 	function showStatus(msg, isError) {
@@ -42,37 +70,95 @@
 		if (el) { el.textContent = msg; el.style.color = isError ? '#ef4444' : '#22c55e'; }
 	}
 
+	function debugLog(label, data) {
+		Logger.log('[SphereXR Configurator] ' + label, data || {});
+	}
+
 	/* ------------------------------------------------------------------ */
 	/* Save                                                                 */
 	/* ------------------------------------------------------------------ */
 
-	document.getElementById('spherexr-save-btn').addEventListener('click', function () {
+	var saveBtn = document.getElementById('spherexr-save-btn');
+	var saveBtnLabel = saveBtn ? saveBtn.textContent.trim() : sxrText('save', 'Save');
+	var saveBtnTimer = 0;
+
+	function setSaveButtonState(state) {
+		if (!saveBtn) return;
+		if (saveBtnTimer) { clearTimeout(saveBtnTimer); saveBtnTimer = 0; }
+		saveBtn.classList.remove('is-saving', 'is-saved', 'is-error');
+
+		if (state === 'saving') {
+			saveBtn.disabled = true;
+			saveBtn.classList.add('is-saving');
+			saveBtn.textContent = sxrText('saving', 'Saving...');
+			return;
+		}
+
+		if (state === 'saved') {
+			saveBtn.disabled = false;
+			saveBtn.classList.add('is-saved');
+			saveBtn.textContent = sxrText('saved', 'Saved');
+			saveBtnTimer = setTimeout(function () {
+				saveBtn.classList.remove('is-saved');
+				saveBtn.textContent = saveBtnLabel;
+			}, 1400);
+			return;
+		}
+
+		if (state === 'error') {
+			saveBtn.disabled = false;
+			saveBtn.classList.add('is-error');
+			saveBtn.textContent = sxrText('error', 'Error');
+			saveBtnTimer = setTimeout(function () {
+				saveBtn.classList.remove('is-error');
+				saveBtn.textContent = saveBtnLabel;
+			}, 1800);
+			return;
+		}
+
+		saveBtn.disabled = false;
+		saveBtn.textContent = saveBtnLabel;
+	}
+
+	function handleSaveSuccess(data) {
+		if (!data || !data.id) throw data || {};
+		showStatus(sxrText('savedStatus', 'Saved!'));
+		setSaveButtonState('saved');
+		debugLog('save success', { postId: data.id, isNew: isNew, animationId: config.animation_id });
+	}
+
+	function handleSaveError(error) {
+		showStatus(sxrText('errorSaving', 'Error saving.'), true);
+		setSaveButtonState('error');
+		debugLog('save error', error || {});
+	}
+
+	if (saveBtn) saveBtn.addEventListener('click', function () {
+		if (saveBtn.classList.contains('is-saving')) return;
 		var title = (document.getElementById('sxr-title') || {}).value || '';
 		var payload = { title: title, config: config };
+		setSaveButtonState('saving');
+		debugLog('save start', { postId: postId, isNew: isNew, animationId: config.animation_id });
 
 		if (isNew || !postId) {
-			apiFetch('/animations', 'POST', { title: title || 'New Animation' }).then(function (data) {
+			apiFetch('/animations', 'POST', { title: title || sxrText('newAnimation', 'New Animation') }).then(function (data) {
 				if (data.id) {
 					postId = data.id;
 					isNew = false;
+					if (saveBtn) saveBtn.setAttribute('data-post-id', postId);
 					// Now update with full config
 					return apiFetch('/animations/' + postId, 'PUT', payload);
 				}
+				throw data || {};
 			}).then(function (data) {
-				if (data && data.id) {
-					showStatus('Saved!');
-					// Redirect to edit URL
-					history.replaceState(null, '', '?page=spherexr-edit&id=' + postId);
-				}
-			}).catch(function () { showStatus('Error saving.', true); });
+				handleSaveSuccess(data);
+				// Redirect to edit URL
+				history.replaceState(null, '', '?page=spherexr-edit&id=' + postId);
+			}).catch(handleSaveError);
 		} else {
 			apiFetch('/animations/' + postId, 'PUT', payload).then(function (data) {
-				if (data.id) {
-					showStatus('Saved!');
-				} else {
-					showStatus('Error saving.', true);
-				}
-			});
+				handleSaveSuccess(data);
+			}).catch(handleSaveError);
 		}
 	});
 
@@ -295,7 +381,7 @@
 		var customBtn = document.createElement('button');
 		customBtn.type = 'button';
 		customBtn.className = 'sxr-bp-btn button button-small';
-		customBtn.textContent = 'Custom';
+		customBtn.textContent = sxrText('custom', 'Custom');
 		customBtn.addEventListener('click', function () {
 			document.querySelectorAll('.sxr-bp-btn').forEach(function (b) { b.classList.remove('is-active'); });
 			customBtn.classList.add('is-active');
@@ -341,28 +427,36 @@
 		return {
 			id: 'o' + Date.now(),
 			shape: 'circle',
-			color: '#7c3aed',
+			color: '#38a3d7',
 			color_mode: 'solid',
-			color_b: '',
+			color_b: '#8bb84a',
+			color_stops: ['#38a3d7', '#8bb84a'],
+			color_animation: 'none',
 			size: { w: 40, h: 40, unit: 'percent' },
 			position: { x: 50, y: 50, unit: 'percent' },
 			blur: 72,
 			opacity: 0.8,
 			animation: { type: 'drift', amplitude_x: 5, amplitude_y: 5, frequency_x: 0.4, frequency_y: 0.5, phase: 0 },
 			parallax: 0.5,
+			interaction_direction: 'normal',
 			rotation: 0,
 		};
 	}
 
 	var orbListEl    = document.getElementById('sxr-orb-list');
 	var sortableInit = false;
+	var addOrbBtn    = document.getElementById('sxr-add-orb-btn');
+	var addFirstBtn  = document.getElementById('sxr-add-first-shape-btn');
 
-	document.getElementById('sxr-add-orb-btn').addEventListener('click', function () {
+	function addShape() {
 		config.orbs.push(newOrb());
 		renderOrbList();
 		selectOrb(config.orbs.length - 1);
 		refreshPreview();
-	});
+	}
+
+	if (addOrbBtn) addOrbBtn.addEventListener('click', addShape);
+	if (addFirstBtn) addFirstBtn.addEventListener('click', addShape);
 
 	// Single delegated click handler (set up once) — avoids per-row listeners
 	if (orbListEl) {
@@ -394,15 +488,37 @@
 	}
 
 	// Rebuild the list DOM (structural changes only: add / remove / reorder / relabel)
+	function escapeHtml(value) {
+		return String(value || '').replace(/[&<>"']/g, function (ch) {
+			return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' }[ch];
+		});
+	}
+
+	function getShapeLabel(shape) {
+		var radios = document.querySelectorAll('[name="sxr-orb-shape"]');
+		for (var i = 0; i < radios.length; i++) {
+			if (radios[i].value === shape) {
+				var label = radios[i].closest('.sxr-shape-option');
+				return label ? label.textContent.trim() : shape;
+			}
+		}
+		return shape || 'circle';
+	}
+
 	function renderOrbList() {
 		if (!orbListEl) return;
+		var emptyEl = document.getElementById('sxr-orb-empty');
+		if (emptyEl) emptyEl.classList.toggle('is-hidden', !!config.orbs.length);
+		var placeholderEl = document.querySelector('.sxr-preview-placeholder');
+		if (placeholderEl) placeholderEl.classList.toggle('is-hidden', !!config.orbs.length);
 		var html = '';
 		config.orbs.forEach(function (orb, idx) {
+			var shapeLabel = escapeHtml(getShapeLabel(orb.shape));
 			html +=
-				'<li class="sxr-orb-item' + (idx === selectedOrbIdx ? ' is-selected' : '') + '" data-orb-id="' + orb.id + '">' +
+				'<li class="sxr-orb-item' + (idx === selectedOrbIdx ? ' is-selected' : '') + '" data-orb-id="' + escapeHtml(orb.id) + '">' +
 					'<span class="sxr-drag-handle" title="Drag to reorder" aria-label="Drag to reorder">&#8942;&#8942;</span>' +
 					'<span class="sxr-orb-swatch" style="background:' + orb.color + ';color:' + orb.color + '"></span>' +
-					'<span class="sxr-orb-label">Orb ' + (idx + 1) + ' <small>(' + orb.shape + ')</small></span>' +
+					'<span class="sxr-orb-label">Layer ' + (idx + 1) + ' <small>(' + shapeLabel + ')</small></span>' +
 					'<span class="sxr-layer-badge" title="Layer (1 = renders on top)">' + (idx + 1) + '</span>' +
 					'<button class="sxr-orb-remove" title="Remove" aria-label="Remove orb">&times;</button>' +
 				'</li>';
@@ -491,6 +607,8 @@
 		if (cmEl) cmEl.value = orb.color_mode || 'solid';
 		setColorPicker('sxr-orb-color', orb.color);
 		setColorPicker('sxr-orb-color-b', orb.color_b || '#8bb84a');
+		renderGradientColors(orb);
+		updateColorFieldVisibility(orb);
 
 		// Size & position
 		setValue('sxr-orb-w', 'sxr-orb-w-num', orb.size.w);
@@ -507,12 +625,6 @@
 		updateUnitLabels('.sxr-pos-unit-label', orb.position.unit);
 		posUnitRanges(orb.position.unit);
 
-		// Secondary color field visibility
-		var colorBFieldEl = document.querySelector('.sxr-color-b-field');
-		if (colorBFieldEl) {
-			colorBFieldEl.style.display = (orb.color_mode || 'solid') !== 'solid' ? 'block' : 'none';
-		}
-
 		// Animation
 		var animTypeEl = document.getElementById('sxr-orb-anim-type');
 		if (animTypeEl) animTypeEl.value = orb.animation.type;
@@ -523,6 +635,8 @@
 		setValue('sxr-orb-phase', 'sxr-orb-phase-num', orb.animation.phase);
 
 		// Interaction
+		var interactionDirectionEl = document.getElementById('sxr-orb-interaction-direction');
+		if (interactionDirectionEl) interactionDirectionEl.value = orb.interaction_direction || 'normal';
 		setValue('sxr-orb-parallax', 'sxr-orb-parallax-num', orb.parallax);
 
 		// Rotation
@@ -543,6 +657,85 @@
 		if (el._wpColorPicker && jQuery) {
 			jQuery(el).wpColorPicker('color', val);
 		}
+	}
+
+	function getColorStops(orb) {
+		var stops = Array.isArray(orb.color_stops) ? orb.color_stops.slice(0, 5) : [];
+		if (!stops.length) stops = [orb.color || '#38a3d7', orb.color_b || '#8bb84a'];
+		if (stops.length === 1) stops.push(orb.color_b || '#8bb84a');
+		stops[0] = orb.color || stops[0] || '#38a3d7';
+		stops[1] = orb.color_b || stops[1] || '#8bb84a';
+		return stops.slice(0, 5);
+	}
+
+	function syncOrbColorsFromStops(orb) {
+		orb.color_stops = getColorStops(orb);
+		orb.color = orb.color_stops[0] || '#38a3d7';
+		orb.color_b = orb.color_stops[1] || '#8bb84a';
+		setColorPicker('sxr-orb-color', orb.color);
+		setColorPicker('sxr-orb-color-b', orb.color_b);
+	}
+
+	function updateColorFieldVisibility(orb) {
+		var mode = (orb && orb.color_mode) || 'solid';
+		var colorBField = document.querySelector('.sxr-color-b-field');
+		var gradientField = document.querySelector('.sxr-gradient-colors-field');
+		var animationField = document.querySelector('.sxr-color-animation-field');
+		var animationEl = document.getElementById('sxr-orb-color-animation');
+		if (colorBField) colorBField.style.display = mode !== 'solid' ? 'block' : 'none';
+		if (gradientField) gradientField.style.display = mode === 'gradient' ? 'block' : 'none';
+		if (animationField) animationField.style.display = mode !== 'solid' ? 'block' : 'none';
+		if (animationEl) animationEl.value = (orb && orb.color_animation) || 'none';
+	}
+
+	function renderGradientColors(orb) {
+		var wrap = document.getElementById('sxr-gradient-colors');
+		var addBtn = document.getElementById('sxr-add-gradient-color');
+		if (!wrap || !orb) return;
+		var stops = getColorStops(orb);
+		orb.color_stops = stops;
+		wrap.innerHTML = '';
+
+		stops.forEach(function (color, idx) {
+			var row = document.createElement('div');
+			row.className = 'sxr-gradient-color-row';
+
+			var input = document.createElement('input');
+			input.type = 'color';
+			input.value = color;
+			input.setAttribute('aria-label', 'Gradient color ' + (idx + 1));
+			input.addEventListener('input', function () {
+				orb.color_stops[idx] = input.value;
+				if (idx === 0) orb.color = input.value;
+				if (idx === 1) orb.color_b = input.value;
+				if (idx < 2) syncOrbColorsFromStops(orb);
+				refreshPreview();
+				renderOrbList();
+			});
+
+			var label = document.createElement('span');
+			label.textContent = idx === 0 ? 'Primary' : idx === 1 ? 'Secondary' : 'Color ' + (idx + 1);
+
+			var remove = document.createElement('button');
+			remove.type = 'button';
+			remove.className = 'button button-small sxr-gradient-remove';
+			remove.textContent = 'Remove';
+			remove.disabled = idx < 2;
+			remove.addEventListener('click', function () {
+				if (idx < 2) return;
+				orb.color_stops.splice(idx, 1);
+				syncOrbColorsFromStops(orb);
+				renderGradientColors(orb);
+				refreshPreview();
+			});
+
+			row.appendChild(input);
+			row.appendChild(label);
+			row.appendChild(remove);
+			wrap.appendChild(row);
+		});
+
+		if (addBtn) addBtn.disabled = stops.length >= 5;
 	}
 
 	function updateUnitLabels(selector, unit) {
@@ -603,6 +796,16 @@
 	bindOrbField('sxr-orb-parallax', 'sxr-orb-parallax-num', 'parallax', false);
 	bindOrbField('sxr-orb-rotation', 'sxr-orb-rotation-num', 'rotation', false);
 
+	var interactionDirectionEl = document.getElementById('sxr-orb-interaction-direction');
+	if (interactionDirectionEl) {
+		interactionDirectionEl.addEventListener('change', function () {
+			var orb = config.orbs[selectedOrbIdx];
+			if (!orb) return;
+			orb.interaction_direction = interactionDirectionEl.value === 'reverse' ? 'reverse' : 'normal';
+			refreshPreview();
+		});
+	}
+
 	// Shape radios
 	document.querySelectorAll('[name="sxr-orb-shape"]').forEach(function (radio) {
 		radio.addEventListener('change', function () {
@@ -622,8 +825,16 @@
 				var id    = e.target.id;
 				var orb   = config.orbs[selectedOrbIdx];
 				if (!orb) return;
-				if (id === 'sxr-orb-color')   { orb.color = color; }
-				if (id === 'sxr-orb-color-b') { orb.color_b = color; }
+				orb.color_stops = getColorStops(orb);
+				if (id === 'sxr-orb-color') {
+					orb.color = color;
+					orb.color_stops[0] = color;
+				}
+				if (id === 'sxr-orb-color-b') {
+					orb.color_b = color;
+					orb.color_stops[1] = color;
+				}
+				renderGradientColors(orb);
 				renderOrbList();
 				refreshPreview();
 			},
@@ -637,8 +848,33 @@
 			var orb = config.orbs[selectedOrbIdx];
 			if (!orb) return;
 			orb.color_mode = colorModeEl.value;
-			var colorBField = document.querySelector('.sxr-color-b-field');
-			if (colorBField) colorBField.style.display = orb.color_mode !== 'solid' ? 'block' : 'none';
+			orb.color_stops = getColorStops(orb);
+			updateColorFieldVisibility(orb);
+			renderGradientColors(orb);
+			refreshPreview();
+		});
+	}
+
+	var addGradientColorBtn = document.getElementById('sxr-add-gradient-color');
+	if (addGradientColorBtn) {
+		addGradientColorBtn.addEventListener('click', function () {
+			var orb = config.orbs[selectedOrbIdx];
+			if (!orb) return;
+			orb.color_stops = getColorStops(orb);
+			if (orb.color_stops.length >= 5) return;
+			orb.color_stops.push(orb.color_stops[orb.color_stops.length - 1] || '#8bb84a');
+			renderGradientColors(orb);
+			refreshPreview();
+		});
+	}
+
+	var colorAnimationEl = document.getElementById('sxr-orb-color-animation');
+	if (colorAnimationEl) {
+		colorAnimationEl.addEventListener('change', function () {
+			var orb = config.orbs[selectedOrbIdx];
+			if (!orb) return;
+			orb.color_animation = colorAnimationEl.value || 'none';
+			refreshPreview();
 		});
 	}
 
@@ -723,40 +959,30 @@
 	var previewRaf     = 0;
 	var previewState   = { w: 0, h: 0, dpr: 1, time: 0, lastTime: 0, running: false };
 
-	// Pointer state for live interactivity (mirrors public engine spherexr-engine.js)
-	var ptr = { mx: 0, my: 0, tx: 0, ty: 0, hover: 0, targetHover: 0, lastPX: -1, lastPY: -1 };
-
-	if (previewCanvas) {
-		previewCanvas.addEventListener('pointerenter', function (e) {
-			var rect = previewCanvas.getBoundingClientRect();
-			if (rect.width && rect.height) {
-				ptr.tx = (e.clientX - rect.left) / rect.width  - 0.5;
-				ptr.ty = (e.clientY - rect.top)  / rect.height - 0.5;
-			}
-			ptr.targetHover = 0.72;
-		}, { passive: true });
-
-		previewCanvas.addEventListener('pointermove', function (e) {
-			var rect = previewCanvas.getBoundingClientRect();
-			if (!rect.width || !rect.height) return;
-			// Velocity-driven hover boost — identical to engine onPointerMove()
-			if (ptr.lastPX >= 0) {
-				var dx  = e.clientX - ptr.lastPX;
-				var dy  = e.clientY - ptr.lastPY;
-				var vel = Math.min(Math.sqrt(dx * dx + dy * dy) / 30, 1);
-				ptr.targetHover = 0.72 + vel * 0.28;
-			}
-			ptr.lastPX = e.clientX;
-			ptr.lastPY = e.clientY;
-			ptr.tx = (e.clientX - rect.left) / rect.width  - 0.5;
-			ptr.ty = (e.clientY - rect.top)  / rect.height - 0.5;
-		}, { passive: true });
-
-		previewCanvas.addEventListener('pointerleave', function () {
-			ptr.targetHover = 0; ptr.tx = 0; ptr.ty = 0;
-			ptr.lastPX = -1; ptr.lastPY = -1;
-		}, { passive: true });
+	var previewPointerSurface = previewFrameEl || previewCanvas;
+	function getPreviewDebugState() {
+		var inter = (config.global && config.global.interactivity) || {};
+		return {
+			animationId: config.animation_id || '',
+			orbs: (config.orbs || []).length,
+			canvas: { width: previewState.w, height: previewState.h, dpr: previewState.dpr },
+			interactivity: {
+				enabled: inter.enabled !== false,
+				mode: inter.mode || 'parallax',
+				strength: inter.strength || 0.5,
+				radius: inter.radius || 30,
+			},
+		};
 	}
+
+	var ptr = (Core && Core.createPointerTracker && previewPointerSurface)
+		? Core.createPointerTracker(previewPointerSurface, refreshPreview, {
+			debug: DEBUG,
+			scope: 'configurator',
+			label: 'live-preview',
+			getState: getPreviewDebugState,
+		})
+		: { mx: 0, my: 0, tx: 0, ty: 0, hover: 0, targetHover: 0, update: function () {} };
 
 	function resizePreview() {
 		if (!previewCanvas) return;
@@ -770,6 +996,7 @@
 		previewCanvas.height = Math.round(h * previewState.dpr);
 		previewCanvas.style.width  = w + 'px';
 		previewCanvas.style.height = h + 'px';
+		debugLog('preview resize', getPreviewDebugState());
 	}
 
 	function tickPreview(now) {
@@ -778,10 +1005,7 @@
 		var dt = Math.min(40, Math.max(0, now - (state.lastTime || now)));
 		state.lastTime = now;
 
-		// Ease pointer state toward targets — same spring factors as the engine
-		ptr.mx += (ptr.tx - ptr.mx) * 0.055;
-		ptr.my += (ptr.ty - ptr.my) * 0.055;
-		ptr.hover += (ptr.targetHover - ptr.hover) * 0.045;
+		ptr.update();
 
 		var speed = (config.global && config.global.speed) || 1.0;
 		state.time += dt * 0.001 * speed * (1 + ptr.hover * 0.35);

@@ -8,10 +8,6 @@
  */
 if ( ! defined( 'ABSPATH' ) ) exit;
 
-// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound
-$sxr_settings   = get_option( 'spherexr_settings', array() );
-// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound
-$sxr_show_debug = ! empty( $sxr_settings['debug_mode'] ) && current_user_can( 'manage_options' );
 ?>
 <div class="spherexr-admin-header">
 	<h1>
@@ -35,12 +31,7 @@ $sxr_show_debug = ! empty( $sxr_settings['debug_mode'] ) && current_user_can( 'm
 			<span class="dashicons dashicons-admin-settings"></span> <?php esc_html_e( 'Settings', 'spherexr' ); ?>
 		</a>
 	<?php endif; ?>
-	<?php if ( $sxr_show_debug ) : ?>
-		<a href="<?php echo esc_url( admin_url( 'admin.php?page=spherexr-debug' ) ); ?>">
-			<span class="dashicons dashicons-admin-tools"></span> <?php esc_html_e( 'Debug', 'spherexr' ); ?>
-		</a>
-	<?php endif; ?>
-	<a href="<?php echo esc_url( admin_url( 'admin.php?page=spherexr-explorexr' ) ); ?>" class="spherexr-premium-action">
+<a href="<?php echo esc_url( admin_url( 'admin.php?page=spherexr-explorexr' ) ); ?>" class="spherexr-premium-action">
 		<span class="dashicons dashicons-star-filled"></span> <?php esc_html_e( 'ExploreXR', 'spherexr' ); ?>
 	</a>
 </div>

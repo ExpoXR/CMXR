@@ -14,6 +14,10 @@
 	--sxr-active:        #00a32a;
 	--sxr-inactive:      #8c8f94;
 	--sxr-danger:        #d63638;
+	--sxr-expoxr-navy:   #4555A5;
+	--sxr-expoxr-cyan:   #13BCD4;
+	--sxr-expoxr-orange: #F36E24;
+	--sxr-expoxr-pink:   #EF4681;
 
 	/* Radius scale */
 	--sxr-radius-sm:     3px;
@@ -203,7 +207,6 @@
 
 /* ---- Settings form overrides ---- */
 .spherexr-settings-form {
-	max-width: 800px;
 	width: 100%;
 }
 
@@ -336,6 +339,7 @@
 }
 
 .spherexr-empty-icon {
+	padding: 20px;
 	font-size: 64px;
 	margin-bottom: 16px;
 	opacity: 0.4;
@@ -545,44 +549,70 @@
 #sxr-dash-modal-bg-row {
 	display: flex;
 	align-items: center;
-	gap: 6px;
+	gap: 8px;
+	padding: 4px;
+	border: 1px solid var(--sxr-border);
+	border-radius: var(--sxr-radius);
+	background: var(--sxr-surface);
+	box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
 }
 
 #sxr-dash-modal-bg-hex {
-	width: 28px;
-	height: 24px;
-	padding: 1px;
+	width: 34px;
+	height: 30px;
+	padding: 2px;
 	border: 1px solid var(--sxr-border);
-	border-radius: var(--sxr-radius-sm);
-	background: none;
+	border-radius: var(--sxr-radius);
+	background: var(--sxr-surface-2);
 	cursor: pointer;
 	flex-shrink: 0;
 }
 
 #sxr-dash-modal-bg-text {
-	width: 130px;
-	font-size: 11px;
-	padding: 3px 7px;
-	border-radius: var(--sxr-radius-sm);
+	width: 150px;
+	font-size: 12px;
+	padding: 5px 8px;
+	border-radius: var(--sxr-radius);
 	border: 1px solid var(--sxr-border);
-	background: var(--sxr-surface);
+	background: var(--sxr-surface-2);
 	color: var(--sxr-text);
 	font-family: monospace;
+	transition: border-color 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
 }
 
 #sxr-dash-modal-bg-transparent {
 	background: var(--sxr-surface);
 	border: 1px solid var(--sxr-border);
-	border-radius: var(--sxr-radius-sm);
+	border-radius: var(--sxr-radius);
 	color: var(--sxr-text-muted);
-	font-size: 13px;
-	line-height: 1;
+	font-size: 12px;
+	font-weight: 600;
+	line-height: 1.4;
 	cursor: pointer;
-	padding: 2px 7px;
+	padding: 4px 10px;
 	flex-shrink: 0;
+	box-shadow: none;
+	transition: border-color 0.15s ease, color 0.15s ease, background 0.15s ease, transform 0.15s ease;
 }
 
-#sxr-dash-modal-bg-transparent:hover { color: var(--sxr-text); border-color: var(--sxr-accent); }
+#sxr-dash-modal-bg-hex:hover,
+#sxr-dash-modal-bg-text:hover,
+#sxr-dash-modal-bg-transparent:hover {
+	border-color: rgba(var(--sxr-accent-rgb), 0.45);
+}
+
+#sxr-dash-modal-bg-text:focus {
+	background: var(--sxr-surface);
+	border-color: var(--sxr-accent);
+	box-shadow: 0 0 0 2px rgba(var(--sxr-accent-rgb), 0.12);
+	outline: none;
+}
+
+#sxr-dash-modal-bg-transparent:hover {
+	color: var(--sxr-accent);
+	background: var(--sxr-accent-muted);
+	transform: translateY(-1px);
+}
 
 #sxr-dash-modal-close {
 	background: none;
@@ -635,7 +665,7 @@
 }
 
 .sxr-xr-hero-logo {
-	height: 48px;
+	height: 128px;
 	width: auto;
 	margin-bottom: 12px;
 }
@@ -746,7 +776,7 @@
 
 .sxr-xr-demos {
 	display: grid;
-	grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+	grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
 	gap: 20px;
 }
 
@@ -779,6 +809,35 @@
 	align-self: flex-start;
 }
 
+/* ---- Settings tool cards grid ---- */
+.sxr-tools-grid {
+	display: grid;
+	grid-template-columns: repeat(3, 1fr);
+	gap: 20px;
+	margin-bottom: 20px;
+}
+
+.sxr-tools-grid .sxr-page-card {
+	margin-bottom: 0;
+	display: flex;
+	flex-direction: column;
+}
+
+.sxr-tools-grid .sxr-page-card p {
+	font-size: 13px;
+	color: var(--sxr-text-muted);
+	margin: 0 0 16px;
+	flex: 1;
+}
+
+.sxr-tools-grid .sxr-page-card .sxr-tool-file-row {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: 8px;
+	margin-bottom: 12px;
+}
+
 /* ---- Responsive (WP admin breakpoint) ---- */
 @media screen and (max-width: 782px) {
 	.spherexr-admin-header {
@@ -791,6 +850,10 @@
 		width: 100%;
 	}
 
+	.sxr-tools-grid {
+		grid-template-columns: 1fr;
+	}
+
 	.spherexr-footer-content {
 		flex-direction: column;
 		text-align: center;
@@ -800,5 +863,14 @@
 	.spherexr-footer-branding {
 		flex-direction: column;
 		gap: 12px;
+	}
+
+	#sxr-dash-modal-header,
+	#sxr-dash-modal-bg-row {
+		flex-wrap: wrap;
+	}
+
+	#sxr-dash-modal-bg-text {
+		width: min(180px, 52vw);
 	}
 }

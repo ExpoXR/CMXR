@@ -60,11 +60,6 @@
 
 	</div>
 
-	<p class="sxr-xr-links">
-		<a href="https://expoxr.com/explorexr/demo/" target="_blank" rel="noopener"><?php esc_html_e( 'Live Demo', 'spherexr' ); ?></a> ·
-		<a href="https://expoxr.com/explorexr/documentation/" target="_blank" rel="noopener"><?php esc_html_e( 'Documentation', 'spherexr' ); ?></a>
-	</p>
-
 	<?php
 	// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound
 	$sxr_addons = array(
@@ -188,23 +183,13 @@
 				__( 'Smooth camera interpolation & custom target focus', 'spherexr' ),
 				__( 'Optional user interaction prompts', 'spherexr' ),
 			),
-		),
-		array(
-			'title'    => __( 'WooCommerce Add-On', 'spherexr' ),
-			'url'      => 'https://expoxr.com/addon/woocommerce/',
-			'features' => array(
-				__( '3D models on WooCommerce product pages', 'spherexr' ),
-				__( 'Per-product model assignment', 'spherexr' ),
-				__( 'Variation-aware model switching', 'spherexr' ),
-				__( 'Shop & gallery integration', 'spherexr' ),
-			),
-		),
+		),		
 	);
 	?>
 
 	<div class="sxr-xr-demos-section">
 		<h2 class="sxr-section-title"><?php esc_html_e( 'ExploreXR Add-Ons & Demos', 'spherexr' ); ?></h2>
-		<p class="sxr-xr-demos-intro"><?php esc_html_e( 'Explore everything the ExploreXR family can do. Each add-on has a live demo on expoxr.com.', 'spherexr' ); ?></p>
+		<p class="sxr-xr-demos-intro"><?php esc_html_e( 'Explore everything the ExploreXR family can do.', 'spherexr' ); ?></p>
 
 		<div class="sxr-xr-demos">
 			<?php foreach ( $sxr_addons as $addon ) : // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound ?>

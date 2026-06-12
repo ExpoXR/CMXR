@@ -38,7 +38,6 @@ class SphereXR_Dashboard {
 				</div>
 				<div class="spherexr-footer-links">
 					<a href="https://expoxr.com" target="_blank" rel="noopener"><?php esc_html_e( 'Visit ExpoXR.com', 'spherexr' ); ?></a>
-					<a href="https://expoxr.com/spherexr/documentation/" target="_blank" rel="noopener"><?php esc_html_e( 'Documentation', 'spherexr' ); ?></a>
 					<a href="https://expoxr.com/support/" target="_blank" rel="noopener"><?php esc_html_e( 'Support', 'spherexr' ); ?></a>
 				</div>
 			</div>
