@@ -1,0 +1,234 @@
+{
+    "generated_at": "2026-06-12 14:31:42",
+    "plugin": "SphereXR",
+    "results": {
+        "templates/admin/debug.php": [
+            {
+                "message": "Global variables defined by a theme/plugin should start with the theme/plugin prefix. Found: &quot;$anim&quot;.",
+                "code": "WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound",
+                "link": "https://wp.aofordesign.de/wp-admin/plugin-editor.php?plugin=spherexr%2Fspherexr.php&file=spherexr%2Ftemplates%2Fadmin%2Fdebug.php&line=49",
+                "docs": "",
+                "severity": 6,
+                "type": "WARNING",
+                "line": 49,
+                "column": 44
+            },
+            {
+                "message": "A function call to _n() with texts containing placeholders was found, but was not accompanied by a \"translators:\" comment on the line above to clarify the meaning of the placeholders.",
+                "code": "WordPress.WP.I18n.MissingTranslatorsComment",
+                "link": "https://wp.aofordesign.de/wp-admin/plugin-editor.php?plugin=spherexr%2Fspherexr.php&file=spherexr%2Ftemplates%2Fadmin%2Fdebug.php&line=55",
+                "docs": "https://developer.wordpress.org/plugins/internationalization/how-to-internationalize-your-plugin/#descriptions",
+                "severity": 5,
+                "type": "ERROR",
+                "line": 55,
+                "column": 61
+            }
+        ],
+        "readme.txt": [
+            {
+                "message": "Mismatched Requires PHP: 8.1 != 7.4. \"Requires PHP\" needs to be exactly the same with that in your main plugin file's header.",
+                "code": "readme_mismatched_header_requires_php",
+                "link": "https://wp.aofordesign.de/wp-admin/plugin-editor.php?plugin=spherexr%2Fspherexr.php&file=spherexr%2Freadme.txt",
+                "docs": "https://developer.wordpress.org/plugins/wordpress-org/how-your-readme-txt-works/#readme-header-information",
+                "severity": 5,
+                "type": "ERROR",
+                "line": 0,
+                "column": 0
+            },
+            {
+                "message": "Plugin name \"SphereXR \u2014 Canvas Orb Animations\" is different from the name declared in plugin header \"SphereXR\".",
+                "code": "mismatched_plugin_name",
+                "link": "https://wp.aofordesign.de/wp-admin/plugin-editor.php?plugin=spherexr%2Fspherexr.php&file=spherexr%2Freadme.txt",
+                "docs": "https://developer.wordpress.org/plugins/wordpress-org/common-issues/#incomplete-readme",
+                "severity": 7,
+                "type": "WARNING",
+                "line": 0,
+                "column": 0
+            }
+        ],
+        "spherexr.php": [
+            {
+                "message": "The \"Domain Path\" header in the plugin file must point to an existing folder. Found: \"languages\"",
+                "code": "plugin_header_nonexistent_domain_path",
+                "link": "https://wp.aofordesign.de/wp-admin/plugin-editor.php?plugin=spherexr%2Fspherexr.php&file=spherexr%2Fspherexr.php",
+                "docs": "https://developer.wordpress.org/plugins/internationalization/how-to-internationalize-your-plugin/#domain-path",
+                "severity": 6,
+                "type": "WARNING",
+                "line": 0,
+                "column": 0
+            }
+        ],
+        "admin/class-spherexr-configurator.php": [
+            {
+                "message": "Processing form data without nonce verification.",
+                "code": "WordPress.Security.NonceVerification.Recommended",
+                "link": "https://wp.aofordesign.de/wp-admin/plugin-editor.php?plugin=spherexr%2Fspherexr.php&file=spherexr%2Fadmin%2Fclass-spherexr-configurator.php&line=11",
+                "docs": "",
+                "severity": 5,
+                "type": "WARNING",
+                "line": 11,
+                "column": 21
+            },
+            {
+                "message": "Processing form data without nonce verification.",
+                "code": "WordPress.Security.NonceVerification.Recommended",
+                "link": "https://wp.aofordesign.de/wp-admin/plugin-editor.php?plugin=spherexr%2Fspherexr.php&file=spherexr%2Fadmin%2Fclass-spherexr-configurator.php&line=11",
+                "docs": "",
+                "severity": 5,
+                "type": "WARNING",
+                "line": 11,
+                "column": 45
+            }
+        ],
+        "includes/class-spherexr-i18n.php": [
+            {
+                "message": "load_plugin_textdomain() has been discouraged since WordPress version 4.6. When your plugin is hosted on WordPress.org, you no longer need to manually include this function call for translations under your plugin slug. WordPress will automatically load the translations for you as needed.",
+                "code": "PluginCheck.CodeAnalysis.DiscouragedFunctions.load_plugin_textdomainFound",
+                "link": "https://wp.aofordesign.de/wp-admin/plugin-editor.php?plugin=spherexr%2Fspherexr.php&file=spherexr%2Fincludes%2Fclass-spherexr-i18n.php&line=7",
+                "docs": "https://make.wordpress.org/core/2016/07/06/i18n-improvements-in-4-6/",
+                "severity": 5,
+                "type": "WARNING",
+                "line": 7,
+                "column": 3
+            }
+        ],
+        "templates/admin/explorexr.php": [
+            {
+                "message": "Global variables defined by a theme/plugin should start with the theme/plugin prefix. Found: &quot;$sxr_addons&quot;.",
+                "code": "WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound",
+                "link": "https://wp.aofordesign.de/wp-admin/plugin-editor.php?plugin=spherexr%2Fspherexr.php&file=spherexr%2Ftemplates%2Fadmin%2Fexplorexr.php&line=69",
+                "docs": "",
+                "severity": 6,
+                "type": "WARNING",
+                "line": 69,
+                "column": 5
+            },
+            {
+                "message": "Global variables defined by a theme/plugin should start with the theme/plugin prefix. Found: &quot;$addon&quot;.",
+                "code": "WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound",
+                "link": "https://wp.aofordesign.de/wp-admin/plugin-editor.php?plugin=spherexr%2Fspherexr.php&file=spherexr%2Ftemplates%2Fadmin%2Fexplorexr.php&line=209",
+                "docs": "",
+                "severity": 6,
+                "type": "WARNING",
+                "line": 209,
+                "column": 44
+            },
+            {
+                "message": "Global variables defined by a theme/plugin should start with the theme/plugin prefix. Found: &quot;$feature&quot;.",
+                "code": "WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound",
+                "link": "https://wp.aofordesign.de/wp-admin/plugin-editor.php?plugin=spherexr%2Fspherexr.php&file=spherexr%2Ftemplates%2Fadmin%2Fexplorexr.php&line=213",
+                "docs": "",
+                "severity": 6,
+                "type": "WARNING",
+                "line": 213,
+                "column": 63
+            }
+        ],
+        "templates/admin/dashboard.php": [
+            {
+                "message": "Global variables defined by a theme/plugin should start with the theme/plugin prefix. Found: &quot;$anim&quot;.",
+                "code": "WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound",
+                "link": "https://wp.aofordesign.de/wp-admin/plugin-editor.php?plugin=spherexr%2Fspherexr.php&file=spherexr%2Ftemplates%2Fadmin%2Fdashboard.php&line=32",
+                "docs": "",
+                "severity": 6,
+                "type": "WARNING",
+                "line": 32,
+                "column": 48
+            }
+        ],
+        "templates/admin/partials/header.php": [
+            {
+                "message": "Global variables defined by a theme/plugin should start with the theme/plugin prefix. Found: &quot;$sxr_settings&quot;.",
+                "code": "WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound",
+                "link": "https://wp.aofordesign.de/wp-admin/plugin-editor.php?plugin=spherexr%2Fspherexr.php&file=spherexr%2Ftemplates%2Fadmin%2Fpartials%2Fheader.php&line=11",
+                "docs": "",
+                "severity": 6,
+                "type": "WARNING",
+                "line": 11,
+                "column": 1
+            },
+            {
+                "message": "Global variables defined by a theme/plugin should start with the theme/plugin prefix. Found: &quot;$sxr_show_debug&quot;.",
+                "code": "WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound",
+                "link": "https://wp.aofordesign.de/wp-admin/plugin-editor.php?plugin=spherexr%2Fspherexr.php&file=spherexr%2Ftemplates%2Fadmin%2Fpartials%2Fheader.php&line=12",
+                "docs": "",
+                "severity": 6,
+                "type": "WARNING",
+                "line": 12,
+                "column": 1
+            }
+        ],
+        "templates/admin/configurator.php": [
+            {
+                "message": "Global variables defined by a theme/plugin should start with the theme/plugin prefix. Found: &quot;$js_data&quot;.",
+                "code": "WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound",
+                "link": "https://wp.aofordesign.de/wp-admin/plugin-editor.php?plugin=spherexr%2Fspherexr.php&file=spherexr%2Ftemplates%2Fadmin%2Fconfigurator.php&line=32",
+                "docs": "",
+                "severity": 6,
+                "type": "WARNING",
+                "line": 32,
+                "column": 5
+            },
+            {
+                "message": "Global variables defined by a theme/plugin should start with the theme/plugin prefix. Found: &quot;$preview_bg_val&quot;.",
+                "code": "WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound",
+                "link": "https://wp.aofordesign.de/wp-admin/plugin-editor.php?plugin=spherexr%2Fspherexr.php&file=spherexr%2Ftemplates%2Fadmin%2Fconfigurator.php&line=59",
+                "docs": "",
+                "severity": 6,
+                "type": "WARNING",
+                "line": 59,
+                "column": 25
+            },
+            {
+                "message": "Global variables defined by a theme/plugin should start with the theme/plugin prefix. Found: &quot;$preview_bg_hex&quot;.",
+                "code": "WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound",
+                "link": "https://wp.aofordesign.de/wp-admin/plugin-editor.php?plugin=spherexr%2Fspherexr.php&file=spherexr%2Ftemplates%2Fadmin%2Fconfigurator.php&line=60",
+                "docs": "",
+                "severity": 6,
+                "type": "WARNING",
+                "line": 60,
+                "column": 25
+            },
+            {
+                "message": "Global variables defined by a theme/plugin should start with the theme/plugin prefix. Found: &quot;$preview_bg_hex&quot;.",
+                "code": "WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound",
+                "link": "https://wp.aofordesign.de/wp-admin/plugin-editor.php?plugin=spherexr%2Fspherexr.php&file=spherexr%2Ftemplates%2Fadmin%2Fconfigurator.php&line=61",
+                "docs": "",
+                "severity": 6,
+                "type": "WARNING",
+                "line": 61,
+                "column": 52
+            },
+            {
+                "message": "Global variables defined by a theme/plugin should start with the theme/plugin prefix. Found: &quot;$bm&quot;.",
+                "code": "WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound",
+                "link": "https://wp.aofordesign.de/wp-admin/plugin-editor.php?plugin=spherexr%2Fspherexr.php&file=spherexr%2Ftemplates%2Fadmin%2Fconfigurator.php&line=93",
+                "docs": "",
+                "severity": 6,
+                "type": "WARNING",
+                "line": 93,
+                "column": 77
+            },
+            {
+                "message": "Global variables defined by a theme/plugin should start with the theme/plugin prefix. Found: &quot;$val&quot;.",
+                "code": "WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound",
+                "link": "https://wp.aofordesign.de/wp-admin/plugin-editor.php?plugin=spherexr%2Fspherexr.php&file=spherexr%2Ftemplates%2Fadmin%2Fconfigurator.php&line=201",
+                "docs": "",
+                "severity": 6,
+                "type": "WARNING",
+                "line": 201,
+                "column": 38
+            },
+            {
+                "message": "Global variables defined by a theme/plugin should start with the theme/plugin prefix. Found: &quot;$label&quot;.",
+                "code": "WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound",
+                "link": "https://wp.aofordesign.de/wp-admin/plugin-editor.php?plugin=spherexr%2Fspherexr.php&file=spherexr%2Ftemplates%2Fadmin%2Fconfigurator.php&line=201",
+                "docs": "",
+                "severity": 6,
+                "type": "WARNING",
+                "line": 201,
+                "column": 46
+            }
+        ]
+    }
+}
