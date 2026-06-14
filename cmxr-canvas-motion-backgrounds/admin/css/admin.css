@@ -1,0 +1,876 @@
+/* CMXR — Admin Base Styles (light WordPress admin theme) */
+
+:root {
+	--cmxr-accent:        #2271b1;
+	--cmxr-accent-h:      #135e96;
+	--cmxr-accent-rgb:    34, 113, 177;
+	--cmxr-active-rgb:    0, 163, 42;
+	--cmxr-accent-muted:  rgba(var(--cmxr-accent-rgb), 0.10);
+	--cmxr-surface:       #ffffff;
+	--cmxr-surface-2:     #f6f7f7;
+	--cmxr-border:        #dcdcde;
+	--cmxr-text:          #1d2327;
+	--cmxr-text-muted:    #646970;
+	--cmxr-active:        #00a32a;
+	--cmxr-inactive:      #8c8f94;
+	--cmxr-danger:        #d63638;
+	--cmxr-expoxr-navy:   #4555A5;
+	--cmxr-expoxr-cyan:   #13BCD4;
+	--cmxr-expoxr-orange: #F36E24;
+	--cmxr-expoxr-pink:   #EF4681;
+
+	/* Radius scale */
+	--cmxr-radius-sm:     3px;
+	--cmxr-radius:        4px;
+	--cmxr-radius-lg:     6px;
+}
+
+/* ---- Focus visibility (keyboard users) ---- */
+.cmxr-wrap a:focus-visible,
+.cmxr-wrap button:focus-visible,
+.cmxr-wrap input:focus-visible,
+.cmxr-wrap select:focus-visible,
+.cmxr-wrap [tabindex]:focus-visible,
+#cmxr-dash-modal button:focus-visible,
+#cmxr-dash-modal input:focus-visible {
+	outline: 2px solid var(--cmxr-accent);
+	outline-offset: 1px;
+}
+
+/* ---- Wrapper ---- */
+.cmxr-wrap {
+	color: var(--cmxr-text);
+	font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}
+
+/* ---- Branded header (ExpoXR family gradient) ---- */
+@keyframes cmxr-gradient-move {
+	0%   { background-position: 0% 50%; }
+	25%  { background-position: 100% 50%; }
+	50%  { background-position: 100% 50%; }
+	75%  { background-position: 0% 50%; }
+	100% { background-position: 0% 50%; }
+}
+
+.cmxr-admin-header {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	margin: 20px 0 0;
+	padding: 25px 30px;
+	background: linear-gradient(135deg, #4555A5 0%, #13BCD4 25%, #F36E24 50%, #EF4681 75%, #4555A5 100%);
+	background-size: 400% 400%;
+	animation: cmxr-gradient-move 30s ease infinite;
+	border-radius: 12px 12px 0 0;
+	box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+	position: relative;
+	overflow: hidden;
+}
+
+.cmxr-admin-header::before {
+	content: '';
+	position: absolute;
+	inset: 0;
+	background: rgba(255, 255, 255, 0.1);
+	pointer-events: none;
+}
+
+.cmxr-admin-header > * {
+	position: relative;
+	z-index: 2;
+}
+
+.cmxr-admin-header h1 {
+	font-size: 28px;
+	font-weight: 600;
+	margin: 0;
+	padding: 0;
+	line-height: 1.3;
+	color: #fff;
+	text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.cmxr-admin-header .cmxr-version {
+	background: rgba(255, 255, 255, 0.2);
+	color: #fff;
+	padding: 4px 12px;
+	font-size: 12px;
+	font-weight: 500;
+	margin-left: 10px;
+	border: 1px solid rgba(255, 255, 255, 0.3);
+	vertical-align: middle;
+}
+
+.cmxr-header-actions a,
+.cmxr-header-actions button {
+	background: rgba(255, 255, 255, 0.2);
+	color: #fff;
+	border: 1px solid rgba(255, 255, 255, 0.3);
+	padding: 8px 16px;
+	border-radius: var(--cmxr-radius-lg);
+	text-decoration: none;
+	font-weight: 500;
+	transition: all 0.3s ease;
+	backdrop-filter: blur(10px);
+}
+
+.cmxr-header-actions a:hover,
+.cmxr-header-actions button:hover {
+	background: rgba(255, 255, 255, 0.3);
+	border-color: rgba(255, 255, 255, 0.5);
+	color: #fff;
+	transform: translateY(-1px);
+	box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+/* ---- Quick actions bar ---- */
+.cmxr-quick-actions {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 10px;
+	margin-bottom: 24px;
+	padding: 14px 0;
+}
+
+.cmxr-quick-actions a {
+	display: flex;
+	align-items: center;
+	padding: 12px 20px;
+	background: var(--cmxr-surface);
+	box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+	border-radius: var(--cmxr-radius-lg);
+	text-decoration: none;
+	color: var(--cmxr-accent);
+	font-weight: 500;
+	transition: all 0.2s ease;
+}
+
+.cmxr-quick-actions a:hover {
+	background: var(--cmxr-surface-2);
+	color: var(--cmxr-accent-h);
+}
+
+.cmxr-quick-actions a .dashicons {
+	margin-right: 8px;
+	font-size: 18px;
+}
+
+.cmxr-quick-actions .cmxr-premium-action {
+	background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+	color: #fff;
+	box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+	font-weight: 600;
+}
+
+.cmxr-quick-actions .cmxr-premium-action:hover {
+	transform: translateY(-2px);
+	box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+	color: #fff;
+	background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.cmxr-quick-actions .cmxr-premium-action .dashicons {
+	color: #fbbf24;
+	text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+/* WP core moves admin notices after .wp-header-end — give them breathing room */
+.cmxr-wrap .wp-header-end {
+	margin: 0;
+	border: 0;
+	visibility: hidden;
+}
+
+.cmxr-wrap .notice {
+	margin: 0 0 16px;
+}
+
+/* ---- Page card ---- */
+.cmxr-page-card {
+	background: var(--cmxr-surface);
+	border: 1px solid var(--cmxr-border);
+	border-radius: var(--cmxr-radius);
+	box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+	padding: 20px 24px;
+	margin-bottom: 20px;
+}
+
+/* ---- Section title ---- */
+.cmxr-section-title {
+	font-size: 14px;
+	font-weight: 600;
+	color: var(--cmxr-text);
+	margin: 0 0 16px;
+	padding-bottom: 10px;
+	border-bottom: 1px solid var(--cmxr-border);
+}
+
+/* ---- Settings form overrides ---- */
+.cmxr-settings-form {
+	width: 100%;
+}
+
+.cmxr-settings-form h2 {
+	font-size: 14px;
+	font-weight: 600;
+	color: var(--cmxr-text);
+	padding: 20px 0 8px;
+	margin: 0 0 4px;
+	border-bottom: 1px solid var(--cmxr-border);
+}
+
+.cmxr-settings-form .form-table {
+	margin-top: 0;
+	border-bottom: 1px solid var(--cmxr-surface-2);
+	margin-bottom: 8px;
+}
+
+.cmxr-settings-form .form-table th {
+	font-size: 13px;
+	font-weight: 500;
+	padding: 12px 16px 12px 0;
+	color: var(--cmxr-text);
+}
+
+.cmxr-settings-form .form-table td {
+	padding: 12px 0;
+}
+
+.cmxr-settings-form .form-table input[type="number"],
+.cmxr-settings-form .form-table input[type="text"],
+.cmxr-settings-form .form-table select {
+	border-radius: var(--cmxr-radius);
+	border: 1px solid var(--cmxr-border);
+	padding: 5px 8px;
+	font-size: 13px;
+}
+
+.cmxr-settings-form .form-table input[type="number"]:focus,
+.cmxr-settings-form .form-table input[type="text"]:focus,
+.cmxr-settings-form .form-table select:focus {
+	outline: 2px solid var(--cmxr-accent);
+	outline-offset: 1px;
+	border-color: var(--cmxr-accent);
+}
+
+/* ---- Branded footer (ExpoXR family) ---- */
+.cmxr-admin-footer {
+	margin: 32px 0 0;
+	padding: 30px 20px;
+	background: linear-gradient(135deg, #F8FAFC 0%, #E5E7F2 100%);
+	position: relative;
+	overflow: hidden;
+}
+
+.cmxr-admin-footer::before {
+	content: '';
+	position: absolute;
+	top: 0;
+	left: 0;
+	right: 0;
+	height: 2px;
+	background: linear-gradient(270deg, #4555A5, #13BCD4, #F36E24, #EF4681, #4555A5);
+	background-size: 400% 400%;
+	animation: cmxr-gradient-move 20s ease infinite;
+}
+
+.cmxr-footer-content {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	max-width: 1200px;
+	margin: 0 auto;
+	position: relative;
+	z-index: 2;
+}
+
+.cmxr-footer-branding {
+	display: flex;
+	align-items: center;
+	gap: 25px;
+}
+
+.cmxr-footer-logo {
+	height: 40px;
+	width: auto;
+}
+
+.cmxr-footer-text {
+	margin: 0;
+	color: #0D152C;
+	font-size: 14px;
+	font-weight: 500;
+}
+
+.cmxr-footer-text strong {
+	color: #2AACE2;
+	font-weight: 600;
+}
+
+.cmxr-footer-version {
+	color: var(--cmxr-text-muted);
+	font-size: 11px;
+	margin-left: 8px;
+}
+
+.cmxr-footer-links {
+	display: flex;
+	gap: 20px;
+}
+
+.cmxr-footer-links a {
+	color: #2AACE2;
+	text-decoration: none;
+	font-weight: 500;
+	font-size: 14px;
+	transition: color 0.3s ease;
+}
+
+.cmxr-footer-links a:hover {
+	color: #1e40af;
+	text-decoration: underline;
+}
+
+/* ---- Empty state ---- */
+.cmxr-empty-state {
+	text-align: center;
+	padding: 60px 20px;
+	color: var(--cmxr-text-muted);
+}
+
+.cmxr-empty-icon {
+	padding: 20px;
+	font-size: 64px;
+	margin-bottom: 16px;
+	opacity: 0.4;
+}
+
+.cmxr-empty-state h2 {
+	color: var(--cmxr-text);
+	margin-bottom: 8px;
+}
+
+/* ---- Dashboard Table ---- */
+.cmxr-table {
+	border-radius: var(--cmxr-radius);
+	overflow: hidden;
+	border: 1px solid var(--cmxr-border);
+}
+
+.cmxr-table th,
+.cmxr-table td {
+	vertical-align: middle;
+	padding: 10px 14px;
+}
+
+.cmxr-id-chip {
+	background: var(--cmxr-surface-2);
+	color: var(--cmxr-accent);
+	padding: 2px 8px;
+	border-radius: var(--cmxr-radius);
+	font-size: 12px;
+	margin-right: 6px;
+	border: 1px solid var(--cmxr-border);
+}
+
+.cmxr-copy-btn {
+	background: none;
+	border: none;
+	cursor: pointer;
+	font-size: 11px;
+	color: var(--cmxr-text-muted);
+	padding: 2px 4px;
+}
+
+.cmxr-copy-btn:hover { color: var(--cmxr-accent); }
+
+.cmxr-no-id {
+	color: var(--cmxr-text-muted);
+	font-size: 12px;
+	font-style: italic;
+}
+
+/* ---- Toggle Button ---- */
+.cmxr-toggle-btn {
+	display: inline-flex;
+	align-items: center;
+	gap: 6px;
+	padding: 4px 12px;
+	border-radius: 20px;
+	border: 1px solid var(--cmxr-inactive);
+	background: transparent;
+	color: var(--cmxr-inactive);
+	font-size: 12px;
+	cursor: pointer;
+	transition: all 0.2s;
+}
+
+.cmxr-toggle-btn.is-active {
+	border-color: var(--cmxr-active);
+	color: var(--cmxr-active);
+}
+
+.cmxr-toggle-btn::before {
+	content: '';
+	width: 8px;
+	height: 8px;
+	border-radius: 50%;
+	background: currentColor;
+}
+
+/* ---- Actions ---- */
+.cmxr-actions { white-space: nowrap; }
+.cmxr-actions .button { margin-right: 4px; }
+
+.cmxr-actions .cmxr-delete-btn { color: var(--cmxr-danger); border-color: var(--cmxr-danger); }
+.cmxr-actions .cmxr-delete-btn:hover { background: var(--cmxr-danger); color: #fff; }
+
+/* ---- Utility ---- */
+.is-hidden { display: none !important; }
+
+.cmxr-mt-12 { margin-top: 12px; }
+
+/* ---- Debug Page ---- */
+.cmxr-json-dump {
+	background: var(--cmxr-surface-2);
+	color: var(--cmxr-text);
+	padding: 16px;
+	border-radius: var(--cmxr-radius);
+	font-size: 12px;
+	line-height: 1.6;
+	overflow-x: auto;
+	max-height: 400px;
+	overflow-y: auto;
+	border: 1px solid var(--cmxr-border);
+	white-space: pre;
+}
+
+.cmxr-debug-anim-block {
+	border: 1px solid var(--cmxr-border);
+	border-radius: var(--cmxr-radius);
+	margin-bottom: 8px;
+	overflow: hidden;
+}
+
+.cmxr-debug-anim-block.is-active { border-color: var(--cmxr-active); }
+.cmxr-debug-anim-block.is-inactive { opacity: 0.6; }
+
+.cmxr-debug-anim-header {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	padding: 10px 14px;
+	background: var(--cmxr-surface-2);
+	flex-wrap: wrap;
+}
+
+.cmxr-status-badge {
+	padding: 2px 8px;
+	border-radius: 20px;
+	font-size: 11px;
+	font-weight: 600;
+	background: var(--cmxr-inactive);
+	color: #fff;
+}
+
+.is-active .cmxr-status-badge { background: var(--cmxr-active); }
+
+.cmxr-debug-table th { font-weight: 600; width: 220px; }
+
+/* ---- Notifications ---- */
+.cmxr-notice {
+	position: fixed;
+	bottom: 20px;
+	right: 20px;
+	background: var(--cmxr-accent);
+	color: #fff;
+	padding: 10px 18px;
+	border-radius: var(--cmxr-radius);
+	font-size: 13px;
+	z-index: 9999;
+	box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+	opacity: 0;
+	transform: translateY(10px);
+	transition: all 0.3s ease;
+	pointer-events: none;
+}
+
+.cmxr-notice.show { opacity: 1; transform: translateY(0); }
+.cmxr-notice.error { background: var(--cmxr-danger); }
+
+/* ---- Preview Modal ---- */
+#cmxr-dash-modal {
+	display: none;
+	position: fixed;
+	inset: 0;
+	z-index: 100000;
+	align-items: center;
+	justify-content: center;
+}
+
+#cmxr-dash-modal-backdrop {
+	position: absolute;
+	inset: 0;
+	background: rgba(0,0,0,0.75);
+}
+
+#cmxr-dash-modal-inner {
+	position: relative;
+	z-index: 1;
+	width: min(92vw, 1000px);
+	height: min(88vh, 680px);
+	background: var(--cmxr-surface);
+	border: 1px solid var(--cmxr-border);
+	border-radius: var(--cmxr-radius-lg);
+	overflow: hidden;
+	display: flex;
+	flex-direction: column;
+	box-shadow: 0 8px 40px rgba(0,0,0,0.25);
+}
+
+#cmxr-dash-modal-header {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	padding: 10px 14px;
+	background: var(--cmxr-surface-2);
+	border-bottom: 1px solid var(--cmxr-border);
+	flex-shrink: 0;
+}
+
+#cmxr-dash-modal-title {
+	font-size: 13px;
+	font-weight: 600;
+	color: var(--cmxr-text);
+	flex: 1;
+	font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}
+
+#cmxr-dash-modal-bg-row {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	padding: 4px;
+	border: 1px solid var(--cmxr-border);
+	border-radius: var(--cmxr-radius);
+	background: var(--cmxr-surface);
+	box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+}
+
+#cmxr-dash-modal-bg-hex {
+	width: 34px;
+	height: 30px;
+	padding: 2px;
+	border: 1px solid var(--cmxr-border);
+	border-radius: var(--cmxr-radius);
+	background: var(--cmxr-surface-2);
+	cursor: pointer;
+	flex-shrink: 0;
+}
+
+#cmxr-dash-modal-bg-text {
+	width: 150px;
+	font-size: 12px;
+	padding: 5px 8px;
+	border-radius: var(--cmxr-radius);
+	border: 1px solid var(--cmxr-border);
+	background: var(--cmxr-surface-2);
+	color: var(--cmxr-text);
+	font-family: monospace;
+	transition: border-color 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
+}
+
+#cmxr-dash-modal-bg-transparent {
+	background: var(--cmxr-surface);
+	border: 1px solid var(--cmxr-border);
+	border-radius: var(--cmxr-radius);
+	color: var(--cmxr-text-muted);
+	font-size: 12px;
+	font-weight: 600;
+	line-height: 1.4;
+	cursor: pointer;
+	padding: 4px 10px;
+	flex-shrink: 0;
+	box-shadow: none;
+	transition: border-color 0.15s ease, color 0.15s ease, background 0.15s ease, transform 0.15s ease;
+}
+
+#cmxr-dash-modal-bg-hex:hover,
+#cmxr-dash-modal-bg-text:hover,
+#cmxr-dash-modal-bg-transparent:hover {
+	border-color: rgba(var(--cmxr-accent-rgb), 0.45);
+}
+
+#cmxr-dash-modal-bg-text:focus {
+	background: var(--cmxr-surface);
+	border-color: var(--cmxr-accent);
+	box-shadow: 0 0 0 2px rgba(var(--cmxr-accent-rgb), 0.12);
+	outline: none;
+}
+
+#cmxr-dash-modal-bg-transparent:hover {
+	color: var(--cmxr-accent);
+	background: var(--cmxr-accent-muted);
+	transform: translateY(-1px);
+}
+
+#cmxr-dash-modal-close {
+	background: none;
+	border: none;
+	color: var(--cmxr-text-muted);
+	font-size: 22px;
+	line-height: 1;
+	cursor: pointer;
+	padding: 0 2px;
+	flex-shrink: 0;
+}
+
+#cmxr-dash-modal-close:hover { color: var(--cmxr-text); }
+
+#cmxr-dash-modal-canvas-wrap {
+	flex: 1;
+	position: relative;
+	background: transparent; /* Default — overridden by JS from config.global.preview_bg */
+	overflow: hidden;
+}
+
+#cmxr-dash-modal-canvas {
+	position: absolute;
+	inset: 0;
+	width: 100%;
+	height: 100%;
+	display: block;
+}
+
+#cmxr-dash-modal-loading {
+	position: absolute;
+	inset: 0;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	color: var(--cmxr-text-muted);
+	font-size: 13px;
+	font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+	pointer-events: none;
+}
+
+/* ---- ExploreXR promo page ---- */
+.cmxr-xr-hero {
+	background: var(--cmxr-surface);
+	border: 1px solid var(--cmxr-border);
+	border-radius: var(--cmxr-radius);
+	box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+	padding: 28px 32px;
+	margin-bottom: 20px;
+}
+
+.cmxr-xr-hero-logo {
+	height: 128px;
+	width: auto;
+	margin-bottom: 12px;
+}
+
+.cmxr-xr-hero h2 {
+	margin: 0 0 10px;
+	font-size: 20px;
+	color: var(--cmxr-text);
+}
+
+.cmxr-xr-hero p {
+	font-size: 14px;
+	color: var(--cmxr-text-muted);
+	max-width: 720px;
+	margin: 0 0 16px;
+}
+
+.cmxr-xr-highlights {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 10px 24px;
+	margin: 0;
+	padding: 0;
+	list-style: none;
+}
+
+.cmxr-xr-highlights li {
+	display: flex;
+	align-items: center;
+	gap: 6px;
+	margin: 0;
+	font-size: 13px;
+	color: var(--cmxr-text);
+}
+
+.cmxr-xr-highlights .dashicons {
+	color: #2AACE2;
+}
+
+.cmxr-xr-tiers {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 20px;
+	margin-bottom: 20px;
+}
+
+.cmxr-xr-card {
+	flex: 1 1 320px;
+	background: var(--cmxr-surface);
+	border: 1px solid var(--cmxr-border);
+	border-radius: var(--cmxr-radius-lg);
+	box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+	padding: 24px 28px;
+	display: flex;
+	flex-direction: column;
+}
+
+.cmxr-xr-card-highlight {
+	border-color: #764ba2;
+	box-shadow: 0 4px 16px rgba(102, 126, 234, 0.18);
+}
+
+.cmxr-xr-card h3 {
+	margin: 0 0 4px;
+	font-size: 16px;
+	color: var(--cmxr-text);
+}
+
+.cmxr-xr-card-tagline {
+	margin: 0 0 14px;
+	font-size: 13px;
+	color: var(--cmxr-text-muted);
+	font-style: italic;
+}
+
+.cmxr-xr-card ul {
+	margin: 0 0 18px;
+	padding-left: 18px;
+	list-style: disc;
+	flex: 1;
+}
+
+.cmxr-xr-card li {
+	font-size: 13px;
+	color: var(--cmxr-text);
+	margin-bottom: 6px;
+}
+
+.cmxr-xr-card .button {
+	align-self: flex-start;
+}
+
+.cmxr-xr-links {
+	font-size: 13px;
+	color: var(--cmxr-text-muted);
+}
+
+/* ---- ExploreXR add-on demos grid ---- */
+.cmxr-xr-demos-section {
+	margin-top: 32px;
+}
+
+.cmxr-xr-demos-intro {
+	font-size: 14px;
+	color: var(--cmxr-text-muted);
+	margin: 0 0 18px;
+}
+
+.cmxr-xr-demos {
+	display: grid;
+	grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+	gap: 20px;
+}
+
+.cmxr-xr-demo-card {
+	display: flex;
+	flex-direction: column;
+	padding: 22px 24px;
+}
+
+.cmxr-xr-demo-card h3 {
+	margin: 0 0 12px;
+	font-size: 15px;
+	color: var(--cmxr-text);
+}
+
+.cmxr-xr-demo-card ul {
+	margin: 0 0 18px;
+	padding-left: 18px;
+	list-style: disc;
+	flex: 1;
+}
+
+.cmxr-xr-demo-card li {
+	font-size: 13px;
+	color: var(--cmxr-text-muted);
+	margin-bottom: 6px;
+}
+
+.cmxr-xr-demo-card .button {
+	align-self: flex-start;
+}
+
+/* ---- Settings tool cards grid ---- */
+.cmxr-tools-grid {
+	display: grid;
+	grid-template-columns: repeat(3, 1fr);
+	gap: 20px;
+	margin-bottom: 20px;
+}
+
+.cmxr-tools-grid .cmxr-page-card {
+	margin-bottom: 0;
+	display: flex;
+	flex-direction: column;
+}
+
+.cmxr-tools-grid .cmxr-page-card p {
+	font-size: 13px;
+	color: var(--cmxr-text-muted);
+	margin: 0 0 16px;
+	flex: 1;
+}
+
+.cmxr-tools-grid .cmxr-page-card .cmxr-tool-file-row {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: 8px;
+	margin-bottom: 12px;
+}
+
+/* ---- Responsive (WP admin breakpoint) ---- */
+@media screen and (max-width: 782px) {
+	.cmxr-admin-header {
+		flex-direction: column;
+		align-items: flex-start;
+		gap: 12px;
+	}
+
+	.cmxr-quick-actions a {
+		width: 100%;
+	}
+
+	.cmxr-tools-grid {
+		grid-template-columns: 1fr;
+	}
+
+	.cmxr-footer-content {
+		flex-direction: column;
+		text-align: center;
+		gap: 20px;
+	}
+
+	.cmxr-footer-branding {
+		flex-direction: column;
+		gap: 12px;
+	}
+
+	#cmxr-dash-modal-header,
+	#cmxr-dash-modal-bg-row {
+		flex-wrap: wrap;
+	}
+
+	#cmxr-dash-modal-bg-text {
+		width: min(180px, 52vw);
+	}
+}

@@ -1,0 +1,29 @@
+/* CMXR — Public Container & Canvas */
+
+.cmxr-ready {
+	position: relative !important;
+	isolation: isolate;
+}
+
+.cmxr-canvas {
+	position: absolute;
+	inset: 0;           /* Fills container — container must have height */
+	z-index: -1;        /* Behind all siblings; isolation:isolate keeps it above parent bg */
+	display: block;
+	width: 100%;
+	height: 100%;
+	pointer-events: none;
+	mix-blend-mode: screen; /* Screen-blend orbs against the container background */
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.cmxr-canvas {
+		opacity: 0.45;
+	}
+}
+
+@media (max-width: 768px) {
+	.cmxr-canvas {
+		opacity: 0.85;
+	}
+}

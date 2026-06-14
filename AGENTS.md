@@ -1,14 +1,14 @@
-# SphereXR — AI Agent Context
+# CMXR — AI Agent Context
 
 ## What This Codebase Does
 
-WordPress plugin that renders GPU-accelerated canvas orb animations. Admins design animations in a 3-panel visual editor. Animations store as JSON in WordPress CPT post meta and render via a small vanilla-JS engine injected into the frontend page.
+WordPress plugin that renders animated canvas motion backgrounds (shapes, orbs, and blobs). Admins design animations in a 3-panel visual editor. Animations store as JSON in WordPress CPT post meta and render via a small vanilla-JS engine injected into the frontend page.
 
 ## Repository Layout
 
 ```
-spherexr/               ← install this as WordPress plugin
-  spherexr.php          ← plugin entry point (constants, hooks)
+cmxr-canvas-motion-backgrounds/               ← install this as WordPress plugin
+  cmxr-canvas-motion-backgrounds.php          ← plugin entry point (constants, hooks)
   uninstall.php         ← cleanup on uninstall
   admin/                ← all WP admin UI
   includes/             ← core logic (CPT, REST, public, loader)
@@ -24,11 +24,11 @@ AGENTS.md               ← this file
 
 | Task | Files to read |
 |------|--------------|
-| Add new orb property | `class-spherexr-cpt.php` (sanitize_config), `configurator.php` (template field), `configurator.js` (bind field + preview), `spherexr-engine.js` (draw logic) |
-| Add new admin page | `class-spherexr-admin.php` (menu), `class-spherexr-dashboard.php` (render_header), new template in `templates/admin/` |
-| Change render behavior | `spherexr-engine.js` (frontend), `configurator.js` (admin preview), `admin.js` (dashboard modal preview) — all three must stay in sync |
-| Change REST API | `class-spherexr-rest.php` |
-| Change settings | `class-spherexr-settings.php` (register + sanitize), `templates/admin/settings.php` (template) |
+| Add new orb property | `class-cmxr-cpt.php` (sanitize_config), `configurator.php` (template field), `configurator.js` (bind field + preview), `cmxr-engine.js` (draw logic) |
+| Add new admin page | `class-cmxr-admin.php` (menu), `class-cmxr-dashboard.php` (render_header), new template in `templates/admin/` |
+| Change render behavior | `cmxr-engine.js` (frontend), `configurator.js` (admin preview), `admin.js` (dashboard modal preview) — all three must stay in sync |
+| Change REST API | `class-cmxr-rest.php` |
+| Change settings | `class-cmxr-settings.php` (register + sanitize), `templates/admin/settings.php` (template) |
 | Style changes | `admin/css/admin.css` (shared), `admin/css/configurator.css` (editor-specific) |
 
 ## Architecture Decisions
@@ -49,8 +49,8 @@ jQuery UI Sortable is already bundled with WordPress admin. Using it avoids addi
 
 All orb config mutations go through:
 1. `admin/js/configurator.js` → in-memory `config` object
-2. `PUT /wp-json/spherexr/v1/animations/{id}` on save
-3. `SphereXR_REST::update_animation()` → `SphereXR_CPT::sanitize_config()` → `update_post_meta()`
+2. `PUT /wp-json/cmxr/v1/animations/{id}` on save
+3. `CMXR_REST::update_animation()` → `CMXR_CPT::sanitize_config()` → `update_post_meta()`
 
 `sanitize_config()` is the single source of truth for valid values. If adding a new property, add it here first.
 
@@ -62,19 +62,19 @@ All orb config mutations go through:
 - **Animation types allowlist**: `drift | orbit | pulse | wave | fixed | figure8`
 - **Units allowlist**: `percent | px | vw | vh`
 - **Canvas z-index**: public canvas sits at `z-index: -1` behind content — do not raise it
-- **Three render engines must stay in sync**: `spherexr-engine.js`, preview in `configurator.js`, modal preview in `admin.js`
+- **Three render engines must stay in sync**: `cmxr-engine.js`, preview in `configurator.js`, modal preview in `admin.js`
 
 ## CSS Conventions
 
-- All CSS variables prefixed `--sxr-` defined in `admin/css/admin.css` `:root`
-- Admin component classes: `.sxr-` prefix (e.g., `.sxr-page-card`, `.sxr-layer-badge`)
-- Legacy classes: `.spherexr-` prefix (e.g., `.spherexr-header`, `.spherexr-table`)
-- New components should use `.sxr-` prefix
+- All CSS variables prefixed `--cmxr-` defined in `admin/css/admin.css` `:root`
+- Admin component classes: `.cmxr-` prefix (e.g., `.cmxr-page-card`, `.cmxr-layer-badge`)
+- Legacy classes: `.cmxr-` prefix (e.g., `.cmxr-header`, `.cmxr-table`)
+- New components should use `.cmxr-` prefix
 - Configurator-specific styles go in `configurator.css`, shared admin styles in `admin.css`
 
 ## REST API Quick Reference
 
-Base: `/wp-json/spherexr/v1`  
+Base: `/wp-json/cmxr/v1`  
 Auth: cookie + `X-WP-Nonce` header (`wp_create_nonce('wp_rest')`)  
 Capability required: `edit_posts`
 
@@ -92,17 +92,17 @@ POST   /animations/:id/toggle    → { id, active: bool }
 
 ```
 wp_footer (priority 5)
-  └── SphereXR_Public::output_config_json()
-        └── <script id="spherexr-config" type="application/json">
+  └── CMXR_Public::output_config_json()
+        └── <script id="cmxr-config" type="application/json">
               [{ animation_id, active, global, orbs }, ...]
 
 wp_enqueue_scripts (priority 20)
-  └── spherexr-detect.js
-        ├── reads #spherexr-config
+  └── cmxr-detect.js
+        ├── reads #cmxr-config
         ├── filters active animations
         ├── finds matching DOM elements by ID
-        └── injects spherexr-engine.js + spherexr.css
-              └── spherexr-engine.js
+        └── injects cmxr-engine.js + cmxr.css
+              └── cmxr-engine.js
                     └── initAnimation(el, cfg) per matched element
                           ├── creates <canvas> as first child
                           ├── ResizeObserver → resize canvas

@@ -1,12 +1,12 @@
-# SphereXR — Canvas Orb Animations for WordPress
+# CMXR — Canvas Motion Backgrounds for WordPress
 
-A WordPress plugin for creating and managing canvas-based orb background animations. Attach to any element by CSS ID — works with Elementor, Gutenberg, Divi, or any theme.
+A WordPress plugin for creating and managing animated canvas motion backgrounds — moving shapes, orbs, and blobs rendered on an HTML5 canvas. Attach to any element by CSS ID — works with Elementor, Gutenberg, Divi, or any theme.
 
 ## Features
 
-- **Visual Configurator** — 3-panel editor (orb list / live preview / settings) with real-time canvas rendering
-- **Drag-to-Reorder Layers** — drag orbs in the sidebar to control render order; top of list = visually on top
-- **Layer Badges** — each orb shows its layer number so stacking is always visible
+- **Visual Configurator** — 3-panel editor (shape list / live preview / settings) with real-time canvas rendering
+- **Drag-to-Reorder Layers** — drag shapes in the sidebar to control render order; top of list = visually on top
+- **Layer Badges** — each shape shows its layer number so stacking is always visible
 - **6 Animation Types** — Drift (compound harmonic), Orbit, Pulse, Wave, Fixed, Figure-8 (Lissajous)
 - **Interactivity** — Parallax, Repel, Attract, Follow cursor
 - **4 Shapes** — Circle, Double, Triple, Blob (with organic deformation)
@@ -25,14 +25,14 @@ A WordPress plugin for creating and managing canvas-based orb background animati
 ## Installation
 
 1. Clone or download this repository
-2. Copy the `spherexr/` folder into `wp-content/plugins/`
-3. Activate **SphereXR** in the WordPress admin
-4. Go to **SphereXR > New Animation** to create your first animation
+2. Copy the `cmxr-canvas-motion-backgrounds/` folder into `wp-content/plugins/`
+3. Activate **CMXR — Canvas Motion Backgrounds** in the WordPress admin
+4. Go to **CMXR > New Animation** to create your first animation
 
 ## Quick Start
 
-1. Create an animation at **SphereXR > New Animation**
-2. Add orbs, set colors, choose animation type
+1. Create an animation at **CMXR > New Animation**
+2. Add shapes, set colors, choose animation type
 3. Note the **Animation ID** (e.g., `hero-bg`)
 4. Add that as a CSS ID on any element in Elementor (Advanced → CSS ID) or in code: `<div id="hero-bg">`
 5. The canvas animation renders automatically behind your content
@@ -40,46 +40,46 @@ A WordPress plugin for creating and managing canvas-based orb background animati
 ## Project Structure
 
 ```
-spherexr/                        ← WordPress plugin root
-├── spherexr.php                 ← entry point (constants, activation hooks)
-├── uninstall.php                ← cleanup on uninstall
-├── readme.txt                   ← WordPress Plugin Directory readme
+cmxr-canvas-motion-backgrounds/         ← WordPress plugin root
+├── cmxr-canvas-motion-backgrounds.php  ← entry point (constants, activation hooks)
+├── uninstall.php                       ← cleanup on uninstall
+├── readme.txt                          ← WordPress Plugin Directory readme
 ├── admin/
-│   ├── class-spherexr-admin.php         ← menu + asset enqueuing
-│   ├── class-spherexr-dashboard.php     ← animation list + render_header() helper
-│   ├── class-spherexr-configurator.php  ← editor page controller
-│   ├── class-spherexr-settings.php      ← WP Settings API
-│   ├── class-spherexr-debug.php         ← debug/diagnostics page
+│   ├── class-cmxr-admin.php            ← menu + asset enqueuing
+│   ├── class-cmxr-dashboard.php        ← animation list + render_header() helper
+│   ├── class-cmxr-configurator.php     ← editor page controller
+│   ├── class-cmxr-settings.php         ← WP Settings API
+│   ├── class-cmxr-debug.php            ← debug/diagnostics page
 │   ├── css/
-│   │   ├── admin.css            ← shared admin styles + CSS variables
-│   │   └── configurator.css     ← editor-specific styles
+│   │   ├── admin.css                   ← shared admin styles + CSS variables
+│   │   └── configurator.css            ← editor-specific styles
 │   └── js/
-│       ├── admin.js             ← dashboard interactions + preview modal
-│       └── configurator.js      ← editor logic, sortable layers, live preview
+│       ├── admin.js                    ← dashboard interactions + preview modal
+│       └── configurator.js             ← editor logic, sortable layers, live preview
 ├── includes/
-│   ├── class-spherexr-loader.php        ← bootstraps all hooks
-│   ├── class-spherexr-activator.php     ← activation handler
-│   ├── class-spherexr-deactivator.php   ← deactivation handler
-│   ├── class-spherexr-i18n.php          ← text domain loading
-│   ├── class-spherexr-cpt.php           ← CPT registration + sanitize_config()
-│   ├── class-spherexr-public.php        ← config JSON injection + detect script
-│   └── class-spherexr-rest.php          ← REST API endpoints
+│   ├── class-cmxr-loader.php           ← bootstraps all hooks
+│   ├── class-cmxr-activator.php        ← activation handler
+│   ├── class-cmxr-deactivator.php      ← deactivation handler
+│   ├── class-cmxr-i18n.php             ← text domain loading
+│   ├── class-cmxr-cpt.php              ← CPT registration + sanitize_config()
+│   ├── class-cmxr-public.php           ← config JSON injection + detect script
+│   └── class-cmxr-rest.php             ← REST API endpoints
 ├── public/
-│   ├── css/spherexr.css         ← canvas container styles
+│   ├── css/cmxr.css                    ← canvas container styles
 │   └── js/
-│       ├── spherexr-detect.js   ← scans DOM, injects engine when animations found
-│       └── spherexr-engine.js   ← requestAnimationFrame canvas renderer
+│       ├── cmxr-detect.js              ← scans DOM, injects engine when animations found
+│       └── cmxr-engine.js              ← requestAnimationFrame canvas renderer
 ├── templates/admin/
 │   ├── dashboard.php
 │   ├── configurator.php
 │   ├── settings.php
 │   └── debug.php
-└── languages/                   ← i18n (.pot files)
+└── languages/                          ← i18n (.pot files)
 ```
 
 ## REST API
 
-Base URL: `/wp-json/spherexr/v1`  
+Base URL: `/wp-json/cmxr/v1`  
 Authentication: WordPress cookie auth + `X-WP-Nonce` header  
 Required capability: `edit_posts`
 
@@ -95,21 +95,21 @@ Required capability: `edit_posts`
 
 ## Layer Ordering
 
-Orbs are rendered on a single HTML5 canvas. Render order determines stacking:
+Shapes are rendered on a single HTML5 canvas. Render order determines stacking:
 
 - **Top of list** → drawn last → visually on top
 - **Bottom of list** → drawn first → visually behind all others
-- Drag orbs in the configurator sidebar to reorder
+- Drag shapes in the configurator sidebar to reorder
 - Layer badge (number) on each row shows current stacking order
 
 ## For Contributors
 
 See [CLAUDE.md](CLAUDE.md) for Claude Code context and [AGENTS.md](AGENTS.md) for AI agent context including architecture decisions and constraint documentation.
 
-**WordPress coding standards apply.** All PHP sanitization goes through `SphereXR_CPT::sanitize_config()`. New orb properties must be added there before adding them anywhere else.
+**WordPress coding standards apply.** All PHP sanitization goes through `CMXR_CPT::sanitize_config()`. New shape properties must be added there before adding them anywhere else.
 
 **Three render engines must stay in sync:**
-- `public/js/spherexr-engine.js` (frontend)
+- `public/js/cmxr-engine.js` (frontend)
 - `admin/js/configurator.js` (editor preview)
 - `admin/js/admin.js` (dashboard modal preview)
 
@@ -118,7 +118,7 @@ See [CLAUDE.md](CLAUDE.md) for Claude Code context and [AGENTS.md](AGENTS.md) fo
 ### 1.0.0
 
 - Initial release
-- Canvas orb animations with 6 types and 4 shapes
+- Canvas motion backgrounds with 6 animation types and 4 shapes
 - 3-panel visual configurator with live preview
 - Drag-to-reorder layers with layer number badges
 - Cursor interactivity (Parallax, Repel, Attract, Follow)
