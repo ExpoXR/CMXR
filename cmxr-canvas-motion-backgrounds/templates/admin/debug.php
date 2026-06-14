@@ -4,7 +4,11 @@
 	<?php
 	CMXR_Dashboard::render_header(
 		__( 'Debug', 'cmxr-canvas-motion-backgrounds' ),
-		'<a href="' . esc_url( wp_nonce_url( admin_url( 'admin.php?page=cmxr-debug&action=export' ), 'cmxr_export' ) ) . '" class="button">' . esc_html__( 'Export All Configs (JSON)', 'cmxr-canvas-motion-backgrounds' ) . '</a>'
+		'<form method="post" action="' . esc_url( admin_url( 'admin-post.php' ) ) . '">'
+			. wp_nonce_field( 'cmxr_export', '_wpnonce', true, false )
+			. '<input type="hidden" name="action" value="cmxr_export">'
+			. '<button type="submit" class="button">' . esc_html__( 'Export All Configs (JSON)', 'cmxr-canvas-motion-backgrounds' ) . '</button>'
+		. '</form>'
 	);
 	?>
 

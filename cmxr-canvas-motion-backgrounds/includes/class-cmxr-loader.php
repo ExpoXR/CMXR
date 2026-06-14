@@ -5,11 +5,18 @@ class CMXR_Loader {
 
 	public function run() {
 		$this->load_dependencies();
+		$this->set_locale();
 		$this->define_admin_hooks();
 		$this->define_public_hooks();
 	}
 
+	private function set_locale() {
+		$i18n = new CMXR_i18n();
+		add_action( 'init', array( $i18n, 'load_textdomain' ) );
+	}
+
 	private function load_dependencies() {
+		require_once CMXR_PLUGIN_DIR . 'includes/class-cmxr-i18n.php';
 		require_once CMXR_PLUGIN_DIR . 'includes/class-cmxr-schema.php';
 		require_once CMXR_PLUGIN_DIR . 'includes/class-cmxr-cpt.php';
 		require_once CMXR_PLUGIN_DIR . 'includes/class-cmxr-rest.php';
@@ -18,6 +25,7 @@ class CMXR_Loader {
 		require_once CMXR_PLUGIN_DIR . 'admin/class-cmxr-dashboard.php';
 		require_once CMXR_PLUGIN_DIR . 'admin/class-cmxr-configurator.php';
 		require_once CMXR_PLUGIN_DIR . 'admin/class-cmxr-settings.php';
+		require_once CMXR_PLUGIN_DIR . 'admin/class-cmxr-debug.php';
 		require_once CMXR_PLUGIN_DIR . 'admin/class-cmxr-explorexr.php';
 	}
 
