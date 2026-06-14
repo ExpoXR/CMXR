@@ -13,9 +13,10 @@ WordPress plugin for canvas-based motion backgrounds (animated shapes, orbs, and
 ### Data Flow
 
 1. Admin creates animation → stored as CPT `cmxr_animation` with JSON in `_cmxr_config` post meta
-2. Frontend: `class-cmxr-public.php` outputs active configs as `<script type="application/json">` in footer
-3. `cmxr-detect.js` reads config, scans DOM for matching element IDs, injects engine
-4. `cmxr-engine.js` renders canvas animations via requestAnimationFrame
+2. Frontend: `class-cmxr-public.php` outputs active configs (plus `coreUrl`/`engineUrl`/`cssUrl`) as `<script id="cmxr-config" type="application/json">` in footer
+3. `cmxr-detect.js` reads config, scans DOM for matching element IDs, injects `cmxr-core.js` then `cmxr-engine.js`
+4. `cmxr-engine.js` runs the per-animation lifecycle (rAF loop, IntersectionObserver, ResizeObserver, pointer); all orb math + canvas drawing lives in `cmxr-core.js` (`window.CMXRCore`)
+5. `cmxr-core.js` is the shared rendering core used by **both** the frontend engine and the configurator live preview — enqueued as the `cmxr-core` handle in admin, injected via `coreUrl` on the frontend
 
 ### Class Map
 
@@ -26,11 +27,13 @@ WordPress plugin for canvas-based motion backgrounds (animated shapes, orbs, and
 | `CMXR_Dashboard` | `admin/class-cmxr-dashboard.php` | Animation list page. Also contains `static render_header()` / `static render_footer()` shared by all admin pages |
 | `CMXR_Configurator` | `admin/class-cmxr-configurator.php` | Editor page controller |
 | `CMXR_Settings` | `admin/class-cmxr-settings.php` | WP Settings API + `admin_post_*` handlers for export, import, cache clear. Uses static `$hooked` guard — instantiated twice (early in loader + inside `add_menu_pages()`), guard prevents double-registration |
-| `CMXR_Debug` | `admin/class-cmxr-debug.php` | Debug/diagnostic page |
+| `CMXR_Debug` | `admin/class-cmxr-debug.php` | Debug/diagnostic submenu page. Only registered when `WP_DEBUG` is true (`add_menu_pages()` gates it). Export button reuses the canonical `cmxr_export` handler in `CMXR_Settings` |
 | `CMXR_ExploreXR` | `admin/class-cmxr-explorexr.php` | ExploreXR (Free and Premium) promo page |
+| `CMXR_Schema` | `includes/class-cmxr-schema.php` | Single source of truth for allowed enum values (shapes, animation/blend/color/interactivity modes, units). Consumed by `CMXR_CPT::sanitize_config()`, `CMXR_Settings`, and the admin UI `<select>` lists so validation and UI never drift |
 | `CMXR_CPT` | `includes/class-cmxr-cpt.php` | CPT registration + `sanitize_config()` |
 | `CMXR_REST` | `includes/class-cmxr-rest.php` | REST endpoints at `cmxr/v1` |
 | `CMXR_Public` | `includes/class-cmxr-public.php` | Frontend config injection + detect script |
+| `CMXR_i18n` | `includes/class-cmxr-i18n.php` | Loads the `cmxr-canvas-motion-backgrounds` text domain on `init` |
 
 ### Admin UI Conventions
 
@@ -92,16 +95,20 @@ jQuery UI Sortable on `#cmxr-orb-list` in the configurator. Each `<li>` has `dat
 
 ## REST API
 
-Namespace: `cmxr/v1`. All endpoints require `edit_posts` capability + `X-WP-Nonce` header.
+Namespace: `cmxr/v1`. All endpoints require an `X-WP-Nonce` header. Permission callbacks
+enforce **object-level capabilities** (the CPT registers with `map_meta_cap => true`):
+collection routes check `edit_posts`; single-item routes check the meta cap for that post ID
+(`read_post` / `edit_post` / `delete_post`). `duplicate` and `toggle` require `edit_post` on
+the target. A missing/invalid ID defers to `edit_posts` so the handler returns a clean 404.
 
 ```
-GET    /animations
-POST   /animations
-GET    /animations/{id}
-PUT    /animations/{id}
-DELETE /animations/{id}
-POST   /animations/{id}/duplicate
-POST   /animations/{id}/toggle
+GET    /animations                  edit_posts
+POST   /animations                  edit_posts
+GET    /animations/{id}             read_post(id)
+PUT    /animations/{id}             edit_post(id)
+DELETE /animations/{id}             delete_post(id)
+POST   /animations/{id}/duplicate   edit_post(id)
+POST   /animations/{id}/toggle      edit_post(id)
 ```
 
 ## Settings Page — Tools

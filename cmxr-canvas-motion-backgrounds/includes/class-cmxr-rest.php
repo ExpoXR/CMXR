@@ -10,12 +10,12 @@ class CMXR_REST {
 			array(
 				'methods'             => WP_REST_Server::READABLE,
 				'callback'            => array( $this, 'get_animations' ),
-				'permission_callback' => array( $this, 'check_permission' ),
+				'permission_callback' => array( $this, 'check_collection_permission' ),
 			),
 			array(
 				'methods'             => WP_REST_Server::CREATABLE,
 				'callback'            => array( $this, 'create_animation' ),
-				'permission_callback' => array( $this, 'check_permission' ),
+				'permission_callback' => array( $this, 'check_collection_permission' ),
 			),
 		) );
 
@@ -23,35 +23,64 @@ class CMXR_REST {
 			array(
 				'methods'             => WP_REST_Server::READABLE,
 				'callback'            => array( $this, 'get_animation' ),
-				'permission_callback' => array( $this, 'check_permission' ),
+				'permission_callback' => array( $this, 'check_read_item_permission' ),
 			),
 			array(
 				'methods'             => WP_REST_Server::EDITABLE,
 				'callback'            => array( $this, 'update_animation' ),
-				'permission_callback' => array( $this, 'check_permission' ),
+				'permission_callback' => array( $this, 'check_edit_item_permission' ),
 			),
 			array(
 				'methods'             => WP_REST_Server::DELETABLE,
 				'callback'            => array( $this, 'delete_animation' ),
-				'permission_callback' => array( $this, 'check_permission' ),
+				'permission_callback' => array( $this, 'check_delete_item_permission' ),
 			),
 		) );
 
 		register_rest_route( self::NAMESPACE, '/animations/(?P<id>\d+)/duplicate', array(
 			'methods'             => WP_REST_Server::CREATABLE,
 			'callback'            => array( $this, 'duplicate_animation' ),
-			'permission_callback' => array( $this, 'check_permission' ),
+			// Duplicating reads the source post, so require edit access to it.
+			'permission_callback' => array( $this, 'check_edit_item_permission' ),
 		) );
 
 		register_rest_route( self::NAMESPACE, '/animations/(?P<id>\d+)/toggle', array(
 			'methods'             => WP_REST_Server::EDITABLE,
 			'callback'            => array( $this, 'toggle_active' ),
-			'permission_callback' => array( $this, 'check_permission' ),
+			'permission_callback' => array( $this, 'check_edit_item_permission' ),
 		) );
 	}
 
-	public function check_permission() {
+	/**
+	 * Collection routes (list / create): require the post type's management cap.
+	 */
+	public function check_collection_permission() {
 		return current_user_can( 'edit_posts' );
+	}
+
+	public function check_read_item_permission( $request ) {
+		return $this->current_user_can_for_item( (int) $request['id'], 'read_post' );
+	}
+
+	public function check_edit_item_permission( $request ) {
+		return $this->current_user_can_for_item( (int) $request['id'], 'edit_post' );
+	}
+
+	public function check_delete_item_permission( $request ) {
+		return $this->current_user_can_for_item( (int) $request['id'], 'delete_post' );
+	}
+
+	/**
+	 * Enforce an object-level (meta) capability on a specific animation post.
+	 * If the ID is missing or not a cmxr_animation, defer to the base management
+	 * cap so the route handler can return a clean 404 rather than a 403.
+	 */
+	private function current_user_can_for_item( $id, $meta_cap ) {
+		$post = get_post( $id );
+		if ( ! $post || $post->post_type !== 'cmxr_animation' ) {
+			return current_user_can( 'edit_posts' );
+		}
+		return current_user_can( $meta_cap, $id );
 	}
 
 	public function get_animations( $request ) {

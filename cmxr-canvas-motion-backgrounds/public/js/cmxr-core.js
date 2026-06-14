@@ -203,7 +203,7 @@
 		return grad;
 	}
 
-	/* Draw a single radial gradient blob (from sm-effects.js pattern) */
+	/* Draw a single radial gradient blob with a soft falloff core */
 	function drawBlob(ctx, x, y, rx, ry, color, alpha, core) {
 		var maxR = Math.max(rx, ry);
 		if (maxR <= 0) return;
@@ -415,7 +415,7 @@
 		var type = orb.animation.type;
 
 		if (type === 'drift') {
-			// Compound harmonic — primary + irrational secondary (identical to kzs-animations.js)
+			// Compound harmonic — primary wave plus an irrational-frequency secondary for organic drift
 			ox = (Math.sin(t * fx + ph) * 0.68 + Math.sin(t * fx * E + seed) * 0.32) * ax;
 			oy = (Math.cos(t * fy + ph) * 0.68 + Math.cos(t * fy * PHI + seed + 1.4) * 0.32) * ay;
 		} else if (type === 'orbit') {
@@ -443,7 +443,7 @@
 			posX += mx * depth * w * 0.08;
 			posY += my * depth * h * 0.06;
 		} else if (interMode === 'repel' || interMode === 'attract') {
-			// Gaussian force field (from kzs-shape-backgrounds.js wireframe distortion)
+			// Gaussian force field — falloff strongest near the pointer, fading with distance
 			var pointerX = (mx + 0.5) * w;
 			var pointerY = (my + 0.5) * h;
 			var dx = posX - pointerX;

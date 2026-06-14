@@ -49,7 +49,8 @@ cmxr-canvas-motion-backgrounds/         ← WordPress plugin root
 │   ├── class-cmxr-dashboard.php        ← animation list + render_header() helper
 │   ├── class-cmxr-configurator.php     ← editor page controller
 │   ├── class-cmxr-settings.php         ← WP Settings API
-│   ├── class-cmxr-debug.php            ← debug/diagnostics page
+│   ├── class-cmxr-debug.php            ← debug/diagnostics page (only when WP_DEBUG)
+│   ├── class-cmxr-explorexr.php        ← ExploreXR promo page
 │   ├── css/
 │   │   ├── admin.css                   ← shared admin styles + CSS variables
 │   │   └── configurator.css            ← editor-specific styles
@@ -61,19 +62,23 @@ cmxr-canvas-motion-backgrounds/         ← WordPress plugin root
 │   ├── class-cmxr-activator.php        ← activation handler
 │   ├── class-cmxr-deactivator.php      ← deactivation handler
 │   ├── class-cmxr-i18n.php             ← text domain loading
+│   ├── class-cmxr-schema.php           ← single source of truth for allowed enum values
 │   ├── class-cmxr-cpt.php              ← CPT registration + sanitize_config()
 │   ├── class-cmxr-public.php           ← config JSON injection + detect script
 │   └── class-cmxr-rest.php             ← REST API endpoints
 ├── public/
 │   ├── css/cmxr.css                    ← canvas container styles
 │   └── js/
-│       ├── cmxr-detect.js              ← scans DOM, injects engine when animations found
-│       └── cmxr-engine.js              ← requestAnimationFrame canvas renderer
+│       ├── cmxr-detect.js              ← scans DOM, injects core + engine when animations found
+│       ├── cmxr-core.js                ← shared orb math + canvas draw (frontend + preview)
+│       └── cmxr-engine.js              ← per-animation lifecycle (rAF, observers, pointer)
 ├── templates/admin/
 │   ├── dashboard.php
 │   ├── configurator.php
 │   ├── settings.php
-│   └── debug.php
+│   ├── debug.php
+│   ├── explorexr.php
+│   └── partials/header.php
 └── languages/                          ← i18n (.pot files)
 ```
 

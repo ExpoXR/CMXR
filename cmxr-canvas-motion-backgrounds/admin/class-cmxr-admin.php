@@ -41,6 +41,18 @@ class CMXR_Admin {
 			array( new CMXR_Settings(), 'render' )
 		);
 
+		// Diagnostics page — only registered when WordPress debug is active.
+		if ( defined( 'WP_DEBUG' ) && WP_DEBUG ) {
+			add_submenu_page(
+				'cmxr',
+				__( 'Debug', 'cmxr-canvas-motion-backgrounds' ),
+				__( 'Debug', 'cmxr-canvas-motion-backgrounds' ),
+				'manage_options',
+				'cmxr-debug',
+				array( new CMXR_Debug(), 'render' )
+			);
+		}
+
 		add_submenu_page(
 			'cmxr',
 			__( 'ExploreXR', 'cmxr-canvas-motion-backgrounds' ),
@@ -69,6 +81,7 @@ class CMXR_Admin {
 			'toplevel_page_cmxr',
 			'cmxr_page_cmxr-new',
 			'cmxr_page_cmxr-settings',
+			'cmxr_page_cmxr-debug',
 			'cmxr_page_cmxr-explorexr',
 			'admin_page_cmxr-edit',
 		);

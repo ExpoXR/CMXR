@@ -24,6 +24,9 @@ class CMXR_CPT {
 			'rewrite'             => false,
 			'supports'            => array( 'title' ),
 			'capability_type'     => 'post',
+			// Map meta caps (edit_post/read_post/delete_post) to primitive post caps
+			// so REST permission callbacks can enforce per-object capabilities.
+			'map_meta_cap'        => true,
 		) );
 	}
 

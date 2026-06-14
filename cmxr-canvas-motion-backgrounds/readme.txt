@@ -21,7 +21,7 @@ CMXR lets you build and manage animated canvas motion backgrounds directly from 
 * **Layer badges** — each shape shows its layer number (1 = topmost)
 * **6 animation types** — Drift, Orbit, Pulse, Wave, Fixed, Figure-8 (Lissajous)
 * **Interactivity modes** — Parallax, Repel, Attract
-* **4 shapes** — Circle, Double, Triple, Blob (with organic deformation)
+* **12 shapes** — Soft Orbs (Circle, Double, Triple, Blob, Outline, Ring), Geometry (Box, Box Outline, Capsule, Capsule Outline), and Lines (Line, Wave Line)
 * **Blend modes** — Screen, Normal, Multiply, Overlay, Lighten, Hard-Light
 * **REST API** — full programmatic control over animations
 * **Performance** — pauses off-screen (IntersectionObserver), respects `prefers-reduced-motion`, DPR cap to limit canvas size on HiDPI screens
@@ -99,8 +99,8 @@ Up to 20 shapes per animation.
 * Visual 3-panel configurator with live preview
 * Drag-to-reorder shape layers with layer number badges
 * Layer ordering: top of list = visually on top on canvas
-* Interactivity: Parallax, Repel, Attract, Follow cursor
-* 4 shapes: Circle, Double, Triple, Blob
+* Interactivity: Parallax, Repel, Attract
+* 12 shapes: Circle, Double, Triple, Blob, Outline, Ring, Box, Box Outline, Capsule, Capsule Outline, Line, Wave Line
 * 6 blend modes
 * REST API for full programmatic control
 * Duplicate, toggle-active, preview modal on dashboard
