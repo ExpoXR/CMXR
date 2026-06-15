@@ -16,3 +16,4 @@ foreach ( $posts as $post_id ) {
 }
 
 delete_option( 'cmxr_settings' );
+delete_transient( 'cmxr_active_configs' );

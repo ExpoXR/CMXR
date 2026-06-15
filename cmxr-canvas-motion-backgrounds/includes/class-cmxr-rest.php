@@ -85,11 +85,13 @@ class CMXR_REST {
 
 	public function get_animations( $request ) {
 		$posts = get_posts( array(
-			'post_type'   => 'cmxr_animation',
-			'post_status' => array( 'publish', 'draft' ),
-			'numberposts' => -1,
-			'orderby'     => 'date',
-			'order'       => 'DESC',
+			'post_type'              => 'cmxr_animation',
+			'post_status'            => array( 'publish', 'draft' ),
+			'numberposts'            => -1,
+			'orderby'                => 'date',
+			'order'                  => 'DESC',
+			'no_found_rows'          => true,
+			'update_post_term_cache' => false,
 		) );
 
 		$data = array();

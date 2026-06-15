@@ -32,12 +32,24 @@ class CMXR_CPT {
 
 	/**
 	 * Return all active animation configs as array.
+	 * Cached per-request (static) and across requests (transient).
 	 */
 	public static function get_active_configs() {
+		static $cache = null;
+		if ( null !== $cache ) return $cache;
+
+		$transient = get_transient( 'cmxr_active_configs' );
+		if ( false !== $transient ) {
+			$cache = $transient;
+			return $cache;
+		}
+
 		$posts = get_posts( array(
-			'post_type'   => 'cmxr_animation',
-			'post_status' => 'publish',
-			'numberposts' => -1,
+			'post_type'              => 'cmxr_animation',
+			'post_status'            => 'publish',
+			'numberposts'            => -1,
+			'no_found_rows'          => true,
+			'update_post_term_cache' => false,
 		) );
 
 		$configs = array();
@@ -51,7 +63,23 @@ class CMXR_CPT {
 			$configs[] = $config;
 		}
 
-		return $configs;
+		set_transient( 'cmxr_active_configs', $configs, HOUR_IN_SECONDS );
+		$cache = $configs;
+		return $cache;
+	}
+
+	/** Bust transient when _cmxr_config meta is written. */
+	public static function bust_config_cache_on_meta( $meta_id, $post_id, $meta_key ) {
+		if ( '_cmxr_config' === $meta_key ) {
+			delete_transient( 'cmxr_active_configs' );
+		}
+	}
+
+	/** Bust transient when a cmxr_animation post is deleted. */
+	public static function bust_config_cache_on_delete( $post_id ) {
+		if ( get_post_type( $post_id ) === 'cmxr_animation' ) {
+			delete_transient( 'cmxr_active_configs' );
+		}
 	}
 
 	/**
