@@ -33,7 +33,6 @@ WordPress plugin for canvas-based motion backgrounds (animated shapes, orbs, and
 | `CMXR_CPT` | `includes/class-cmxr-cpt.php` | CPT registration + `sanitize_config()` |
 | `CMXR_REST` | `includes/class-cmxr-rest.php` | REST endpoints at `cmxr/v1` |
 | `CMXR_Public` | `includes/class-cmxr-public.php` | Frontend config injection + detect script |
-| `CMXR_i18n` | `includes/class-cmxr-i18n.php` | Loads the `cmxr-canvas-motion-backgrounds` text domain on `init` |
 
 ### Admin UI Conventions
 

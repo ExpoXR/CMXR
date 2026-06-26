@@ -254,9 +254,9 @@
 							<div class="cmxr-field">
 								<label><?php esc_html_e( 'Color Mode', 'cmxr-canvas-motion-backgrounds' ); ?></label>
 								<select id="cmxr-orb-color-mode">
-									<option value="solid"><?php esc_html_e( 'Solid', 'cmxr-canvas-motion-backgrounds' ); ?></option>
-									<option value="dual"><?php esc_html_e( 'Dual Color', 'cmxr-canvas-motion-backgrounds' ); ?></option>
-									<option value="gradient"><?php esc_html_e( 'Gradient', 'cmxr-canvas-motion-backgrounds' ); ?></option>
+									<?php foreach ( CMXR_Schema::get_color_mode_labels() as $cmxr_value => $cmxr_label ) : // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound ?>
+										<option value="<?php echo esc_attr( $cmxr_value ); ?>"><?php echo esc_html( $cmxr_label ); ?></option>
+									<?php endforeach; ?>
 								</select>
 							</div>
 							<div class="cmxr-field">
@@ -288,10 +288,9 @@
 							<div class="cmxr-field">
 								<label><?php esc_html_e( 'Size Unit', 'cmxr-canvas-motion-backgrounds' ); ?></label>
 								<select id="cmxr-orb-size-unit">
-									<option value="percent">%</option>
-									<option value="px">px</option>
-									<option value="vw">vw</option>
-									<option value="vh">vh</option>
+									<?php foreach ( CMXR_Schema::get_unit_labels() as $cmxr_value => $cmxr_label ) : // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound ?>
+										<option value="<?php echo esc_attr( $cmxr_value ); ?>"><?php echo esc_html( $cmxr_label ); ?></option>
+									<?php endforeach; ?>
 								</select>
 							</div>
 							<div class="cmxr-field">
@@ -324,10 +323,9 @@
 							<div class="cmxr-field">
 								<label><?php esc_html_e( 'Position Unit', 'cmxr-canvas-motion-backgrounds' ); ?></label>
 								<select id="cmxr-orb-pos-unit">
-									<option value="percent">%</option>
-									<option value="px">px</option>
-									<option value="vw">vw</option>
-									<option value="vh">vh</option>
+									<?php foreach ( CMXR_Schema::get_unit_labels() as $cmxr_value => $cmxr_label ) : // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound ?>
+										<option value="<?php echo esc_attr( $cmxr_value ); ?>"><?php echo esc_html( $cmxr_label ); ?></option>
+									<?php endforeach; ?>
 								</select>
 								<p class="description"><?php esc_html_e( 'Position is relative to the container holding the animation ID.', 'cmxr-canvas-motion-backgrounds' ); ?></p>
 							</div>
@@ -354,12 +352,9 @@
 							<div class="cmxr-field">
 								<label><?php esc_html_e( 'Animation Type', 'cmxr-canvas-motion-backgrounds' ); ?></label>
 								<select id="cmxr-orb-anim-type">
-									<option value="drift"><?php esc_html_e( 'Drift (compound harmonic)', 'cmxr-canvas-motion-backgrounds' ); ?></option>
-									<option value="orbit"><?php esc_html_e( 'Orbit (elliptical)', 'cmxr-canvas-motion-backgrounds' ); ?></option>
-									<option value="pulse"><?php esc_html_e( 'Pulse (breathing)', 'cmxr-canvas-motion-backgrounds' ); ?></option>
-									<option value="wave"><?php esc_html_e( 'Wave (sine path)', 'cmxr-canvas-motion-backgrounds' ); ?></option>
-									<option value="fixed"><?php esc_html_e( 'Fixed (no movement)', 'cmxr-canvas-motion-backgrounds' ); ?></option>
-									<option value="figure8"><?php esc_html_e( 'Figure 8 (Lissajous)', 'cmxr-canvas-motion-backgrounds' ); ?></option>
+									<?php foreach ( CMXR_Schema::get_animation_type_labels() as $cmxr_value => $cmxr_label ) : // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound ?>
+										<option value="<?php echo esc_attr( $cmxr_value ); ?>"><?php echo esc_html( $cmxr_label ); ?></option>
+									<?php endforeach; ?>
 								</select>
 							</div>
 
