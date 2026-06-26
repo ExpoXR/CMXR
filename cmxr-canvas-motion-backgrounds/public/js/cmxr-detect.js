@@ -36,11 +36,12 @@
 		},
 	};
 
-	// Pass configs + global settings to engine
-	window.CMXRAnimations = found;
+	// Hand the engine the full set so its DOM re-scan can pick up containers
+	// added after initial load (not just the ones present right now).
+	window.CMXRAnimations = cfg.animations;
 	window.CMXRSettings   = cfg.settings || {};
 
-	// Inject CSS
+	// Inject CSS (kept eager — tiny, and lets layout settle before the engine runs)
 	if (cfg.cssUrl) {
 		var link = document.createElement('link');
 		link.rel  = 'stylesheet';
@@ -59,8 +60,33 @@
 		document.head.appendChild(script);
 	}
 
-	if (cfg.coreUrl)   injectScript(cfg.coreUrl, 'core');
-	if (cfg.engineUrl) injectScript(cfg.engineUrl, 'engine');
+	var injected = false;
+	function injectEngine() {
+		if (injected) return;
+		injected = true;
+		if (cfg.coreUrl)   injectScript(cfg.coreUrl, 'core');
+		if (cfg.engineUrl) injectScript(cfg.engineUrl, 'engine');
+		window.CMXRDebug.log('[CMXR] Loaded engine for ' + found.length + ' animation(s):', found.map(function (a) { return '#' + a.animation_id; }));
+	}
 
-	window.CMXRDebug.log('[CMXR] Found ' + found.length + ' animation(s) on page:', found.map(function (a) { return '#' + a.animation_id; }));
+	// Lazy-load: defer the ~27KB core+engine until a matched element nears the
+	// viewport, so pages with below-the-fold animations skip it on initial load.
+	// Falls back to immediate injection when IntersectionObserver is unavailable.
+	if ('IntersectionObserver' in window) {
+		var io = new IntersectionObserver(function (entries) {
+			for (var i = 0; i < entries.length; i++) {
+				if (entries[i].isIntersecting) {
+					injectEngine();
+					io.disconnect();
+					return;
+				}
+			}
+		}, { rootMargin: '200px' });
+		found.forEach(function (a) {
+			var el = document.getElementById(a.animation_id);
+			if (el) io.observe(el);
+		});
+	} else {
+		injectEngine();
+	}
 })();
