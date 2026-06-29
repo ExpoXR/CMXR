@@ -66,4 +66,32 @@ class CMXR_Schema {
 			'both'       => __( 'Both Axes', 'cmxr-canvas-motion-backgrounds' ),
 		);
 	}
+
+	public static function get_unit_labels() {
+		return array(
+			'percent' => __( '%', 'cmxr-canvas-motion-backgrounds' ),
+			'px'      => __( 'px', 'cmxr-canvas-motion-backgrounds' ),
+			'vw'      => __( 'vw', 'cmxr-canvas-motion-backgrounds' ),
+			'vh'      => __( 'vh', 'cmxr-canvas-motion-backgrounds' ),
+		);
+	}
+
+	public static function get_color_mode_labels() {
+		return array(
+			'solid'    => __( 'Solid', 'cmxr-canvas-motion-backgrounds' ),
+			'dual'     => __( 'Dual Color', 'cmxr-canvas-motion-backgrounds' ),
+			'gradient' => __( 'Gradient', 'cmxr-canvas-motion-backgrounds' ),
+		);
+	}
+
+	public static function get_animation_type_labels() {
+		return array(
+			'drift'   => __( 'Drift (compound harmonic)', 'cmxr-canvas-motion-backgrounds' ),
+			'orbit'   => __( 'Orbit (elliptical)', 'cmxr-canvas-motion-backgrounds' ),
+			'pulse'   => __( 'Pulse (breathing)', 'cmxr-canvas-motion-backgrounds' ),
+			'wave'    => __( 'Wave (sine path)', 'cmxr-canvas-motion-backgrounds' ),
+			'fixed'   => __( 'Fixed (no movement)', 'cmxr-canvas-motion-backgrounds' ),
+			'figure8' => __( 'Figure 8 (Lissajous)', 'cmxr-canvas-motion-backgrounds' ),
+		);
+	}
 }

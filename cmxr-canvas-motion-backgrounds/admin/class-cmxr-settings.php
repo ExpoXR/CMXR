@@ -98,7 +98,7 @@ class CMXR_Settings {
 
 	public function sanitize( $input ) {
 		$allowed_blend = CMXR_Schema::BLEND_MODES;
-		$blend_mode    = $input['default_blend_mode'] ?? 'screen';
+		$blend_mode    = $input['default_blend_mode'] ?? 'normal';
 
 		return array(
 			'dpr_cap'                => max( 1.0, min( 3.0, (float) ( $input['dpr_cap'] ?? 1.75 ) ) ),
@@ -106,7 +106,7 @@ class CMXR_Settings {
 			'debug_mode'             => ! empty( $input['debug_mode'] ),
 			'default_speed'          => max( 0.1, min( 10.0, (float) ( $input['default_speed'] ?? 1.0 ) ) ),
 			'default_safe_margin'    => max( 0, min( 30, (int) ( $input['default_safe_margin'] ?? 5 ) ) ),
-			'default_blend_mode'     => in_array( $blend_mode, $allowed_blend, true ) ? $blend_mode : 'screen',
+			'default_blend_mode'     => in_array( $blend_mode, $allowed_blend, true ) ? $blend_mode : 'normal',
 		);
 	}
 
@@ -297,7 +297,7 @@ class CMXR_Settings {
 
 	public function field_default_blend_mode() {
 		$opts    = get_option( self::OPTION_KEY, array() );
-		$current = $opts['default_blend_mode'] ?? 'screen';
+		$current = $opts['default_blend_mode'] ?? 'normal';
 		$modes   = CMXR_Schema::BLEND_MODES;
 		echo '<select name="' . esc_attr( self::OPTION_KEY ) . '[default_blend_mode]">';
 		foreach ( $modes as $mode ) {

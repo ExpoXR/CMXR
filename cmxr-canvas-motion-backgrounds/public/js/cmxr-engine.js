@@ -36,6 +36,11 @@
 		? window.matchMedia('(prefers-reduced-motion: reduce)').matches
 		: false;
 
+	// Registry of elements with a live animation, so we can dispose them when
+	// they are removed from the DOM (Elementor/AJAX re-renders) instead of
+	// leaking their canvas, observers, listeners and rAF loop.
+	var liveEls = [];
+
 	/* ------------------------------------------------------------------ */
 	/* Per-animation init                                                   */
 	/* ------------------------------------------------------------------ */
@@ -43,6 +48,7 @@
 	function initAnimation(el, cfg) {
 		if (el.__cmxrReady) return;
 		el.__cmxrReady = true;
+		if (liveEls.indexOf(el) === -1) liveEls.push(el);
 
 		el.classList.add('cmxr-ready');
 
@@ -165,7 +171,7 @@
 			ctx.clearRect(0, 0, w, h);
 
 			var g          = cfg.global || {};
-			var blendMode  = g.blend_mode || 'screen';
+			var blendMode  = Core.blendOp(g.blend_mode || 'normal');
 			var safeMargin = g.safe_margin || 0;
 			var interact   = g.interactivity || {};
 			var iEnabled   = (interact.enabled !== false) && interact.mode !== 'none';
@@ -248,13 +254,56 @@
 	/* Boot all found animations                                            */
 	/* ------------------------------------------------------------------ */
 
-	function init() {
+	// Init any matching elements not yet running, and dispose ones whose element
+	// has been detached from the document.
+	function scan() {
 		animations.forEach(function (cfg) {
 			var el = document.getElementById(cfg.animation_id);
-			if (!el) return;
-			initAnimation(el, cfg);
+			if (el) initAnimation(el, cfg);
 		});
+
+		for (var i = liveEls.length - 1; i >= 0; i--) {
+			var el = liveEls[i];
+			if (!document.contains(el)) {
+				if (typeof el.__cmxrDispose === 'function') el.__cmxrDispose();
+				liveEls.splice(i, 1);
+			}
+		}
 	}
+
+	// Debounced re-scan so bursts of DOM mutations collapse into one pass.
+	var scanScheduled = false;
+	function scheduleScan() {
+		if (scanScheduled) return;
+		scanScheduled = true;
+		setTimeout(function () {
+			scanScheduled = false;
+			scan();
+		}, 150);
+	}
+
+	function init() {
+		scan();
+
+		// Watch for elements added/removed after load (page builders, AJAX, SPA
+		// navigation) so animations init on new containers and tear down on
+		// removed ones.
+		if ('MutationObserver' in window && document.body) {
+			var mo = new MutationObserver(function (mutations) {
+				for (var i = 0; i < mutations.length; i++) {
+					if (mutations[i].addedNodes.length || mutations[i].removedNodes.length) {
+						scheduleScan();
+						return;
+					}
+				}
+			});
+			mo.observe(document.body, { childList: true, subtree: true });
+		}
+	}
+
+	// Public hook for themes/builders to force a re-scan after custom DOM swaps.
+	window.CMXR = window.CMXR || {};
+	window.CMXR.refresh = scheduleScan;
 
 	if (document.readyState === 'loading') {
 		document.addEventListener('DOMContentLoaded', init);

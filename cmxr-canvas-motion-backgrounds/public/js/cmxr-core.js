@@ -137,8 +137,12 @@
 		return pointer;
 	}
 
-	// Memoised hex → rgba string (colours/alpha repeat heavily across frames)
+	// Memoised hex → rgba string (colours/alpha repeat heavily across frames).
+	// Bounded so long-lived pages with many distinct alpha values can't grow it
+	// without limit — a finite palette stays well under the cap.
+	var RGBA_CACHE_MAX = 512;
 	var rgbaCache = {};
+	var rgbaCacheSize = 0;
 	function hexToRgba(hex, alpha) {
 		var key = hex + '|' + alpha;
 		var cached = rgbaCache[key];
@@ -147,7 +151,9 @@
 		var g = parseInt(hex.slice(3, 5), 16) || 0;
 		var b = parseInt(hex.slice(5, 7), 16) || 0;
 		var out = 'rgba(' + r + ',' + g + ',' + b + ',' + alpha + ')';
+		if (rgbaCacheSize >= RGBA_CACHE_MAX) { rgbaCache = {}; rgbaCacheSize = 0; }
 		rgbaCache[key] = out;
+		rgbaCacheSize++;
 		return out;
 	}
 
@@ -540,11 +546,35 @@
 		ctx.restore();
 	}
 
+	// Map a config blend mode to a valid canvas globalCompositeOperation.
+	// 'normal' is a CSS keyword, not a canvas op — assigning it is silently
+	// ignored by the browser, so translate it to 'source-over' (standard alpha
+	// compositing: an opaque upper orb fully covers lower ones, partial opacity
+	// blends proportionally). Unknown values fall back to 'source-over'.
+	var CANVAS_BLEND_OPS = {
+		'normal': 'source-over',
+		'source-over': 'source-over',
+		'screen': 'screen',
+		'multiply': 'multiply',
+		'overlay': 'overlay',
+		'lighten': 'lighten',
+		'darken': 'darken',
+		'hard-light': 'hard-light',
+		'soft-light': 'soft-light',
+		'color-dodge': 'color-dodge',
+		'color-burn': 'color-burn',
+	};
+
+	function blendOp(mode) {
+		return CANVAS_BLEND_OPS[mode] || 'source-over';
+	}
+
 	window.CMXRCore = {
 		PHI: PHI,
 		E: E,
 		clamp: clamp,
 		hexToRgba: hexToRgba,
+		blendOp: blendOp,
 		createPointerTracker: createPointerTracker,
 		hashSeed: hashSeed,
 		resolvePx: resolvePx,

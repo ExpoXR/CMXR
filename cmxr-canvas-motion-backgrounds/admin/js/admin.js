@@ -290,7 +290,7 @@
 			ctx.setTransform(ms.dpr, 0, 0, ms.dpr, 0, 0);
 			ctx.clearRect(0, 0, w, h);
 
-			var blendMode  = (config.global && config.global.blend_mode)  || 'screen';
+			var blendMode  = Core.blendOp((config.global && config.global.blend_mode) || 'normal');
 			var safeMargin = (config.global && config.global.safe_margin) || 0;
 
 			var inter    = (config.global && config.global.interactivity) || {};

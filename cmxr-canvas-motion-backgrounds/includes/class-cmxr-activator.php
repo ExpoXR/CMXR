@@ -17,7 +17,7 @@ class CMXR_Activator {
 				'debug_mode'              => false,
 				'default_speed'           => 1.0,
 				'default_safe_margin'     => 5,
-				'default_blend_mode'      => 'screen',
+				'default_blend_mode'      => 'normal',
 			), '', 'no' );
 		}
 	}

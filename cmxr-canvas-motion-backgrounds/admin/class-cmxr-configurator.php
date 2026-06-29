@@ -28,7 +28,7 @@ class CMXR_Configurator {
 				'global'       => array(
 					'speed'       => (float) ( $settings['default_speed'] ?? 1.0 ),
 					'safe_margin' => (int) ( $settings['default_safe_margin'] ?? 5 ),
-					'blend_mode'  => $settings['default_blend_mode'] ?? 'screen',
+					'blend_mode'  => $settings['default_blend_mode'] ?? 'normal',
 					'interactivity' => array(
 						'enabled'  => true,
 						'mode'     => 'parallax',

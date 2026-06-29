@@ -47,6 +47,9 @@
 
 	var selectedOrbIdx = -1;
 	var previewEngine  = null;
+	// Guards the wpColorPicker change callback while we set a value programmatically,
+	// so syncing the picker to the selected orb doesn't echo back into config.
+	var suppressColorChange = false;
 
 	/* ------------------------------------------------------------------ */
 	/* API helpers                                                          */
@@ -596,8 +599,8 @@
 		// Shape
 		document.querySelectorAll('[name="cmxr-orb-shape"]').forEach(function (r) {
 			r.checked = r.value === orb.shape;
-			r.closest('.cmxr-shape-option').classList.toggle('selected', r.checked);
 		});
+		syncShapeSelection();
 
 		setValue('cmxr-orb-blur', 'cmxr-orb-blur-num', orb.blur);
 		setValue('cmxr-orb-opacity', 'cmxr-orb-opacity-num', orb.opacity);
@@ -643,6 +646,16 @@
 		setValue('cmxr-orb-rotation', 'cmxr-orb-rotation-num', orb.rotation || 0);
 	}
 
+	// Keep the visible shape-card highlight in sync with the checked radio.
+	// CSS :has(input:checked) covers modern browsers; the .selected class is the
+	// fallback for engines without :has() and must be moved on every change.
+	function syncShapeSelection() {
+		document.querySelectorAll('[name="cmxr-orb-shape"]').forEach(function (r) {
+			var option = r.closest('.cmxr-shape-option');
+			if (option) option.classList.toggle('selected', r.checked);
+		});
+	}
+
 	function setValue(sliderId, numId, val) {
 		var s = document.getElementById(sliderId);
 		var n = document.getElementById(numId);
@@ -652,10 +665,19 @@
 
 	function setColorPicker(inputId, val) {
 		var el = document.getElementById(inputId);
-		if (!el) return;
+		if (!el || !val) return;
 		el.value = val;
-		if (el._wpColorPicker && jQuery) {
-			jQuery(el).wpColorPicker('color', val);
+		// wpColorPicker stores its state in jQuery data, not on the DOM node, so
+		// updating el.value alone never refreshes the visible Iris swatch. Drive
+		// the picker through its public API instead (idempotent once initialized).
+		if (window.jQuery && jQuery.fn.wpColorPicker) {
+			suppressColorChange = true;
+			try {
+				jQuery(el).wpColorPicker('color', val);
+			} catch (e) {
+				Logger.warn('cmxr: wpColorPicker color set failed', e);
+			}
+			suppressColorChange = false;
 		}
 	}
 
@@ -809,6 +831,7 @@
 	// Shape radios
 	document.querySelectorAll('[name="cmxr-orb-shape"]').forEach(function (radio) {
 		radio.addEventListener('change', function () {
+			syncShapeSelection();
 			var orb = config.orbs[selectedOrbIdx];
 			if (!orb) return;
 			orb.shape = radio.value;
@@ -821,6 +844,7 @@
 	if (typeof jQuery !== 'undefined' && jQuery.fn.wpColorPicker) {
 		jQuery('.cmxr-color-picker').wpColorPicker({
 			change: function (e, ui) {
+				if (suppressColorChange) return;
 				var color = ui.color.toString();
 				var id    = e.target.id;
 				var orb   = config.orbs[selectedOrbIdx];
@@ -1014,7 +1038,7 @@
 		previewCtx.setTransform(state.dpr, 0, 0, state.dpr, 0, 0);
 		previewCtx.clearRect(0, 0, w, h);
 
-		var blendMode = config.global && config.global.blend_mode || 'screen';
+		var blendMode = Core.blendOp((config.global && config.global.blend_mode) || 'normal');
 		var safeMargin = (config.global && config.global.safe_margin) || 0;
 
 		// Interactivity — mirrors cmxr-engine.js draw()
