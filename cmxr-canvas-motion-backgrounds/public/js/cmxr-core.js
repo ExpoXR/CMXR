@@ -1,4 +1,4 @@
-/* CMXR Core v1.0.0 — Shared animation math + canvas rendering.
+/* CMXR Core v1.0.1 — Shared animation math + canvas rendering.
    Single source of truth used by the public engine, the configurator preview
    and the dashboard modal preview. Exposed as window.CMXRCore. */
 (function () {

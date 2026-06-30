@@ -3,7 +3,7 @@
  * Plugin Name:       CMXR — Canvas Motion Backgrounds
  * Plugin URI:        https://expoxr.com/
  * Description:       Create animated HTML5 canvas motion backgrounds with shapes, orbs, blobs, and interactive effects for WordPress, Elementor, Gutenberg, and any theme with a visual editor.
- * Version:           1.0.0
+ * Version:           1.0.1
  * Author:            Ayal Othman
  * Author URI:        https://expoxr.com
  * Requires at least: 6.0
@@ -19,7 +19,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'CMXR_VERSION', '1.0.0' );
+define( 'CMXR_VERSION', '1.0.1' );
 define( 'CMXR_PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
 define( 'CMXR_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
 define( 'CMXR_PLUGIN_FILE', __FILE__ );

@@ -103,10 +103,6 @@ class CMXR_CPT {
 		$global = $raw['global'] ?? array();
 		$interactivity = $global['interactivity'] ?? array();
 
-		// Migrate removed 'follow' mode to 'attract'.
-		if ( isset( $interactivity['mode'] ) && 'follow' === $interactivity['mode'] ) {
-			$interactivity['mode'] = 'attract';
-		}
 
 		$config = array(
 			'animation_id' => $animation_id,

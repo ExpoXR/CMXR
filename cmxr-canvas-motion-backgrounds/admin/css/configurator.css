@@ -474,7 +474,7 @@
 .cmxr-config-body {
 	display: grid;
 	grid-template-columns: 220px minmax(0, 1fr) 340px;
-	height: calc(100vh - 280px);
+	height: calc(100vh - 390px);
 	min-height: 500px;
 	border: 1px solid var(--cmxr-border);
 	border-top: none;

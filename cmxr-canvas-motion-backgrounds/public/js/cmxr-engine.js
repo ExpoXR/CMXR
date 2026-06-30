@@ -1,4 +1,4 @@
-/* CMXR Engine v1.0.0 — Ayal Othman / ExpoXR (expoxr.com) */
+/* CMXR Engine v1.0.1 — Ayal Othman / ExpoXR (expoxr.com) */
 (function () {
 	'use strict';
 
