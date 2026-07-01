@@ -838,23 +838,6 @@
 	margin-bottom: 12px;
 }
 
-/* ---- WordPress admin chrome: Change Position on all CMXR pages ---- */
-body.toplevel_page_cmxr #wpfooter,
-body.cmxr_page_cmxr-new #wpfooter,
-body.cmxr_page_cmxr-settings #wpfooter,
-body.cmxr_page_cmxr-explorexr #wpfooter,
-body.admin_page_cmxr-edit #wpfooter {
-	position: relative !important;
-}
-
-body.toplevel_page_cmxr #wpbody-content,
-body.cmxr_page_cmxr-new #wpbody-content,
-body.cmxr_page_cmxr-settings #wpbody-content,
-body.cmxr_page_cmxr-explorexr #wpbody-content,
-body.admin_page_cmxr-edit #wpbody-content {
-	padding-bottom: 0 !important;
-}
-
 /* ---- Responsive (WP admin breakpoint) ---- */
 @media screen and (max-width: 782px) {
 	.cmxr-admin-header {
