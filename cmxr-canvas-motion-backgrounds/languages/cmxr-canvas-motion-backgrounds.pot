@@ -1,0 +1,1233 @@
+# Copyright (C) 2026 Ayal Othman
+# This file is distributed under the same license as the CMXR Canvas Motion Backgrounds plugin.
+#
+# Translators: Ayal Othman, 2026.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: CMXR Canvas Motion Backgrounds 1.0.1\n"
+"Report-Msgid-Bugs-To: https://expoxr.com/\n"
+"POT-Creation-Date: 2026-06-30 17:36+0000\n"
+"PO-Revision-Date: 2026-06-30 17:36+0000\n"
+"Last-Translator: Ayal Othman <https://expoxr.com/>\n"
+"Language-Team: ExpoXR <https://expoxr.com/>\n"
+"Language: en\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: cmxr-canvas-motion-backgrounds/admin/class-cmxr-admin.php:8
+#: cmxr-canvas-motion-backgrounds/admin/class-cmxr-admin.php:9
+msgid "CMXR"
+msgstr ""
+
+#: cmxr-canvas-motion-backgrounds/admin/class-cmxr-admin.php:19
+#: cmxr-canvas-motion-backgrounds/admin/class-cmxr-admin.php:20
+msgid "Animations"
+msgstr ""
+
+#: cmxr-canvas-motion-backgrounds/admin/class-cmxr-admin.php:28
+#: cmxr-canvas-motion-backgrounds/admin/class-cmxr-admin.php:29
+#: cmxr-canvas-motion-backgrounds/admin/class-cmxr-admin.php:147
+#: cmxr-canvas-motion-backgrounds/templates/admin/configurator.php:4
+#: cmxr-canvas-motion-backgrounds/templates/admin/configurator.php:10
+#: cmxr-canvas-motion-backgrounds/templates/admin/dashboard.php:7
+#: cmxr-canvas-motion-backgrounds/templates/admin/partials/header.php:27
+msgid "New Animation"
+msgstr ""
+
+#: cmxr-canvas-motion-backgrounds/admin/class-cmxr-admin.php:37
+#: cmxr-canvas-motion-backgrounds/admin/class-cmxr-admin.php:38
+#: cmxr-canvas-motion-backgrounds/templates/admin/partials/header.php:31
+#: cmxr-canvas-motion-backgrounds/templates/admin/settings.php:6
+msgid "Settings"
+msgstr ""
+
+#: cmxr-canvas-motion-backgrounds/admin/class-cmxr-admin.php:48
+#: cmxr-canvas-motion-backgrounds/admin/class-cmxr-admin.php:49
+#: cmxr-canvas-motion-backgrounds/templates/admin/debug.php:6
+msgid "Debug"
+msgstr ""
+
+#: cmxr-canvas-motion-backgrounds/admin/class-cmxr-admin.php:58
+#: cmxr-canvas-motion-backgrounds/admin/class-cmxr-admin.php:59
+#: cmxr-canvas-motion-backgrounds/templates/admin/explorexr.php:6
+#: cmxr-canvas-motion-backgrounds/templates/admin/partials/header.php:35
+msgid "ExploreXR"
+msgstr ""
+
+#: cmxr-canvas-motion-backgrounds/admin/class-cmxr-admin.php:68
+#: cmxr-canvas-motion-backgrounds/includes/class-cmxr-cpt.php:11
+#: cmxr-canvas-motion-backgrounds/templates/admin/configurator.php:4
+#: cmxr-canvas-motion-backgrounds/templates/admin/configurator.php:10
+msgid "Edit Animation"
+msgstr ""
+
+#: cmxr-canvas-motion-backgrounds/admin/class-cmxr-admin.php:141
+#: cmxr-canvas-motion-backgrounds/templates/admin/configurator.php:43
+msgid "Save"
+msgstr ""
+
+#: cmxr-canvas-motion-backgrounds/admin/class-cmxr-admin.php:142
+msgid "Saving..."
+msgstr ""
+
+#: cmxr-canvas-motion-backgrounds/admin/class-cmxr-admin.php:143
+msgid "Saved"
+msgstr ""
+
+#: cmxr-canvas-motion-backgrounds/admin/class-cmxr-admin.php:144
+msgid "Saved!"
+msgstr ""
+
+#: cmxr-canvas-motion-backgrounds/admin/class-cmxr-admin.php:145
+msgid "Error"
+msgstr ""
+
+#: cmxr-canvas-motion-backgrounds/admin/class-cmxr-admin.php:146
+msgid "Error saving."
+msgstr ""
+
+#: cmxr-canvas-motion-backgrounds/admin/class-cmxr-admin.php:148
+msgid "Copied:"
+msgstr ""
+
+#: cmxr-canvas-motion-backgrounds/admin/class-cmxr-admin.php:149
+msgid "Animation activated."
+msgstr ""
+
+#: cmxr-canvas-motion-backgrounds/admin/class-cmxr-admin.php:150
+msgid "Animation deactivated."
+msgstr ""
+
+#: cmxr-canvas-motion-backgrounds/admin/class-cmxr-admin.php:151
+#: cmxr-canvas-motion-backgrounds/templates/admin/dashboard.php:54
+#: cmxr-canvas-motion-backgrounds/templates/admin/debug.php:58
+msgid "Active"
+msgstr ""
+
+#: cmxr-canvas-motion-backgrounds/admin/class-cmxr-admin.php:152
+#: cmxr-canvas-motion-backgrounds/templates/admin/dashboard.php:54
+#: cmxr-canvas-motion-backgrounds/templates/admin/debug.php:58
+msgid "Inactive"
+msgstr ""
+
+#: cmxr-canvas-motion-backgrounds/admin/class-cmxr-admin.php:153
+msgid "Duplicated. Reloading..."
+msgstr ""
+
+#: cmxr-canvas-motion-backgrounds/admin/class-cmxr-admin.php:154
+msgid "Animation deleted."
+msgstr ""
+
+#: cmxr-canvas-motion-backgrounds/admin/class-cmxr-admin.php:155
+msgid "Hide Config"
+msgstr ""
+
+#. translators: %d: number of shapes
+#: cmxr-canvas-motion-backgrounds/admin/class-cmxr-admin.php:156
+#: cmxr-canvas-motion-backgrounds/templates/admin/debug.php:62
+msgid "Show Config"
+msgstr ""
+
+#: cmxr-canvas-motion-backgrounds/admin/class-cmxr-admin.php:157
+msgid "Custom"
+msgstr ""
+
+#: cmxr-canvas-motion-backgrounds/admin/class-cmxr-admin.php:158
+#: cmxr-canvas-motion-backgrounds/templates/admin/configurator.php:189
+msgid "Fill"
+msgstr ""
+
+#: cmxr-canvas-motion-backgrounds/admin/class-cmxr-configurator.php:8
+#: cmxr-canvas-motion-backgrounds/admin/class-cmxr-dashboard.php:50
+#: cmxr-canvas-motion-backgrounds/admin/class-cmxr-debug.php:8
+#: cmxr-canvas-motion-backgrounds/admin/class-cmxr-explorexr.php:12
+#: cmxr-canvas-motion-backgrounds/admin/class-cmxr-settings.php:115
+msgid "You do not have permission to access this page."
+msgstr ""
+
+#: cmxr-canvas-motion-backgrounds/admin/class-cmxr-dashboard.php:30
+msgid "ExpoXR Logo"
+msgstr ""
+
+#: cmxr-canvas-motion-backgrounds/admin/class-cmxr-dashboard.php:34
+msgid "CMXR is part of the"
+msgstr ""
+
+#: cmxr-canvas-motion-backgrounds/admin/class-cmxr-dashboard.php:34
+msgid "ExpoXR Family"
+msgstr ""
+
+#: cmxr-canvas-motion-backgrounds/admin/class-cmxr-dashboard.php:35
+msgid "XR solutions for the modern web"
+msgstr ""
+
+#: cmxr-canvas-motion-backgrounds/admin/class-cmxr-dashboard.php:40
+msgid "Visit ExpoXR.com"
+msgstr ""
+
+#: cmxr-canvas-motion-backgrounds/admin/class-cmxr-dashboard.php:41
+msgid "Support"
+msgstr ""
+
+#: cmxr-canvas-motion-backgrounds/admin/class-cmxr-settings.php:31
+msgid "Performance"
+msgstr ""
+
+#: cmxr-canvas-motion-backgrounds/admin/class-cmxr-settings.php:38
+msgid "Device Pixel Ratio Cap"
+msgstr ""
+
+#: cmxr-canvas-motion-backgrounds/admin/class-cmxr-settings.php:46
+msgid "IntersectionObserver Threshold"
+msgstr ""
+
+#: cmxr-canvas-motion-backgrounds/admin/class-cmxr-settings.php:54
+msgid "Default Animation Values"
+msgstr ""
+
+#: cmxr-canvas-motion-backgrounds/admin/class-cmxr-settings.php:61
+msgid "Default Speed"
+msgstr ""
+
+#: cmxr-canvas-motion-backgrounds/admin/class-cmxr-settings.php:69
+msgid "Default Safe Margin (%)"
+msgstr ""
+
+#: cmxr-canvas-motion-backgrounds/admin/class-cmxr-settings.php:77
+msgid "Default Blend Mode"
+msgstr ""
+
+#: cmxr-canvas-motion-backgrounds/admin/class-cmxr-settings.php:85
+msgid "Developer"
+msgstr ""
+
+#: cmxr-canvas-motion-backgrounds/admin/class-cmxr-settings.php:92
+msgid "Debug Mode"
+msgstr ""
+
+#: cmxr-canvas-motion-backgrounds/admin/class-cmxr-settings.php:127
+#: cmxr-canvas-motion-backgrounds/admin/class-cmxr-settings.php:148
+#: cmxr-canvas-motion-backgrounds/admin/class-cmxr-settings.php:187
+msgid "You do not have permission to perform this action."
+msgstr ""
+
+#: cmxr-canvas-motion-backgrounds/admin/class-cmxr-settings.php:227
+msgid "Imported Animation"
+msgstr ""
+
+#: cmxr-canvas-motion-backgrounds/admin/class-cmxr-settings.php:262
+msgid ""
+"Cap device pixel ratio to limit canvas size on high-density screens. "
+"Recommended: 1.75."
+msgstr ""
+
+#: cmxr-canvas-motion-backgrounds/admin/class-cmxr-settings.php:274
+msgid ""
+"Visibility fraction required before animation starts. 0.01 = start when 1% "
+"visible."
+msgstr ""
+
+#: cmxr-canvas-motion-backgrounds/admin/class-cmxr-settings.php:322
+msgid "Output engine debug info to browser console."
+msgstr ""
+
+#: cmxr-canvas-motion-backgrounds/includes/class-cmxr-cpt.php:8
+msgid "CMXR Animations"
+msgstr ""
+
+#: cmxr-canvas-motion-backgrounds/includes/class-cmxr-cpt.php:9
+#: cmxr-canvas-motion-backgrounds/templates/admin/configurator.php:213
+msgid "Animation"
+msgstr ""
+
+#: cmxr-canvas-motion-backgrounds/includes/class-cmxr-cpt.php:10
+msgid "Add New Animation"
+msgstr ""
+
+#: cmxr-canvas-motion-backgrounds/includes/class-cmxr-cpt.php:12
+msgid "Search Animations"
+msgstr ""
+
+#: cmxr-canvas-motion-backgrounds/includes/class-cmxr-cpt.php:13
+msgid "No animations found."
+msgstr ""
+
+#: cmxr-canvas-motion-backgrounds/includes/class-cmxr-rest.php:108
+#: cmxr-canvas-motion-backgrounds/includes/class-cmxr-rest.php:171
+#: cmxr-canvas-motion-backgrounds/includes/class-cmxr-rest.php:197
+#: cmxr-canvas-motion-backgrounds/includes/class-cmxr-rest.php:208
+#: cmxr-canvas-motion-backgrounds/includes/class-cmxr-rest.php:243
+msgid "Animation not found."
+msgstr ""
+
+#: cmxr-canvas-motion-backgrounds/includes/class-cmxr-rest.php:126
+msgid "Title is required."
+msgstr ""
+
+#: cmxr-canvas-motion-backgrounds/includes/class-cmxr-rest.php:186
+msgid "Invalid configuration."
+msgstr ""
+
+#: cmxr-canvas-motion-backgrounds/includes/class-cmxr-schema.php:23
+msgid "Soft Orbs"
+msgstr ""
+
+#: cmxr-canvas-motion-backgrounds/includes/class-cmxr-schema.php:25
+msgid "Circle"
+msgstr ""
+
+#: cmxr-canvas-motion-backgrounds/includes/class-cmxr-schema.php:26
+msgid "Double"
+msgstr ""
+
+#: cmxr-canvas-motion-backgrounds/includes/class-cmxr-schema.php:27
+msgid "Triple"
+msgstr ""
+
+#: cmxr-canvas-motion-backgrounds/includes/class-cmxr-schema.php:28
+msgid "Blob"
+msgstr ""
+
+#: cmxr-canvas-motion-backgrounds/includes/class-cmxr-schema.php:29
+msgid "Outline"
+msgstr ""
+
+#: cmxr-canvas-motion-backgrounds/includes/class-cmxr-schema.php:30
+msgid "Ring"
+msgstr ""
+
+#: cmxr-canvas-motion-backgrounds/includes/class-cmxr-schema.php:34
+msgid "Geometry"
+msgstr ""
+
+#: cmxr-canvas-motion-backgrounds/includes/class-cmxr-schema.php:36
+msgid "Box"
+msgstr ""
+
+#: cmxr-canvas-motion-backgrounds/includes/class-cmxr-schema.php:37
+msgid "Box Outline"
+msgstr ""
+
+#: cmxr-canvas-motion-backgrounds/includes/class-cmxr-schema.php:38
+msgid "Capsule"
+msgstr ""
+
+#: cmxr-canvas-motion-backgrounds/includes/class-cmxr-schema.php:39
+msgid "Capsule Outline"
+msgstr ""
+
+#: cmxr-canvas-motion-backgrounds/includes/class-cmxr-schema.php:43
+msgid "Lines"
+msgstr ""
+
+#: cmxr-canvas-motion-backgrounds/includes/class-cmxr-schema.php:45
+msgid "Line"
+msgstr ""
+
+#: cmxr-canvas-motion-backgrounds/includes/class-cmxr-schema.php:46
+msgid "Wave Line"
+msgstr ""
+
+#: cmxr-canvas-motion-backgrounds/includes/class-cmxr-schema.php:54
+msgid "Normal"
+msgstr ""
+
+#: cmxr-canvas-motion-backgrounds/includes/class-cmxr-schema.php:55
+msgid "Reverse"
+msgstr ""
+
+#: cmxr-canvas-motion-backgrounds/includes/class-cmxr-schema.php:61
+msgid "None"
+msgstr ""
+
+#: cmxr-canvas-motion-backgrounds/includes/class-cmxr-schema.php:62
+msgid "Left to Right"
+msgstr ""
+
+#: cmxr-canvas-motion-backgrounds/includes/class-cmxr-schema.php:63
+msgid "Right to Left"
+msgstr ""
+
+#: cmxr-canvas-motion-backgrounds/includes/class-cmxr-schema.php:64
+msgid "Top to Bottom"
+msgstr ""
+
+#: cmxr-canvas-motion-backgrounds/includes/class-cmxr-schema.php:65
+msgid "Bottom to Top"
+msgstr ""
+
+#: cmxr-canvas-motion-backgrounds/includes/class-cmxr-schema.php:66
+msgid "Both Axes"
+msgstr ""
+
+#: cmxr-canvas-motion-backgrounds/includes/class-cmxr-schema.php:72
+msgid "%"
+msgstr ""
+
+#: cmxr-canvas-motion-backgrounds/includes/class-cmxr-schema.php:73
+msgid "px"
+msgstr ""
+
+#: cmxr-canvas-motion-backgrounds/includes/class-cmxr-schema.php:74
+msgid "vw"
+msgstr ""
+
+#: cmxr-canvas-motion-backgrounds/includes/class-cmxr-schema.php:75
+msgid "vh"
+msgstr ""
+
+#: cmxr-canvas-motion-backgrounds/includes/class-cmxr-schema.php:81
+msgid "Solid"
+msgstr ""
+
+#: cmxr-canvas-motion-backgrounds/includes/class-cmxr-schema.php:82
+msgid "Dual Color"
+msgstr ""
+
+#: cmxr-canvas-motion-backgrounds/includes/class-cmxr-schema.php:83
+msgid "Gradient"
+msgstr ""
+
+#: cmxr-canvas-motion-backgrounds/includes/class-cmxr-schema.php:89
+msgid "Drift (compound harmonic)"
+msgstr ""
+
+#: cmxr-canvas-motion-backgrounds/includes/class-cmxr-schema.php:90
+msgid "Orbit (elliptical)"
+msgstr ""
+
+#: cmxr-canvas-motion-backgrounds/includes/class-cmxr-schema.php:91
+msgid "Pulse (breathing)"
+msgstr ""
+
+#: cmxr-canvas-motion-backgrounds/includes/class-cmxr-schema.php:92
+msgid "Wave (sine path)"
+msgstr ""
+
+#: cmxr-canvas-motion-backgrounds/includes/class-cmxr-schema.php:93
+msgid "Fixed (no movement)"
+msgstr ""
+
+#: cmxr-canvas-motion-backgrounds/includes/class-cmxr-schema.php:94
+msgid "Figure 8 (Lissajous)"
+msgstr ""
+
+#: cmxr-canvas-motion-backgrounds/templates/admin/configurator.php:9
+msgid "ExpoXR"
+msgstr ""
+
+#: cmxr-canvas-motion-backgrounds/templates/admin/configurator.php:14
+msgid "Canvas Background Builder"
+msgstr ""
+
+#: cmxr-canvas-motion-backgrounds/templates/admin/configurator.php:22
+msgid "All Animations"
+msgstr ""
+
+#: cmxr-canvas-motion-backgrounds/templates/admin/configurator.php:25
+msgid "Animation Name"
+msgstr ""
+
+#: cmxr-canvas-motion-backgrounds/templates/admin/configurator.php:28
+msgid "Hero background"
+msgstr ""
+
+#: cmxr-canvas-motion-backgrounds/templates/admin/configurator.php:31
+msgid "CSS Target ID"
+msgstr ""
+
+#: cmxr-canvas-motion-backgrounds/templates/admin/configurator.php:65
+msgid "Background"
+msgstr ""
+
+#: cmxr-canvas-motion-backgrounds/templates/admin/configurator.php:66
+msgid "Motion"
+msgstr ""
+
+#: cmxr-canvas-motion-backgrounds/templates/admin/configurator.php:67
+#: cmxr-canvas-motion-backgrounds/templates/admin/configurator.php:214
+msgid "Interaction"
+msgstr ""
+
+#: cmxr-canvas-motion-backgrounds/templates/admin/configurator.php:75
+msgid "Background Color"
+msgstr ""
+
+#: cmxr-canvas-motion-backgrounds/templates/admin/configurator.php:84
+msgid "Transparent"
+msgstr ""
+
+#: cmxr-canvas-motion-backgrounds/templates/admin/configurator.php:92
+msgid "Speed"
+msgstr ""
+
+#: cmxr-canvas-motion-backgrounds/templates/admin/configurator.php:100
+msgid "Safe Margin"
+msgstr ""
+
+#: cmxr-canvas-motion-backgrounds/templates/admin/configurator.php:109
+msgid "Blend Mode"
+msgstr ""
+
+#: cmxr-canvas-motion-backgrounds/templates/admin/configurator.php:122
+msgid "Enable Interactivity"
+msgstr ""
+
+#: cmxr-canvas-motion-backgrounds/templates/admin/configurator.php:127
+msgid "Mode"
+msgstr ""
+
+#: cmxr-canvas-motion-backgrounds/templates/admin/configurator.php:135
+msgid "Strength"
+msgstr ""
+
+#: cmxr-canvas-motion-backgrounds/templates/admin/configurator.php:142
+msgid "Radius (%)"
+msgstr ""
+
+#: cmxr-canvas-motion-backgrounds/templates/admin/configurator.php:148
+msgid "Move your mouse over the preview to test interaction."
+msgstr ""
+
+#: cmxr-canvas-motion-backgrounds/templates/admin/configurator.php:161
+#: cmxr-canvas-motion-backgrounds/templates/admin/dashboard.php:26
+msgid "Shapes"
+msgstr ""
+
+#: cmxr-canvas-motion-backgrounds/templates/admin/configurator.php:162
+msgid "Add Shape"
+msgstr ""
+
+#: cmxr-canvas-motion-backgrounds/templates/admin/configurator.php:164
+msgid "Top = above others · drag to reorder"
+msgstr ""
+
+#: cmxr-canvas-motion-backgrounds/templates/admin/configurator.php:170
+msgid "Start with a shape"
+msgstr ""
+
+#: cmxr-canvas-motion-backgrounds/templates/admin/configurator.php:171
+msgid "Add one visual layer, then tune color, motion, and position."
+msgstr ""
+
+#: cmxr-canvas-motion-backgrounds/templates/admin/configurator.php:172
+msgid "Add First Shape"
+msgstr ""
+
+#: cmxr-canvas-motion-backgrounds/templates/admin/configurator.php:179
+msgid "Live Preview"
+msgstr ""
+
+#: cmxr-canvas-motion-backgrounds/templates/admin/configurator.php:195
+msgid "Add a shape to preview"
+msgstr ""
+
+#: cmxr-canvas-motion-backgrounds/templates/admin/configurator.php:204
+msgid "Select a shape from the list to configure it."
+msgstr ""
+
+#: cmxr-canvas-motion-backgrounds/templates/admin/configurator.php:210
+msgid "Shape"
+msgstr ""
+
+#: cmxr-canvas-motion-backgrounds/templates/admin/configurator.php:211
+msgid "Color"
+msgstr ""
+
+#: cmxr-canvas-motion-backgrounds/templates/admin/configurator.php:212
+msgid "Size & Position"
+msgstr ""
+
+#: cmxr-canvas-motion-backgrounds/templates/admin/configurator.php:235
+msgid "Blur"
+msgstr ""
+
+#: cmxr-canvas-motion-backgrounds/templates/admin/configurator.php:244
+msgid "Opacity"
+msgstr ""
+
+#: cmxr-canvas-motion-backgrounds/templates/admin/configurator.php:255
+msgid "Color Mode"
+msgstr ""
+
+#: cmxr-canvas-motion-backgrounds/templates/admin/configurator.php:263
+msgid "Primary Color"
+msgstr ""
+
+#: cmxr-canvas-motion-backgrounds/templates/admin/configurator.php:267
+msgid "Secondary Color"
+msgstr ""
+
+#: cmxr-canvas-motion-backgrounds/templates/admin/configurator.php:271
+msgid "Gradient Colors"
+msgstr ""
+
+#: cmxr-canvas-motion-backgrounds/templates/admin/configurator.php:273
+msgid "Add Color"
+msgstr ""
+
+#: cmxr-canvas-motion-backgrounds/templates/admin/configurator.php:274
+msgid "Use up to 5 colors. First two stay synced with Primary and Secondary."
+msgstr ""
+
+#: cmxr-canvas-motion-backgrounds/templates/admin/configurator.php:277
+msgid "Color Animation"
+msgstr ""
+
+#: cmxr-canvas-motion-backgrounds/templates/admin/configurator.php:289
+msgid "Size Unit"
+msgstr ""
+
+#: cmxr-canvas-motion-backgrounds/templates/admin/configurator.php:297
+msgid "Width"
+msgstr ""
+
+#: cmxr-canvas-motion-backgrounds/templates/admin/configurator.php:305
+msgid "Height"
+msgstr ""
+
+#: cmxr-canvas-motion-backgrounds/templates/admin/configurator.php:313
+msgid "Rotation (°)"
+msgstr ""
+
+#: cmxr-canvas-motion-backgrounds/templates/admin/configurator.php:324
+msgid "Position Unit"
+msgstr ""
+
+#: cmxr-canvas-motion-backgrounds/templates/admin/configurator.php:330
+msgid "Position is relative to the container holding the animation ID."
+msgstr ""
+
+#: cmxr-canvas-motion-backgrounds/templates/admin/configurator.php:333
+msgid "X Position"
+msgstr ""
+
+#: cmxr-canvas-motion-backgrounds/templates/admin/configurator.php:341
+msgid "Y Position"
+msgstr ""
+
+#: cmxr-canvas-motion-backgrounds/templates/admin/configurator.php:353
+msgid "Animation Type"
+msgstr ""
+
+#: cmxr-canvas-motion-backgrounds/templates/admin/configurator.php:362
+msgid "Amplitude X (%)"
+msgstr ""
+
+#: cmxr-canvas-motion-backgrounds/templates/admin/configurator.php:369
+msgid "Amplitude Y (%)"
+msgstr ""
+
+#: cmxr-canvas-motion-backgrounds/templates/admin/configurator.php:376
+msgid "Frequency X"
+msgstr ""
+
+#: cmxr-canvas-motion-backgrounds/templates/admin/configurator.php:383
+msgid "Frequency Y"
+msgstr ""
+
+#: cmxr-canvas-motion-backgrounds/templates/admin/configurator.php:390
+msgid "Phase Offset (rad)"
+msgstr ""
+
+#: cmxr-canvas-motion-backgrounds/templates/admin/configurator.php:401
+msgid "Interaction Direction"
+msgstr ""
+
+#: cmxr-canvas-motion-backgrounds/templates/admin/configurator.php:407
+msgid ""
+"Normal follows the global interaction behavior. Reverse flips this layer "
+"response."
+msgstr ""
+
+#: cmxr-canvas-motion-backgrounds/templates/admin/configurator.php:410
+msgid "Parallax Depth"
+msgstr ""
+
+#: cmxr-canvas-motion-backgrounds/templates/admin/configurator.php:415
+msgid ""
+"0 = no reaction, 1 = full reaction. Used by parallax, repel, attract modes."
+msgstr ""
+
+#: cmxr-canvas-motion-backgrounds/templates/admin/dashboard.php:6
+msgid "CMXR Dashboard"
+msgstr ""
+
+#: cmxr-canvas-motion-backgrounds/templates/admin/dashboard.php:14
+msgid "No animations yet"
+msgstr ""
+
+#: cmxr-canvas-motion-backgrounds/templates/admin/dashboard.php:15
+msgid ""
+"Create your first animated canvas background and attach it to any Elementor "
+"section via CSS ID."
+msgstr ""
+
+#: cmxr-canvas-motion-backgrounds/templates/admin/dashboard.php:17
+msgid "Create Animation"
+msgstr ""
+
+#: cmxr-canvas-motion-backgrounds/templates/admin/dashboard.php:24
+msgid "Name"
+msgstr ""
+
+#: cmxr-canvas-motion-backgrounds/templates/admin/dashboard.php:25
+msgid "CSS ID"
+msgstr ""
+
+#: cmxr-canvas-motion-backgrounds/templates/admin/dashboard.php:27
+msgid "Status"
+msgstr ""
+
+#: cmxr-canvas-motion-backgrounds/templates/admin/dashboard.php:28
+msgid "Actions"
+msgstr ""
+
+#: cmxr-canvas-motion-backgrounds/templates/admin/dashboard.php:44
+msgid "Copy ID"
+msgstr ""
+
+#: cmxr-canvas-motion-backgrounds/templates/admin/dashboard.php:46
+msgid "— not set —"
+msgstr ""
+
+#: cmxr-canvas-motion-backgrounds/templates/admin/dashboard.php:53
+msgid "Toggle active"
+msgstr ""
+
+#: cmxr-canvas-motion-backgrounds/templates/admin/dashboard.php:61
+msgid "Preview"
+msgstr ""
+
+#: cmxr-canvas-motion-backgrounds/templates/admin/dashboard.php:64
+#: cmxr-canvas-motion-backgrounds/templates/admin/debug.php:65
+msgid "Edit"
+msgstr ""
+
+#: cmxr-canvas-motion-backgrounds/templates/admin/dashboard.php:67
+msgid "Duplicate"
+msgstr ""
+
+#: cmxr-canvas-motion-backgrounds/templates/admin/dashboard.php:70
+msgid "Delete this animation? This cannot be undone."
+msgstr ""
+
+#: cmxr-canvas-motion-backgrounds/templates/admin/dashboard.php:71
+msgid "Delete"
+msgstr ""
+
+#: cmxr-canvas-motion-backgrounds/templates/admin/debug.php:10
+msgid "Export All Configs (JSON)"
+msgstr ""
+
+#: cmxr-canvas-motion-backgrounds/templates/admin/debug.php:17
+msgid "System Info"
+msgstr ""
+
+#: cmxr-canvas-motion-backgrounds/templates/admin/debug.php:20
+msgid "PHP Version"
+msgstr ""
+
+#: cmxr-canvas-motion-backgrounds/templates/admin/debug.php:21
+msgid "WordPress Version"
+msgstr ""
+
+#: cmxr-canvas-motion-backgrounds/templates/admin/debug.php:22
+msgid "Active Theme"
+msgstr ""
+
+#: cmxr-canvas-motion-backgrounds/templates/admin/debug.php:23
+msgid "Plugin Version"
+msgstr ""
+
+#: cmxr-canvas-motion-backgrounds/templates/admin/debug.php:24
+msgid "REST API Namespace"
+msgstr ""
+
+#: cmxr-canvas-motion-backgrounds/templates/admin/debug.php:31
+msgid "Asset URLs"
+msgstr ""
+
+#: cmxr-canvas-motion-backgrounds/templates/admin/debug.php:34
+msgid "Engine JS"
+msgstr ""
+
+#: cmxr-canvas-motion-backgrounds/templates/admin/debug.php:35
+msgid "Detect JS"
+msgstr ""
+
+#: cmxr-canvas-motion-backgrounds/templates/admin/debug.php:36
+msgid "Public CSS"
+msgstr ""
+
+#: cmxr-canvas-motion-backgrounds/templates/admin/debug.php:43
+msgid "Active Settings"
+msgstr ""
+
+#: cmxr-canvas-motion-backgrounds/templates/admin/debug.php:49
+msgid "Registered Animations"
+msgstr ""
+
+#: cmxr-canvas-motion-backgrounds/templates/admin/debug.php:51
+msgid "No animations registered."
+msgstr ""
+
+#: cmxr-canvas-motion-backgrounds/templates/admin/debug.php:76
+msgid "Browser Compatibility"
+msgstr ""
+
+#: cmxr-canvas-motion-backgrounds/templates/admin/debug.php:77
+msgid ""
+"Checked in browser at runtime. Open browser console on any page with CMXR "
+"animations for a detailed report."
+msgstr ""
+
+#: cmxr-canvas-motion-backgrounds/templates/admin/debug.php:79
+msgid "Feature"
+msgstr ""
+
+#: cmxr-canvas-motion-backgrounds/templates/admin/debug.php:79
+msgid "Required"
+msgstr ""
+
+#: cmxr-canvas-motion-backgrounds/templates/admin/debug.php:81
+#: cmxr-canvas-motion-backgrounds/templates/admin/debug.php:84
+msgid "Yes"
+msgstr ""
+
+#: cmxr-canvas-motion-backgrounds/templates/admin/debug.php:82
+#: cmxr-canvas-motion-backgrounds/templates/admin/debug.php:83
+msgid "Recommended (graceful fallback)"
+msgstr ""
+
+#: cmxr-canvas-motion-backgrounds/templates/admin/debug.php:85
+msgid "Optional (interactivity)"
+msgstr ""
+
+#: cmxr-canvas-motion-backgrounds/templates/admin/explorexr.php:16
+msgid "ExploreXR Logo"
+msgstr ""
+
+#: cmxr-canvas-motion-backgrounds/templates/admin/explorexr.php:19
+msgid "Interactive 3D models for WordPress"
+msgstr ""
+
+#: cmxr-canvas-motion-backgrounds/templates/admin/explorexr.php:21
+msgid ""
+"ExploreXR brings interactive 3D models to your website with zero coding "
+"required — from the same ExpoXR family as CMXR. Upload GLB, GLTF and USDZ "
+"files, embed them anywhere with a shortcode, and let visitors rotate, zoom "
+"and even view your models in Augmented Reality."
+msgstr ""
+
+#: cmxr-canvas-motion-backgrounds/templates/admin/explorexr.php:24
+msgid "Drag-and-drop model uploads"
+msgstr ""
+
+#: cmxr-canvas-motion-backgrounds/templates/admin/explorexr.php:25
+msgid "Augmented Reality on mobile devices"
+msgstr ""
+
+#: cmxr-canvas-motion-backgrounds/templates/admin/explorexr.php:26
+msgid "Progressive loading optimization"
+msgstr ""
+
+#: cmxr-canvas-motion-backgrounds/templates/admin/explorexr.php:27
+msgid "Elementor, Divi & Gutenberg integrations"
+msgstr ""
+
+#: cmxr-canvas-motion-backgrounds/templates/admin/explorexr.php:34
+msgid "ExploreXR Free"
+msgstr ""
+
+#: cmxr-canvas-motion-backgrounds/templates/admin/explorexr.php:35
+msgid "Get started with 3D on WordPress."
+msgstr ""
+
+#: cmxr-canvas-motion-backgrounds/templates/admin/explorexr.php:37
+msgid "Core 3D viewer (GLB / GLTF / USDZ)"
+msgstr ""
+
+#: cmxr-canvas-motion-backgrounds/templates/admin/explorexr.php:38
+msgid "One free addon (AR, Animation, Loading, or Annotations)"
+msgstr ""
+
+#: cmxr-canvas-motion-backgrounds/templates/admin/explorexr.php:39
+msgid "Compression decoders: Draco, KTX2, Meshopt"
+msgstr ""
+
+#: cmxr-canvas-motion-backgrounds/templates/admin/explorexr.php:40
+msgid "Community support"
+msgstr ""
+
+#: cmxr-canvas-motion-backgrounds/templates/admin/explorexr.php:43
+msgid "Install from WordPress.org"
+msgstr ""
+
+#: cmxr-canvas-motion-backgrounds/templates/admin/explorexr.php:48
+msgid "ExploreXR Premium"
+msgstr ""
+
+#: cmxr-canvas-motion-backgrounds/templates/admin/explorexr.php:49
+msgid "Rich production sites with AR and commerce."
+msgstr ""
+
+#: cmxr-canvas-motion-backgrounds/templates/admin/explorexr.php:51
+msgid "Everything in Free"
+msgstr ""
+
+#: cmxr-canvas-motion-backgrounds/templates/admin/explorexr.php:52
+msgid "Commercial addons: AR, Animation, Annotations, Camera controls & more"
+msgstr ""
+
+#: cmxr-canvas-motion-backgrounds/templates/admin/explorexr.php:53
+msgid "Page builder widgets (Elementor, Divi, Avada)"
+msgstr ""
+
+#: cmxr-canvas-motion-backgrounds/templates/admin/explorexr.php:54
+msgid "Priority email support & automatic updates"
+msgstr ""
+
+#: cmxr-canvas-motion-backgrounds/templates/admin/explorexr.php:57
+msgid "View Pricing"
+msgstr ""
+
+#: cmxr-canvas-motion-backgrounds/templates/admin/explorexr.php:67
+msgid "Morphing Add-On"
+msgstr ""
+
+#: cmxr-canvas-motion-backgrounds/templates/admin/explorexr.php:70
+msgid "Morph between different model versions or states"
+msgstr ""
+
+#: cmxr-canvas-motion-backgrounds/templates/admin/explorexr.php:71
+msgid "Trigger via buttons or scroll"
+msgstr ""
+
+#: cmxr-canvas-motion-backgrounds/templates/admin/explorexr.php:72
+msgid "Adjustable timing & easing curves"
+msgstr ""
+
+#: cmxr-canvas-motion-backgrounds/templates/admin/explorexr.php:73
+msgid "Seamless visual transitions"
+msgstr ""
+
+#: cmxr-canvas-motion-backgrounds/templates/admin/explorexr.php:77
+msgid "Environment & Lighting Add-On"
+msgstr ""
+
+#: cmxr-canvas-motion-backgrounds/templates/admin/explorexr.php:80
+msgid "Background presets"
+msgstr ""
+
+#: cmxr-canvas-motion-backgrounds/templates/admin/explorexr.php:81
+msgid "Reflection and ambience controls"
+msgstr ""
+
+#: cmxr-canvas-motion-backgrounds/templates/admin/explorexr.php:82
+msgid "Environment lighting adjustments"
+msgstr ""
+
+#: cmxr-canvas-motion-backgrounds/templates/admin/explorexr.php:83
+msgid "Visual consistency across models"
+msgstr ""
+
+#: cmxr-canvas-motion-backgrounds/templates/admin/explorexr.php:87
+msgid "Post-Processing Add-On"
+msgstr ""
+
+#: cmxr-canvas-motion-backgrounds/templates/admin/explorexr.php:90
+msgid "Bloom"
+msgstr ""
+
+#: cmxr-canvas-motion-backgrounds/templates/admin/explorexr.php:91
+msgid "Depth of Field (DOF)"
+msgstr ""
+
+#: cmxr-canvas-motion-backgrounds/templates/admin/explorexr.php:92
+msgid "Screen Space Ambient Occlusion (SSAO)"
+msgstr ""
+
+#: cmxr-canvas-motion-backgrounds/templates/admin/explorexr.php:93
+msgid "Tone mapping & color grading"
+msgstr ""
+
+#: cmxr-canvas-motion-backgrounds/templates/admin/explorexr.php:97
+msgid "Annotations Add-On"
+msgstr ""
+
+#: cmxr-canvas-motion-backgrounds/templates/admin/explorexr.php:100
+msgid "4 annotation types: hotspots, animated, dimension labels, camera-view"
+msgstr ""
+
+#: cmxr-canvas-motion-backgrounds/templates/admin/explorexr.php:101
+msgid "Unlimited annotations per model"
+msgstr ""
+
+#: cmxr-canvas-motion-backgrounds/templates/admin/explorexr.php:102
+msgid "Style & color customization"
+msgstr ""
+
+#: cmxr-canvas-motion-backgrounds/templates/admin/explorexr.php:103
+msgid "Hover or click interaction modes"
+msgstr ""
+
+#: cmxr-canvas-motion-backgrounds/templates/admin/explorexr.php:104
+msgid "Rich text + image content with built-in editor"
+msgstr ""
+
+#: cmxr-canvas-motion-backgrounds/templates/admin/explorexr.php:105
+msgid "Fully responsive"
+msgstr ""
+
+#: cmxr-canvas-motion-backgrounds/templates/admin/explorexr.php:109
+msgid "Animation Add-On"
+msgstr ""
+
+#: cmxr-canvas-motion-backgrounds/templates/admin/explorexr.php:112
+msgid "Multiple animation support per model"
+msgstr ""
+
+#: cmxr-canvas-motion-backgrounds/templates/admin/explorexr.php:113
+msgid "Play, pause, reset controls"
+msgstr ""
+
+#: cmxr-canvas-motion-backgrounds/templates/admin/explorexr.php:114
+msgid "Custom timing & sequencing"
+msgstr ""
+
+#: cmxr-canvas-motion-backgrounds/templates/admin/explorexr.php:115
+msgid "Ping-pong loop mode"
+msgstr ""
+
+#: cmxr-canvas-motion-backgrounds/templates/admin/explorexr.php:116
+msgid "Crossfade transitions between animations"
+msgstr ""
+
+#: cmxr-canvas-motion-backgrounds/templates/admin/explorexr.php:117
+msgid "Responsive animation UI"
+msgstr ""
+
+#: cmxr-canvas-motion-backgrounds/templates/admin/explorexr.php:121
+msgid "Materials & Variants Add-On"
+msgstr ""
+
+#: cmxr-canvas-motion-backgrounds/templates/admin/explorexr.php:124
+msgid "Automatic detection of glTF material variants"
+msgstr ""
+
+#: cmxr-canvas-motion-backgrounds/templates/admin/explorexr.php:125
+msgid "Real-time material switching without reloads"
+msgstr ""
+
+#: cmxr-canvas-motion-backgrounds/templates/admin/explorexr.php:126
+msgid "Multiple UI styles: buttons, tabs, dropdowns"
+msgstr ""
+
+#: cmxr-canvas-motion-backgrounds/templates/admin/explorexr.php:127
+msgid "Custom labels, previews, and variant naming"
+msgstr ""
+
+#: cmxr-canvas-motion-backgrounds/templates/admin/explorexr.php:128
+msgid "Smart caching for fast switching"
+msgstr ""
+
+#: cmxr-canvas-motion-backgrounds/templates/admin/explorexr.php:129
+msgid "Fully responsive on all devices"
+msgstr ""
+
+#: cmxr-canvas-motion-backgrounds/templates/admin/explorexr.php:133
+msgid "Loading Options Add-On"
+msgstr ""
+
+#: cmxr-canvas-motion-backgrounds/templates/admin/explorexr.php:136
+msgid "Fully customizable loading bar (position, height, colors)"
+msgstr ""
+
+#: cmxr-canvas-motion-backgrounds/templates/admin/explorexr.php:137
+msgid "Percentage counters & custom loading messages"
+msgstr ""
+
+#: cmxr-canvas-motion-backgrounds/templates/admin/explorexr.php:138
+msgid "Multi-language support"
+msgstr ""
+
+#: cmxr-canvas-motion-backgrounds/templates/admin/explorexr.php:139
+msgid "Background overlays, gradients & blur effects"
+msgstr ""
+
+#: cmxr-canvas-motion-backgrounds/templates/admin/explorexr.php:140
+msgid "Lazy loading & script optimization"
+msgstr ""
+
+#: cmxr-canvas-motion-backgrounds/templates/admin/explorexr.php:141
+msgid "Accessibility support (screen readers, reduced motion, dark mode)"
+msgstr ""
+
+#: cmxr-canvas-motion-backgrounds/templates/admin/explorexr.php:145
+msgid "Mouse3D Control Add-On"
+msgstr ""
+
+#: cmxr-canvas-motion-backgrounds/templates/admin/explorexr.php:148
+msgid "Mouse-based camera rotation"
+msgstr ""
+
+#: cmxr-canvas-motion-backgrounds/templates/admin/explorexr.php:149
+msgid "Optional zoom behavior"
+msgstr ""
+
+#: cmxr-canvas-motion-backgrounds/templates/admin/explorexr.php:150
+msgid "Subtle parallax-style interaction"
+msgstr ""
+
+#: cmxr-canvas-motion-backgrounds/templates/admin/explorexr.php:151
+msgid "Lightweight & performance-friendly"
+msgstr ""
+
+#: cmxr-canvas-motion-backgrounds/templates/admin/explorexr.php:155
+msgid "AR Add-On"
+msgstr ""
+
+#: cmxr-canvas-motion-backgrounds/templates/admin/explorexr.php:158
+msgid "WebXR support (browser-based AR)"
+msgstr ""
+
+#: cmxr-canvas-motion-backgrounds/templates/admin/explorexr.php:159
+msgid "Android Scene Viewer integration"
+msgstr ""
+
+#: cmxr-canvas-motion-backgrounds/templates/admin/explorexr.php:160
+msgid "iOS Quick Look (USDZ support)"
+msgstr ""
+
+#: cmxr-canvas-motion-backgrounds/templates/admin/explorexr.php:161
+msgid "Customizable AR buttons"
+msgstr ""
+
+#: cmxr-canvas-motion-backgrounds/templates/admin/explorexr.php:162
+msgid "Floor, wall, and object placement"
+msgstr ""
+
+#: cmxr-canvas-motion-backgrounds/templates/admin/explorexr.php:163
+msgid "Scaling & positioning controls"
+msgstr ""
+
+#: cmxr-canvas-motion-backgrounds/templates/admin/explorexr.php:167
+msgid "Draggable Add-On"
+msgstr ""
+
+#: cmxr-canvas-motion-backgrounds/templates/admin/explorexr.php:170
+msgid "Drag & reposition models on frontend"
+msgstr ""
+
+#: cmxr-canvas-motion-backgrounds/templates/admin/explorexr.php:171
+msgid "Optional position memory"
+msgstr ""
+
+#: cmxr-canvas-motion-backgrounds/templates/admin/explorexr.php:172
+msgid "Boundary constraints for layouts"
+msgstr ""
+
+#: cmxr-canvas-motion-backgrounds/templates/admin/explorexr.php:176
+msgid "Expert Camera Mode Add-On"
+msgstr ""
+
+#: cmxr-canvas-motion-backgrounds/templates/admin/explorexr.php:179
+msgid "Custom orbit angles & camera presets"
+msgstr ""
+
+#: cmxr-canvas-motion-backgrounds/templates/admin/explorexr.php:180
+msgid "Field of view (FOV) adjustment"
+msgstr ""
+
+#: cmxr-canvas-motion-backgrounds/templates/admin/explorexr.php:181
+msgid "Min/max orbit & zoom limits"
+msgstr ""
+
+#: cmxr-canvas-motion-backgrounds/templates/admin/explorexr.php:182
+msgid "Touch & mouse gesture customization"
+msgstr ""
+
+#: cmxr-canvas-motion-backgrounds/templates/admin/explorexr.php:183
+msgid "Smooth camera interpolation & custom target focus"
+msgstr ""
+
+#: cmxr-canvas-motion-backgrounds/templates/admin/explorexr.php:184
+msgid "Optional user interaction prompts"
+msgstr ""
+
+#: cmxr-canvas-motion-backgrounds/templates/admin/explorexr.php:191
+msgid "ExploreXR Add-Ons & Demos"
+msgstr ""
+
+#: cmxr-canvas-motion-backgrounds/templates/admin/explorexr.php:192
+msgid "Explore everything the ExploreXR family can do."
+msgstr ""
+
+#: cmxr-canvas-motion-backgrounds/templates/admin/explorexr.php:204
+msgid "Open Demo"
+msgstr ""
+
+#: cmxr-canvas-motion-backgrounds/templates/admin/partials/header.php:24
+msgid "Dashboard"
+msgstr ""
+
+#: cmxr-canvas-motion-backgrounds/templates/admin/settings.php:17
+msgid "Cache cleared successfully."
+msgstr ""
+
+#. translators: 1: number of animations imported, 2: number of failures
+#: cmxr-canvas-motion-backgrounds/templates/admin/settings.php:24
+#, php-format
+msgid "Import complete. %1$d animation(s) imported, %2$d failed."
+msgstr ""
+
+#: cmxr-canvas-motion-backgrounds/templates/admin/settings.php:32
+msgid "Import failed. Please upload a valid CMXR JSON export file."
+msgstr ""
+
+#: cmxr-canvas-motion-backgrounds/templates/admin/settings.php:40
+msgid "Save Settings"
+msgstr ""
+
+#: cmxr-canvas-motion-backgrounds/templates/admin/settings.php:48
+msgid "Cache"
+msgstr ""
+
+#: cmxr-canvas-motion-backgrounds/templates/admin/settings.php:49
+msgid ""
+"Clear all CMXR transient caches. Use after bulk changes or if animations "
+"appear stale."
+msgstr ""
+
+#: cmxr-canvas-motion-backgrounds/templates/admin/settings.php:53
+msgid "Clear Cache"
+msgstr ""
+
+#: cmxr-canvas-motion-backgrounds/templates/admin/settings.php:59
+#: cmxr-canvas-motion-backgrounds/templates/admin/settings.php:64
+msgid "Export Animations"
+msgstr ""
+
+#: cmxr-canvas-motion-backgrounds/templates/admin/settings.php:60
+msgid ""
+"Download all animations as a JSON file. Use this to back up or migrate to "
+"another site."
+msgstr ""
+
+#: cmxr-canvas-motion-backgrounds/templates/admin/settings.php:70
+msgid "Import Animations"
+msgstr ""
+
+#: cmxr-canvas-motion-backgrounds/templates/admin/settings.php:71
+msgid ""
+"Import animations from a previously exported JSON file. Creates new "
+"animations — never overwrites existing ones."
+msgstr ""
+
+#: cmxr-canvas-motion-backgrounds/templates/admin/settings.php:78
+msgid "Import"
+msgstr ""
