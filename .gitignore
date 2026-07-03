@@ -34,5 +34,5 @@ npm-debug.log
 package-lock.json
 
 # Local workspace-only files
-/plugin-check/
+plugin-check/
 /index.php
