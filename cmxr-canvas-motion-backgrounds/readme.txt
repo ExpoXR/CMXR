@@ -8,11 +8,11 @@ Requires PHP: 7.4
 License: GPL-2.0-or-later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
-Create animated HTML5 canvas motion backgrounds with shapes, orbs, blobs, and interactive effects for WordPress, Elementor, Gutenberg, and any theme.
+Canvas Motion Background Made Easy. Create animated HTML5 canvas motion backgrounds with shapes, orbs, blobs, and interactive effects for WordPress, Elementor, Gutenberg, and any theme.
 
 == Description ==
 
-CMXR lets you build and manage animated canvas motion backgrounds directly from the WordPress admin. Compose moving shapes — orbs, blobs, and multi-ring forms — that render on an HTML5 canvas, sit behind your page content, and are driven by a tiny vanilla-JS engine with zero frontend dependencies.
+Canvas Motion Background Made Easy. CMXR lets you build and manage animated canvas motion backgrounds directly from the WordPress admin. Compose moving shapes — orbs, blobs, and multi-ring forms — that render on an HTML5 canvas, sit behind your page content, and are driven by a tiny vanilla-JS engine with zero frontend dependencies.
 
 **Key features:**
 
@@ -85,11 +85,14 @@ Up to 20 shapes per animation.
 
 == Screenshots ==
 
-1. Dashboard — list of animations with status, shape count, and action buttons
-2. Configurator — three-panel editor with live canvas preview
-3. Shape list — drag handles and layer badges for layer ordering
-4. Settings — Performance and default animation value configuration
-5. Debug — system info, asset URLs, and registered animation configs
+1. CMXR Dashboard
+2. New Animation Dashboard
+3. Settings Page
+4. New Animation — different shapes
+5. Different color styling for shapes
+6. Different color animation styling for shapes
+7. Different shapes with easy blur, opacity, size, and position controls
+8. Different shape animation styles
 
 == Changelog ==
 
