@@ -36,3 +36,4 @@ package-lock.json
 # Local workspace-only files
 plugin-check/
 /index.php
+expoxr/

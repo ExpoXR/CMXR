@@ -135,6 +135,9 @@ class CMXR_CPT {
 				$orb['color_b'] ?? '#8bb84a'
 			);
 
+			$size_unit = self::sanitize_enum( $size['unit'] ?? 'percent', $allowed_units, 'percent' );
+			$size_max  = ( 'px' === $size_unit ) ? 2000 : 200;
+
 			$sanitized_orb = array(
 				'id'         => sanitize_key( $orb['id'] ?? uniqid( 'o' ) ),
 				'shape'      => self::sanitize_enum( $orb['shape'] ?? 'circle', $allowed_shapes, 'circle' ),
@@ -144,9 +147,9 @@ class CMXR_CPT {
 				'color_stops' => $color_stops,
 				'color_animation' => self::sanitize_enum( $orb['color_animation'] ?? 'none', $allowed_canims, 'none' ),
 				'size'       => array(
-					'w'    => self::clamp_float( $size['w'] ?? 40, 1, 200 ),
-					'h'    => self::clamp_float( $size['h'] ?? 40, 1, 200 ),
-					'unit' => self::sanitize_enum( $size['unit'] ?? 'percent', $allowed_units, 'percent' ),
+					'w'    => self::clamp_float( $size['w'] ?? 40, 1, $size_max ),
+					'h'    => self::clamp_float( $size['h'] ?? 40, 1, $size_max ),
+					'unit' => $size_unit,
 				),
 				'position' => array(
 					'x'    => self::clamp_float( $pos['x'] ?? 50, 0, 100 ),

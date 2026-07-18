@@ -3,7 +3,7 @@ Contributors: expoxr
 Tags: animation, canvas, background, shapes, elementor
 Requires at least: 6.0
 Tested up to: 7.0
-Stable tag: 1.0.1
+Stable tag: 1.1.0
 Requires PHP: 7.4
 License: GPL-2.0-or-later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -96,6 +96,9 @@ Up to 20 shapes per animation.
 
 == Changelog ==
 
+= 1.1.0 =
+* Fixed orb size in px units being silently clamped to 200px on save, causing frontend shape size to ignore the configured px width/height.
+
 = 1.0.1 =
 * Fixed WordPress admin footer overlap on CMXR admin screens and configurator columns.
 * Removed obsolete pre-release interactivity migration code.
@@ -118,6 +121,9 @@ Up to 20 shapes per animation.
 * WordPress 6.0+ and PHP 7.4+ compatible
 
 == Upgrade Notice ==
+
+= 1.1.0 =
+Fixes px-unit orb sizing on the frontend. No manual upgrade steps required.
 
 = 1.0.1 =
 Fixes admin footer layout overlap and removes obsolete pre-release migration code. No manual upgrade steps required.
