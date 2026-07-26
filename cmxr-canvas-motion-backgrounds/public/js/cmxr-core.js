@@ -165,6 +165,164 @@
 		return (h & 0xffff) / 0xffff * Math.PI * 6;
 	}
 
+	function seedUint32(value) {
+		var str = String(value === null || value === undefined ? '' : value);
+		var h = 2166136261 >>> 0;
+		for (var i = 0; i < str.length; i++) {
+			h ^= str.charCodeAt(i);
+			h = Math.imul(h, 16777619);
+		}
+		return h >>> 0;
+	}
+
+	function createPRNG(seed) {
+		var state = seedUint32(seed || 'cmxr-seed') || 0x6d2b79f5;
+		return function () {
+			state += 0x6d2b79f5;
+			var t = state;
+			t = Math.imul(t ^ (t >>> 15), t | 1);
+			t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+			return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+		};
+	}
+
+	function SimplexNoise(seed) {
+		var random = createPRNG(seed);
+		this.grad3 = [
+			[1, 1], [-1, 1], [1, -1], [-1, -1],
+			[1, 0], [-1, 0], [1, 0], [-1, 0],
+			[0, 1], [0, -1], [0, 1], [0, -1],
+		];
+		var p = [];
+		for (var i = 0; i < 256; i++) p[i] = i;
+		for (var j = 255; j > 0; j--) {
+			var k = Math.floor(random() * (j + 1));
+			var temp = p[j];
+			p[j] = p[k];
+			p[k] = temp;
+		}
+		this.perm = [];
+		for (var n = 0; n < 512; n++) this.perm[n] = p[n & 255];
+	}
+
+	SimplexNoise.prototype.noise2D = function (xin, yin) {
+		var F2 = 0.5 * (Math.sqrt(3) - 1);
+		var G2 = (3 - Math.sqrt(3)) / 6;
+		var s = (xin + yin) * F2;
+		var i = Math.floor(xin + s);
+		var j = Math.floor(yin + s);
+		var t = (i + j) * G2;
+		var x0 = xin - (i - t);
+		var y0 = yin - (j - t);
+		var i1 = x0 > y0 ? 1 : 0;
+		var j1 = x0 > y0 ? 0 : 1;
+		var x1 = x0 - i1 + G2;
+		var y1 = y0 - j1 + G2;
+		var x2 = x0 - 1 + 2 * G2;
+		var y2 = y0 - 1 + 2 * G2;
+		var ii = i & 255;
+		var jj = j & 255;
+		var gi0 = this.perm[ii + this.perm[jj]] % 12;
+		var gi1 = this.perm[ii + i1 + this.perm[jj + j1]] % 12;
+		var gi2 = this.perm[ii + 1 + this.perm[jj + 1]] % 12;
+
+		function corner(tt, grad, x, y) {
+			if (tt < 0) return 0;
+			tt *= tt;
+			return tt * tt * (grad[0] * x + grad[1] * y);
+		}
+
+		return 70 * (
+			corner(0.5 - x0 * x0 - y0 * y0, this.grad3[gi0], x0, y0) +
+			corner(0.5 - x1 * x1 - y1 * y1, this.grad3[gi1], x1, y1) +
+			corner(0.5 - x2 * x2 - y2 * y2, this.grad3[gi2], x2, y2)
+		);
+	};
+
+	function responsiveKey(width, breakpoints) {
+		breakpoints = breakpoints || {};
+		if (width < (breakpoints.tablet || 768)) return 'mobile';
+		if (width < (breakpoints.desktop || 1024)) return 'tablet';
+		return 'desktop';
+	}
+
+	function createLocalInputTracker(surfaceEl, onActivity, onTrigger) {
+		var input = { x: 0, y: 0, active: false, pointerType: '', lastTouchAt: 0 };
+
+		function position(clientX, clientY) {
+			var rect = surfaceEl.getBoundingClientRect();
+			if (!rect.width || !rect.height) return false;
+			input.x = clientX - rect.left;
+			input.y = clientY - rect.top;
+			return true;
+		}
+
+		function activity() {
+			if (typeof onActivity === 'function') onActivity();
+		}
+
+		function onPointerMove(e) {
+			if (e.pointerType === 'touch') return;
+			if (!position(e.clientX, e.clientY)) return;
+			input.pointerType = e.pointerType || 'mouse';
+			input.active = true;
+			activity();
+		}
+
+		function onPointerLeave(e) {
+			if (!e.pointerType || e.pointerType !== 'touch') input.active = false;
+		}
+
+		function onClick(e) {
+			if (Date.now() - input.lastTouchAt < 700) return;
+			if (!position(e.clientX, e.clientY)) return;
+			input.pointerType = 'mouse';
+			input.active = true;
+			if (typeof onTrigger === 'function') onTrigger(input.x, input.y, performance.now());
+			activity();
+		}
+
+		function onTouchStart(e) {
+			if (!e.touches || !e.touches[0]) return;
+			if (!position(e.touches[0].clientX, e.touches[0].clientY)) return;
+			input.lastTouchAt = Date.now();
+			input.pointerType = 'touch';
+			input.active = true;
+			if (typeof onTrigger === 'function') onTrigger(input.x, input.y, performance.now());
+			activity();
+		}
+
+		function onTouchMove(e) {
+			if (!e.touches || !e.touches[0]) return;
+			if (!position(e.touches[0].clientX, e.touches[0].clientY)) return;
+			input.active = true;
+			activity();
+		}
+
+		function onTouchEnd() {
+			input.active = false;
+		}
+
+		surfaceEl.addEventListener('pointermove', onPointerMove, { passive: true });
+		surfaceEl.addEventListener('pointerleave', onPointerLeave, { passive: true });
+		surfaceEl.addEventListener('click', onClick, { passive: true });
+		surfaceEl.addEventListener('touchstart', onTouchStart, { passive: true });
+		surfaceEl.addEventListener('touchmove', onTouchMove, { passive: true });
+		surfaceEl.addEventListener('touchend', onTouchEnd, { passive: true });
+		surfaceEl.addEventListener('touchcancel', onTouchEnd, { passive: true });
+
+		input.dispose = function () {
+			surfaceEl.removeEventListener('pointermove', onPointerMove);
+			surfaceEl.removeEventListener('pointerleave', onPointerLeave);
+			surfaceEl.removeEventListener('click', onClick);
+			surfaceEl.removeEventListener('touchstart', onTouchStart);
+			surfaceEl.removeEventListener('touchmove', onTouchMove);
+			surfaceEl.removeEventListener('touchend', onTouchEnd);
+			surfaceEl.removeEventListener('touchcancel', onTouchEnd);
+		};
+		return input;
+	}
+
 	// Resolve a sized value with unit to px within a container
 	function resolvePx(val, unit, containerW, containerH, axis) {
 		if (unit === 'percent') return (val / 100) * (axis === 'x' ? containerW : containerH);
@@ -576,6 +734,10 @@
 		hexToRgba: hexToRgba,
 		blendOp: blendOp,
 		createPointerTracker: createPointerTracker,
+		createLocalInputTracker: createLocalInputTracker,
+		createPRNG: createPRNG,
+		SimplexNoise: SimplexNoise,
+		responsiveKey: responsiveKey,
 		hashSeed: hashSeed,
 		resolvePx: resolvePx,
 		blurFilter: blurFilter,

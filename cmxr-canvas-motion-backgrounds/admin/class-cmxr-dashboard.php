@@ -62,12 +62,19 @@ class CMXR_Dashboard {
 		foreach ( $posts as $post ) {
 			$raw    = get_post_meta( $post->ID, '_cmxr_config', true );
 			$config = $raw ? json_decode( $raw, true ) : array();
+			$is_v2  = 2 === (int) ( $config['config_version'] ?? 1 );
+			$counts = $is_v2 ? ( $config['settings']['counts'] ?? array() ) : array();
 			$animations[] = array(
 				'post'      => $post,
 				'config'    => $config,
 				'active'    => ! empty( $config['active'] ),
-				'orb_count' => count( $config['orbs'] ?? array() ),
-				'anim_id'   => $config['animation_id'] ?? '',
+				'orb_count' => $is_v2 ? (int) ( $counts['desktop'] ?? 0 ) : count( $config['orbs'] ?? array() ),
+				'count_label' => $is_v2
+					? sprintf( '%d / %d / %d', (int) ( $counts['mobile'] ?? 0 ), (int) ( $counts['tablet'] ?? 0 ), (int) ( $counts['desktop'] ?? 0 ) )
+					: (string) count( $config['orbs'] ?? array() ),
+				'anim_id'   => CMXR_CPT::config_target( $config ),
+				'effect_type' => $is_v2 ? ( $config['effect_type'] ?? 'procedural-orbs' ) : 'layered-shapes',
+				'template_slug' => $is_v2 ? ( $config['template_slug'] ?? '' ) : '',
 			);
 		}
 

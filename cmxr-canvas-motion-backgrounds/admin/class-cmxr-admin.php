@@ -121,10 +121,18 @@ class CMXR_Admin {
 			true
 		);
 
+		wp_register_script(
+			'cmxr-renderers',
+			CMXR_PLUGIN_URL . 'public/js/cmxr-renderers.js',
+			array( 'cmxr-core' ),
+			CMXR_VERSION,
+			true
+		);
+
 		wp_enqueue_script(
 			'cmxr-admin',
 			CMXR_PLUGIN_URL . 'admin/js/admin.js',
-			array( 'wp-api-fetch', 'cmxr-core' ),
+			array( 'wp-api-fetch', 'cmxr-renderers' ),
 			CMXR_VERSION,
 			true
 		);
@@ -156,6 +164,13 @@ class CMXR_Admin {
 				'showConfig'            => __( 'Show Config', 'cmxr-canvas-motion-backgrounds' ),
 				'custom'                => __( 'Custom', 'cmxr-canvas-motion-backgrounds' ),
 				'fill'                  => __( 'Fill', 'cmxr-canvas-motion-backgrounds' ),
+				'enterNameTarget'       => __( 'Enter a name and a CSS ID beginning with a letter.', 'cmxr-canvas-motion-backgrounds' ),
+				'createFailed'          => __( 'Could not create animation.', 'cmxr-canvas-motion-backgrounds' ),
+				'resetTemplateConfirm'  => __( 'Reset all template settings? Name, target, and active status stay unchanged.', 'cmxr-canvas-motion-backgrounds' ),
+				'defaultsRestored'      => __( 'Template defaults restored. Save to apply.', 'cmxr-canvas-motion-backgrounds' ),
+				'defaultsLoadFailed'    => __( 'Could not load template defaults.', 'cmxr-canvas-motion-backgrounds' ),
+				'pause'                 => __( 'Pause', 'cmxr-canvas-motion-backgrounds' ),
+				'resume'                => __( 'Resume', 'cmxr-canvas-motion-backgrounds' ),
 			),
 		) );
 

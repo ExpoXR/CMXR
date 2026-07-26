@@ -13,11 +13,16 @@
 	try { cfg = JSON.parse(cfgEl.textContent || cfgEl.innerHTML); } catch (e) { return; }
 	if (!cfg || !cfg.animations || !cfg.animations.length) return;
 
-	var found = cfg.animations.filter(function (a) {
-		return a.animation_id && !!document.getElementById(a.animation_id);
-	});
+	function targetFor(a) {
+		return Number(a.config_version || 1) === 2
+			? (a.target && a.target.mode === 'id' ? a.target.selector : '')
+			: a.animation_id;
+	}
 
-	if (!found.length) return;
+	var found = cfg.animations.filter(function (a) {
+		var target = targetFor(a);
+		return target && !!document.getElementById(target);
+	});
 
 	var debug = !!(cfg.settings && (cfg.settings.debugMode || cfg.settings.wpDebug || cfg.settings.scriptDebug));
 	window.CMXRDebug = window.CMXRDebug || {
@@ -65,14 +70,30 @@
 		if (injected) return;
 		injected = true;
 		if (cfg.coreUrl)   injectScript(cfg.coreUrl, 'core');
+		if (cfg.renderersUrl) injectScript(cfg.renderersUrl, 'renderers');
 		if (cfg.engineUrl) injectScript(cfg.engineUrl, 'engine');
-		window.CMXRDebug.log('[CMXR] Loaded engine for ' + found.length + ' animation(s):', found.map(function (a) { return '#' + a.animation_id; }));
+		window.CMXRDebug.log('[CMXR] Loaded engine for ' + found.length + ' animation(s):', found.map(function (a) { return '#' + targetFor(a); }));
 	}
 
 	// Lazy-load: defer the ~27KB core+engine until a matched element nears the
 	// viewport, so pages with below-the-fold animations skip it on initial load.
 	// Falls back to immediate injection when IntersectionObserver is unavailable.
-	if ('IntersectionObserver' in window) {
+	if (!found.length && 'MutationObserver' in window) {
+		var waiting = new MutationObserver(function () {
+			for (var i = 0; i < cfg.animations.length; i++) {
+				var target = targetFor(cfg.animations[i]);
+				if (target && document.getElementById(target)) {
+					waiting.disconnect();
+					injectEngine();
+					return;
+				}
+			}
+		});
+		if (document.body) waiting.observe(document.body, { childList: true, subtree: true });
+		else document.addEventListener('DOMContentLoaded', function () {
+			waiting.observe(document.body, { childList: true, subtree: true });
+		});
+	} else if ('IntersectionObserver' in window) {
 		var io = new IntersectionObserver(function (entries) {
 			for (var i = 0; i < entries.length; i++) {
 				if (entries[i].isIntersecting) {
@@ -83,7 +104,7 @@
 			}
 		}, { rootMargin: '200px' });
 		found.forEach(function (a) {
-			var el = document.getElementById(a.animation_id);
+			var el = document.getElementById(targetFor(a));
 			if (el) io.observe(el);
 		});
 	} else {

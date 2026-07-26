@@ -2,6 +2,12 @@
 (function () {
 	'use strict';
 
+	var proceduralContainer = document.getElementById('cmxr-procedural-configurator');
+	if (proceduralContainer) {
+		initProceduralConfigurator(proceduralContainer);
+		return;
+	}
+
 	/* ------------------------------------------------------------------ */
 	/* Bootstrap                                                            */
 	/* ------------------------------------------------------------------ */
@@ -50,6 +56,162 @@
 	// Guards the wpColorPicker change callback while we set a value programmatically,
 	// so syncing the picker to the selected orb doesn't echo back into config.
 	var suppressColorChange = false;
+
+	function initProceduralConfigurator(root) {
+		var data = JSON.parse(root.getAttribute('data-config') || '{}');
+		var procConfig = data.config || {};
+		var procRestUrl = data.restUrl || '';
+		var procNonce = data.nonce || '';
+		var Renderers = window.CMXRRenderers;
+		var previewEl = document.getElementById('cmxr-proc-preview');
+		var previewCanvasEl = document.getElementById('cmxr-proc-canvas');
+		var save = document.getElementById('cmxr-proc-save');
+		var reset = document.getElementById('cmxr-proc-reset');
+		var title = document.getElementById('cmxr-proc-title');
+		var target = document.getElementById('cmxr-proc-target');
+		var status = document.querySelector('.cmxr-save-status');
+		var pause = document.getElementById('cmxr-proc-pause');
+		var reduced = document.getElementById('cmxr-proc-reduced');
+		var instance = null;
+		var paused = false;
+		var procStrings = (window.CMXRAdmin && window.CMXRAdmin.strings) || {};
+
+		function procText(key, fallback) {
+			return procStrings[key] || fallback;
+		}
+
+		function procFetch(path, method, body) {
+			return fetch(procRestUrl + path, {
+				method: method || 'GET',
+				headers: { 'Content-Type': 'application/json', 'X-WP-Nonce': procNonce },
+				body: body ? JSON.stringify(body) : undefined,
+			}).then(function (response) {
+				return response.json().catch(function () { return {}; }).then(function (result) {
+					if (!response.ok) throw result;
+					return result;
+				});
+			});
+		}
+
+		function pathGet(obj, path) {
+			return path.split('.').reduce(function (value, key) {
+				return value === undefined || value === null ? undefined : value[key];
+			}, obj);
+		}
+
+		function pathSet(obj, path, value) {
+			var keys = path.split('.');
+			var cursor = obj;
+			for (var i = 0; i < keys.length - 1; i++) {
+				if (!cursor[keys[i]] || typeof cursor[keys[i]] !== 'object') {
+					cursor[keys[i]] = /^\d+$/.test(keys[i + 1]) ? [] : {};
+				}
+				cursor = cursor[keys[i]];
+			}
+			cursor[keys[keys.length - 1]] = value;
+		}
+
+		function patchPreview() {
+			if (instance) instance.previewPatch(procConfig.settings);
+		}
+
+		function syncControls() {
+			root.querySelectorAll('[data-cmxr-path]').forEach(function (input) {
+				var value = pathGet(procConfig, input.getAttribute('data-cmxr-path'));
+				if (input.hasAttribute('data-cmxr-bool')) input.checked = !!value;
+				else input.value = value === null || value === undefined ? '' : value;
+			});
+			patchPreview();
+		}
+
+		root.querySelectorAll('[data-cmxr-path]').forEach(function (input) {
+			input.addEventListener(input.tagName === 'SELECT' || input.type === 'checkbox' ? 'change' : 'input', function () {
+				var value;
+				if (input.hasAttribute('data-cmxr-bool')) value = input.checked;
+				else if (input.hasAttribute('data-cmxr-number')) {
+					value = parseFloat(input.value);
+					if (isNaN(value)) return;
+				} else value = input.value;
+				pathSet(procConfig, input.getAttribute('data-cmxr-path'), value);
+				patchPreview();
+			});
+		});
+
+		target.addEventListener('input', function () {
+			procConfig.target.selector = target.value.trim();
+		});
+
+		document.getElementById('cmxr-proc-new-seed').addEventListener('click', function () {
+			var nextSeed = String(Date.now()) + '-' + String(Math.floor(Math.random() * 1000000));
+			procConfig.settings.seed = nextSeed;
+			document.getElementById('cmxr-proc-seed').value = nextSeed;
+			patchPreview();
+		});
+
+		save.addEventListener('click', function () {
+			save.disabled = true;
+			status.textContent = procText('saving', 'Saving...');
+			procFetch('/animations/' + data.postId, 'PUT', {
+				title: title.value.trim(),
+				config: procConfig,
+			}).then(function (result) {
+				procConfig = result.config;
+				target.value = procConfig.target.selector;
+				status.textContent = procText('saved', 'Saved');
+				save.disabled = false;
+				syncControls();
+			}).catch(function (error) {
+				status.textContent = (error && error.message) || procText('errorSaving', 'Error saving.');
+				save.disabled = false;
+			});
+		});
+
+		reset.addEventListener('click', function () {
+			if (!window.confirm(procText('resetTemplateConfirm', 'Reset all template settings? Name, target, and active status stay unchanged.'))) return;
+			procFetch('/templates/' + procConfig.template_slug).then(function (definition) {
+				procConfig.settings = JSON.parse(JSON.stringify(definition.settings));
+				syncControls();
+				status.textContent = procText('defaultsRestored', 'Template defaults restored. Save to apply.');
+			}).catch(function () {
+				status.textContent = procText('defaultsLoadFailed', 'Could not load template defaults.');
+			});
+		});
+
+		pause.addEventListener('click', function () {
+			paused = !paused;
+			if (paused) instance.pause();
+			else instance.resume();
+			pause.textContent = paused ? procText('resume', 'Resume') : procText('pause', 'Pause');
+		});
+
+		reduced.addEventListener('change', function () {
+			instance.setReducedMotion(reduced.checked);
+		});
+
+		root.querySelectorAll('[data-cmxr-preview-size]').forEach(function (button) {
+			button.addEventListener('click', function () {
+				var size = button.getAttribute('data-cmxr-preview-size').split(',');
+				var width = parseInt(size[0], 10) || 0;
+				var height = parseInt(size[1], 10) || 0;
+				previewEl.style.width = width ? width + 'px' : '';
+				previewEl.style.height = height ? height + 'px' : '';
+				previewEl.style.maxWidth = '100%';
+				if (instance) instance.resize();
+			});
+		});
+
+		if (Renderers && previewEl && previewCanvasEl) {
+			instance = Renderers.create('procedural-orbs', previewEl, procConfig, {
+				environment: 'configurator',
+				canvas: previewCanvasEl,
+				dprCap: 1.5,
+			});
+		}
+
+		window.addEventListener('beforeunload', function () {
+			if (instance) instance.destroy();
+		});
+	}
 
 	/* ------------------------------------------------------------------ */
 	/* API helpers                                                          */
@@ -980,6 +1142,8 @@
 
 	var previewCanvas  = document.getElementById('cmxr-preview-canvas');
 	var previewCtx     = previewCanvas ? previewCanvas.getContext('2d', { alpha: true }) : null;
+	var SharedRenderers = window.CMXRRenderers;
+	var sharedPreviewEngine = null;
 	var previewRaf     = 0;
 	var previewState   = { w: 0, h: 0, dpr: 1, time: 0, lastTime: 0, running: false };
 
@@ -999,7 +1163,7 @@
 		};
 	}
 
-	var ptr = (Core && Core.createPointerTracker && previewPointerSurface)
+	var ptr = (!SharedRenderers && Core && Core.createPointerTracker && previewPointerSurface)
 		? Core.createPointerTracker(previewPointerSurface, refreshPreview, {
 			debug: DEBUG,
 			scope: 'configurator',
@@ -1067,18 +1231,31 @@
 	}
 
 	function refreshPreview() {
+		if (sharedPreviewEngine) {
+			sharedPreviewEngine.previewPatch(config.global ? config : config.settings);
+			return;
+		}
 		if (!previewRaf) {
 			previewRaf = requestAnimationFrame(tickPreview);
 		}
 	}
 
 	function startPreview() {
+		if (SharedRenderers && previewFrameEl && previewCanvas) {
+			sharedPreviewEngine = SharedRenderers.create('layered-shapes', previewFrameEl, config, {
+				environment: 'configurator',
+				canvas: previewCanvas,
+				dprCap: 1.75,
+				debug: DEBUG,
+			});
+			return;
+		}
 		resizePreview();
 		refreshPreview();
 	}
 
 	// Resize observer for preview
-	if (typeof ResizeObserver !== 'undefined' && previewCanvas) {
+	if (!SharedRenderers && typeof ResizeObserver !== 'undefined' && previewCanvas) {
 		new ResizeObserver(function () { resizePreview(); }).observe(previewCanvas.parentElement);
 	}
 
@@ -1090,5 +1267,9 @@
 	renderOrbList();
 	renderBreakpointPicker();
 	if (config.orbs.length > 0) selectOrb(0);
+
+	window.addEventListener('beforeunload', function () {
+		if (sharedPreviewEngine) sharedPreviewEngine.destroy();
+	});
 
 })();

@@ -6,6 +6,18 @@ class CMXR_REST {
 	const NAMESPACE = 'cmxr/v1';
 
 	public function register_routes() {
+		register_rest_route( self::NAMESPACE, '/templates', array(
+			'methods'             => WP_REST_Server::READABLE,
+			'callback'            => array( $this, 'get_templates' ),
+			'permission_callback' => array( $this, 'check_collection_permission' ),
+		) );
+
+		register_rest_route( self::NAMESPACE, '/templates/(?P<slug>[a-z0-9-]+)', array(
+			'methods'             => WP_REST_Server::READABLE,
+			'callback'            => array( $this, 'get_template' ),
+			'permission_callback' => array( $this, 'check_collection_permission' ),
+		) );
+
 		register_rest_route( self::NAMESPACE, '/animations', array(
 			array(
 				'methods'             => WP_REST_Server::READABLE,
@@ -83,6 +95,18 @@ class CMXR_REST {
 		return current_user_can( $meta_cap, $id );
 	}
 
+	public function get_templates() {
+		return rest_ensure_response( CMXR_Template_Registry::metadata() );
+	}
+
+	public function get_template( $request ) {
+		$definition = CMXR_Template_Registry::definition( $request['slug'] );
+		if ( ! $definition ) {
+			return new WP_Error( 'not_found', __( 'Template not found.', 'cmxr-canvas-motion-backgrounds' ), array( 'status' => 404 ) );
+		}
+		return rest_ensure_response( $definition );
+	}
+
 	public function get_animations( $request ) {
 		$posts = get_posts( array(
 			'post_type'              => 'cmxr_animation',
@@ -126,24 +150,32 @@ class CMXR_REST {
 			return new WP_Error( 'missing_title', __( 'Title is required.', 'cmxr-canvas-motion-backgrounds' ), array( 'status' => 400 ) );
 		}
 
-		$settings = get_option( 'cmxr_settings', array() );
-
-		$default_config = array(
-			'animation_id' => sanitize_title( $title ),
-			'active'       => true,
-			'global'       => array(
-				'speed'       => (float) ( $settings['default_speed'] ?? 1.0 ),
-				'safe_margin' => (int) ( $settings['default_safe_margin'] ?? 5 ),
-				'blend_mode'  => $settings['default_blend_mode'] ?? 'normal',
-				'interactivity' => array(
-					'enabled'  => true,
-					'mode'     => 'parallax',
-					'strength' => 0.5,
-					'radius'   => 30,
+		if ( ! empty( $params['template_slug'] ) ) {
+			$default_config = CMXR_Template_Registry::instantiate(
+				$params['template_slug'],
+				$params['target'] ?? '',
+				is_array( $params['overrides'] ?? null ) ? $params['overrides'] : array()
+			);
+			if ( is_wp_error( $default_config ) ) return $default_config;
+		} else {
+			$settings = get_option( 'cmxr_settings', array() );
+			$default_config = array(
+				'animation_id' => CMXR_CPT::unique_target_token( sanitize_title( $title ) ),
+				'active'       => true,
+				'global'       => array(
+					'speed'       => (float) ( $settings['default_speed'] ?? 1.0 ),
+					'safe_margin' => (int) ( $settings['default_safe_margin'] ?? 5 ),
+					'blend_mode'  => $settings['default_blend_mode'] ?? 'normal',
+					'interactivity' => array(
+						'enabled'  => true,
+						'mode'     => 'parallax',
+						'strength' => 0.5,
+						'radius'   => 30,
+					),
 				),
-			),
-			'orbs' => array(),
-		);
+				'orbs' => array(),
+			);
+		}
 
 		$post_id = wp_insert_post( array(
 			'post_title'  => $title,
@@ -173,20 +205,25 @@ class CMXR_REST {
 
 		$params = $request->get_json_params();
 
+		$clean = null;
+		if ( isset( $params['config'] ) ) {
+			$clean = CMXR_CPT::sanitize_config( $params['config'] );
+			if ( ! $clean ) {
+				return new WP_Error( 'invalid_config', __( 'Invalid configuration.', 'cmxr-canvas-motion-backgrounds' ), array( 'status' => 400 ) );
+			}
+			$target = CMXR_CPT::config_target( $clean );
+			if ( CMXR_CPT::target_in_use( $target, $post->ID ) ) {
+				return new WP_Error( 'target_conflict', __( 'Another animation already uses this target.', 'cmxr-canvas-motion-backgrounds' ), array( 'status' => 400 ) );
+			}
+		}
+
 		if ( isset( $params['title'] ) ) {
 			wp_update_post( array(
 				'ID'         => $post->ID,
 				'post_title' => sanitize_text_field( $params['title'] ),
 			) );
 		}
-
-		if ( isset( $params['config'] ) ) {
-			$clean = CMXR_CPT::sanitize_config( $params['config'] );
-			if ( ! $clean ) {
-				return new WP_Error( 'invalid_config', __( 'Invalid configuration.', 'cmxr-canvas-motion-backgrounds' ), array( 'status' => 400 ) );
-			}
-			update_post_meta( $post->ID, '_cmxr_config', wp_json_encode( $clean ) );
-		}
+		if ( null !== $clean ) update_post_meta( $post->ID, '_cmxr_config', wp_json_encode( $clean ) );
 
 		return $this->get_animation( $request );
 	}
@@ -223,11 +260,19 @@ class CMXR_REST {
 		}
 
 		if ( $config ) {
-			// Suffix with the new post ID so repeated duplicates get unique IDs.
-			$config['animation_id'] = sanitize_title( $post->post_title ) . '-copy-' . $new_id;
+			if ( 2 === (int) ( $config['config_version'] ?? 1 ) ) {
+				$config['target']['selector'] = CMXR_CPT::unique_target_token( CMXR_CPT::config_target( $config ) . '-copy-' . $new_id );
+			} else {
+				// Suffix with the new post ID so repeated duplicates get unique IDs.
+				$config['animation_id'] = CMXR_CPT::unique_target_token( sanitize_title( $post->post_title ) . '-copy-' . $new_id );
+			}
 			// Re-validate the copied config so stale/invalid data can't propagate.
 			$clean = CMXR_CPT::sanitize_config( $config );
-			update_post_meta( $new_id, '_cmxr_config', wp_json_encode( $clean ?: $config ) );
+			if ( ! $clean ) {
+				wp_delete_post( $new_id, true );
+				return new WP_Error( 'invalid_config', __( 'Source animation configuration is invalid.', 'cmxr-canvas-motion-backgrounds' ), array( 'status' => 400 ) );
+			}
+			update_post_meta( $new_id, '_cmxr_config', wp_json_encode( $clean ) );
 		}
 
 		return rest_ensure_response( array(
@@ -263,12 +308,18 @@ class CMXR_REST {
 		$raw    = get_post_meta( $post->ID, '_cmxr_config', true );
 		$config = $raw ? json_decode( $raw, true ) : array();
 
+		$is_v2 = 2 === (int) ( $config['config_version'] ?? 1 );
+		$counts = $is_v2 ? ( $config['settings']['counts'] ?? array() ) : array();
 		return array(
 			'id'           => $post->ID,
 			'title'        => $post->post_title,
-			'animation_id' => $config['animation_id'] ?? '',
+			'animation_id' => CMXR_CPT::config_target( $config ),
 			'active'       => ! empty( $config['active'] ),
-			'orb_count'    => count( $config['orbs'] ?? array() ),
+			'orb_count'    => $is_v2 ? (int) ( $counts['desktop'] ?? 0 ) : count( $config['orbs'] ?? array() ),
+			'counts'       => $counts,
+			'config_version' => $is_v2 ? 2 : 1,
+			'template_slug'  => $is_v2 ? ( $config['template_slug'] ?? '' ) : '',
+			'effect_type'    => $is_v2 ? ( $config['effect_type'] ?? '' ) : 'layered-shapes',
 			'status'       => $post->post_status,
 		);
 	}

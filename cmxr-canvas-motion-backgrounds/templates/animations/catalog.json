@@ -1,0 +1,31 @@
+{
+  "schema_version": 1,
+  "templates": [
+    {
+      "slug": "expoxr-orb-flow",
+      "title": "ExpoXR Orb Flow",
+      "description": "Organic seeded gradient orbs with responsive Simplex motion.",
+      "priority": 1,
+      "order": 1,
+      "kind": "background",
+      "effect_type": "procedural-orbs",
+      "variant": "static",
+      "renderer": "procedural-orbs",
+      "performance": "low",
+      "definition": "expoxr-orb-flow.json"
+    },
+    {
+      "slug": "expoxr-orb-flow-interactive",
+      "title": "ExpoXR Orb Flow Interactive",
+      "description": "Responsive gradient orbs with attraction, aura, burst, and ripple interaction.",
+      "priority": 1,
+      "order": 2,
+      "kind": "background",
+      "effect_type": "procedural-orbs",
+      "variant": "interactive",
+      "renderer": "procedural-orbs",
+      "performance": "medium",
+      "definition": "expoxr-orb-flow-interactive.json"
+    }
+  ]
+}

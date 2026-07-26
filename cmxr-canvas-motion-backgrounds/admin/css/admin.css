@@ -428,6 +428,103 @@
 /* ---- Utility ---- */
 .is-hidden { display: none !important; }
 
+.cmxr-library-heading {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	margin: 24px 0 18px;
+}
+
+.cmxr-library-heading h2 { margin: 0 0 5px; }
+.cmxr-library-heading p { margin: 0; color: var(--cmxr-text-muted); }
+
+.cmxr-template-grid {
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+	gap: 20px;
+}
+
+.cmxr-template-card {
+	overflow: hidden;
+	border: 1px solid var(--cmxr-border);
+	border-radius: 14px;
+	background: var(--cmxr-surface);
+	box-shadow: var(--cmxr-shadow-sm);
+}
+
+.cmxr-template-card-preview {
+	position: relative;
+	height: 180px;
+	overflow: hidden;
+	background: #0a0b18;
+}
+
+.cmxr-template-card-preview span {
+	position: absolute;
+	width: 150px;
+	height: 150px;
+	border-radius: 50%;
+	filter: blur(22px);
+	background: radial-gradient(circle, rgba(42,172,226,.9), rgba(42,172,226,0));
+}
+
+.cmxr-template-card-preview span:nth-child(1) { top: -20px; left: 45%; }
+.cmxr-template-card-preview span:nth-child(2) { top: 45px; left: 10%; background: radial-gradient(circle, rgba(128,98,170,.9), rgba(128,98,170,0)); }
+.cmxr-template-card-preview span:nth-child(3) { top: 70px; right: -20px; background: radial-gradient(circle, rgba(239,70,129,.9), rgba(239,70,129,0)); }
+.cmxr-template-preview-interactive span { animation: cmxr-template-drift 5s ease-in-out infinite alternate; }
+.cmxr-template-preview-legacy { background: linear-gradient(135deg, #f4f5fb, #e9e7f7); }
+.cmxr-template-preview-legacy span { filter: blur(10px); opacity: .75; }
+
+@keyframes cmxr-template-drift {
+	to { transform: translate(-24px, 18px) scale(1.12); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.cmxr-template-preview-interactive span { animation: none; }
+}
+
+.cmxr-template-card-body { padding: 20px; }
+.cmxr-template-card-body h3 { margin: 10px 0 8px; font-size: 18px; }
+.cmxr-template-card-body > p { min-height: 42px; color: var(--cmxr-text-muted); }
+.cmxr-template-badges { display: flex; gap: 7px; }
+.cmxr-template-badges span {
+	padding: 3px 8px;
+	border-radius: 999px;
+	background: var(--cmxr-accent-muted);
+	color: var(--cmxr-accent);
+	font-size: 11px;
+	font-weight: 600;
+}
+
+.cmxr-template-capabilities {
+	min-height: 68px;
+	padding-left: 18px;
+	color: var(--cmxr-text-muted);
+	font-size: 12px;
+}
+
+.cmxr-template-dialog[hidden] { display: none; }
+.cmxr-template-dialog {
+	position: fixed;
+	z-index: 100100;
+	inset: 0;
+	display: grid;
+	place-items: center;
+}
+.cmxr-template-dialog-backdrop { position: absolute; inset: 0; background: rgba(15, 16, 30, .58); }
+.cmxr-template-dialog-panel {
+	position: relative;
+	width: min(440px, calc(100vw - 32px));
+	padding: 24px;
+	border-radius: 14px;
+	background: #fff;
+	box-shadow: 0 20px 60px rgba(0,0,0,.25);
+}
+.cmxr-template-dialog-panel label { display: grid; gap: 6px; margin: 14px 0; font-weight: 600; }
+.cmxr-template-dialog-panel input { width: 100%; }
+.cmxr-template-dialog-actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 18px; }
+.cmxr-template-dialog-error { min-height: 20px; color: #b42318; }
+
 .cmxr-mt-12 { margin-top: 12px; }
 
 /* ---- Debug Page ---- */

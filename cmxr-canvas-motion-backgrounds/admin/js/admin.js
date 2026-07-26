@@ -8,6 +8,7 @@
 	var strings = api.strings || {};
 	var DEBUG = !!(api.debugMode || api.wpDebug || api.scriptDebug);
 	var Core = window.CMXRCore;
+	var Renderers = window.CMXRRenderers;
 
 	window.CMXRDebug = window.CMXRDebug || {
 		enabled: DEBUG,
@@ -53,6 +54,8 @@
 	}
 
 	function init() {
+		initTemplateLibrary();
+
 		// Copy ID buttons
 		document.querySelectorAll('.cmxr-copy-btn').forEach(function (btn) {
 			btn.addEventListener('click', function () {
@@ -138,6 +141,77 @@
 		});
 	}
 
+	function slugify(value) {
+		return String(value || '').toLowerCase().trim()
+			.replace(/[^a-z0-9_-]+/g, '-')
+			.replace(/^-+|-+$/g, '') || 'cmxr-animation';
+	}
+
+	function initTemplateLibrary() {
+		var library = document.getElementById('cmxr-template-library');
+		if (!library) return;
+		var dialog = document.getElementById('cmxr-template-dialog');
+		var title = document.getElementById('cmxr-template-title');
+		var target = document.getElementById('cmxr-template-target');
+		var create = document.getElementById('cmxr-template-create');
+		var cancel = document.getElementById('cmxr-template-cancel');
+		var error = dialog.querySelector('.cmxr-template-dialog-error');
+		var selected = '';
+		var targetOwned = false;
+		var opener = null;
+
+		function close() {
+			dialog.hidden = true;
+			selected = '';
+			error.textContent = '';
+			if (opener) opener.focus();
+		}
+
+		document.querySelectorAll('.cmxr-use-template').forEach(function (button) {
+			button.addEventListener('click', function () {
+				opener = button;
+				selected = button.getAttribute('data-template-slug');
+				var templateTitle = button.getAttribute('data-template-title') || 'New Animation';
+				title.value = templateTitle;
+				target.value = slugify(selected);
+				targetOwned = false;
+				dialog.hidden = false;
+				title.focus();
+				title.select();
+			});
+		});
+
+		title.addEventListener('input', function () {
+			if (!targetOwned) target.value = slugify(title.value);
+		});
+		target.addEventListener('input', function () { targetOwned = true; });
+		cancel.addEventListener('click', close);
+		dialog.querySelector('.cmxr-template-dialog-backdrop').addEventListener('click', close);
+		document.addEventListener('keydown', function (event) {
+			if (!dialog.hidden && event.key === 'Escape') close();
+		});
+
+		create.addEventListener('click', function () {
+			var name = title.value.trim();
+			var token = target.value.trim();
+			if (!name || !/^[A-Za-z][A-Za-z0-9_-]{0,99}$/.test(token)) {
+				error.textContent = cmxrText('enterNameTarget', 'Enter a name and a CSS ID beginning with a letter.');
+				return;
+			}
+			create.disabled = true;
+			error.textContent = '';
+			apiFetch('/animations', 'POST', { title: name, template_slug: selected, target: token })
+				.then(function (data) {
+					if (!data || !data.id) throw data || {};
+					window.location.href = 'admin.php?page=cmxr-edit&id=' + data.id;
+				})
+				.catch(function (data) {
+					create.disabled = false;
+					error.textContent = (data && data.message) || cmxrText('createFailed', 'Could not create animation.');
+				});
+		});
+	}
+
 	/* ------------------------------------------------------------------ */
 	/* Preview Modal                                                        */
 	/* ------------------------------------------------------------------ */
@@ -145,6 +219,7 @@
 	var _modalRaf = 0;
 	var _modalPointer = null;
 	var _modalResizeObserver = null;
+	var _modalRenderer = null;
 
 	function injectPreviewModal() {
 		if (document.getElementById('cmxr-dash-modal')) return;
@@ -206,6 +281,7 @@
 		if (_modalRaf) { cancelAnimationFrame(_modalRaf); _modalRaf = 0; }
 		if (_modalPointer) { _modalPointer.dispose(); _modalPointer = null; }
 		if (_modalResizeObserver) { _modalResizeObserver.disconnect(); _modalResizeObserver = null; }
+		if (_modalRenderer) { _modalRenderer.destroy(); _modalRenderer = null; }
 	}
 
 	function openPreviewModal(postId, title) {
@@ -239,11 +315,24 @@
 		if (_modalRaf) { cancelAnimationFrame(_modalRaf); _modalRaf = 0; }
 		if (_modalPointer) { _modalPointer.dispose(); _modalPointer = null; }
 		if (_modalResizeObserver) { _modalResizeObserver.disconnect(); _modalResizeObserver = null; }
+		if (_modalRenderer) { _modalRenderer.destroy(); _modalRenderer = null; }
 		if (!Core) return;
 
 		var canvas = document.getElementById('cmxr-dash-modal-canvas');
 		var wrap = document.getElementById('cmxr-dash-modal-canvas-wrap');
 		if (!canvas || !wrap) return;
+		if (Renderers) {
+			var effectType = Number(config.config_version || 1) === 2 ? config.effect_type : 'layered-shapes';
+			if (Renderers.has(effectType)) {
+				_modalRenderer = Renderers.create(effectType, wrap, config, {
+					environment: 'dashboard',
+					canvas: canvas,
+					dprCap: 1.75,
+					debug: DEBUG,
+				});
+				return;
+			}
+		}
 		var ctx  = canvas.getContext('2d', { alpha: true });
 
 		var ms = { w: 0, h: 0, dpr: 1, time: 0, lastTime: 0 };

@@ -1,0 +1,45 @@
+{
+  "config_version": 2,
+  "slug": "expoxr-orb-flow",
+  "title": "ExpoXR Orb Flow",
+  "priority": 1,
+  "kind": "background",
+  "effect_type": "procedural-orbs",
+  "variant": "static",
+  "renderer": "procedural-orbs",
+  "settings": {
+    "seed": null,
+    "palette": {
+      "mode": "random-hsl",
+      "hue_min": 220,
+      "hue_max": 360,
+      "hue_offsets": [0, 30, 60],
+      "saturation": 95,
+      "lightness": 50,
+      "fixed_colors": ["#2AACE2", "#8062AA", "#EF4681"]
+    },
+    "counts": {"mobile": 4, "tablet": 6, "desktop": 8},
+    "breakpoints": {"tablet": 768, "desktop": 1024},
+    "alpha": 0.8,
+    "simplex_increment": 0.002,
+    "scale": {"min": 0.5, "max": 1},
+    "blur": {"mobile": 20, "tablet": 30, "desktop": 30},
+    "dpr_cap": 1.5,
+    "minimum_size": 200,
+    "bounds": {
+      "mobile": {"origin_x": 0.5, "origin_y": 0.5, "distance_basis": "min-dimension", "distance_divisor": 2.5},
+      "tablet": {"origin_x": 0.6667, "origin_y": 0.6667, "distance_basis": "width", "distance_divisor": 4},
+      "desktop": {"origin_x": 0.8, "origin_y": 0.7273, "distance_basis": "width", "distance_divisor": 5}
+    },
+    "radius": {
+      "mobile": [0.125, 0.25, "min-dimension"],
+      "tablet": [0.1429, 0.2857, "height"],
+      "desktop": [0.1667, 0.3333, "height"]
+    }
+  },
+  "markup": {},
+  "target": {"mode": "id", "selector": "expoxr-orb-flow", "placement": "attached"},
+  "dependencies": [],
+  "capabilities": ["simplex-motion", "responsive-counts", "seeded-preview"],
+  "fallback": {"reduced_motion": "static", "unsupported": "static"}
+}

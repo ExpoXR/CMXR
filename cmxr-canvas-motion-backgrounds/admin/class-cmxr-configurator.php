@@ -13,6 +13,14 @@ class CMXR_Configurator {
 		$post    = $post_id ? get_post( $post_id ) : null;
 		$is_new  = ! $post || $post->post_type !== 'cmxr_animation';
 		$config  = array();
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- read-only screen choice.
+		$legacy_new = ! empty( $_GET['legacy'] );
+
+		if ( $is_new && ! $legacy_new ) {
+			$templates = CMXR_Template_Registry::metadata();
+			include CMXR_PLUGIN_DIR . 'templates/admin/template-library.php';
+			return;
+		}
 
 		if ( ! $is_new ) {
 			$raw    = get_post_meta( $post->ID, '_cmxr_config', true );
@@ -50,6 +58,12 @@ class CMXR_Configurator {
 			$bp_md = (int) get_option( 'elementor_viewport_md', 768  );
 			$breakpoints[2]['w'] = $bp_lg;
 			$breakpoints[1]['w'] = $bp_md;
+		}
+
+		if ( ! $is_new && 2 === (int) ( $config['config_version'] ?? 1 ) ) {
+			$template_definition = CMXR_Template_Registry::definition( $config['template_slug'] ?? '' );
+			include CMXR_PLUGIN_DIR . 'templates/admin/configurator-procedural.php';
+			return;
 		}
 
 		include CMXR_PLUGIN_DIR . 'templates/admin/configurator.php';

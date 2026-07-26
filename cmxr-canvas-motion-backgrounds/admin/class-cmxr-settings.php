@@ -168,6 +168,7 @@ class CMXR_Settings {
 		$payload  = array(
 			'plugin'      => 'cmxr',
 			'version'     => CMXR_VERSION,
+			'export_version' => 2,
 			'exported_at' => gmdate( 'Y-m-d\TH:i:s\Z' ),
 			'animations'  => $animations,
 		);
@@ -208,6 +209,10 @@ class CMXR_Settings {
 			wp_safe_redirect( add_query_arg( 'cmxr_notice', 'import_error', $redirect_base ) );
 			exit;
 		}
+		if ( isset( $data['export_version'] ) && ! in_array( (int) $data['export_version'], array( 1, 2 ), true ) ) {
+			wp_safe_redirect( add_query_arg( 'cmxr_notice', 'import_error', $redirect_base ) );
+			exit;
+		}
 
 		// Accept both the export bundle format { animations: [...] } and a bare array.
 		$animations = isset( $data['animations'] ) && is_array( $data['animations'] ) ? $data['animations'] : $data;
@@ -219,7 +224,13 @@ class CMXR_Settings {
 				$failed++;
 				continue;
 			}
-			$clean = CMXR_CPT::sanitize_config( $item['config'] );
+			$incoming = $item['config'];
+			if ( 2 === (int) ( $incoming['config_version'] ?? 1 ) ) {
+				$incoming['target']['selector'] = CMXR_CPT::unique_target_token( CMXR_CPT::config_target( $incoming ) );
+			} else {
+				$incoming['animation_id'] = CMXR_CPT::unique_target_token( CMXR_CPT::config_target( $incoming ) );
+			}
+			$clean = CMXR_CPT::sanitize_config( $incoming );
 			if ( ! $clean ) {
 				$failed++;
 				continue;

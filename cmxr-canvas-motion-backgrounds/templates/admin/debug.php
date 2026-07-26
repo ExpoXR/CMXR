@@ -32,6 +32,7 @@
 		<table class="widefat fixed striped cmxr-debug-table">
 			<tbody>
 				<tr><th><?php esc_html_e( 'Engine JS', 'cmxr-canvas-motion-backgrounds' ); ?></th><td><code><?php echo esc_html( $system['engine_url'] ); ?></code></td></tr>
+				<tr><th><?php esc_html_e( 'Renderers JS', 'cmxr-canvas-motion-backgrounds' ); ?></th><td><code><?php echo esc_html( $system['renderers_url'] ); ?></code></td></tr>
 				<tr><th><?php esc_html_e( 'Detect JS', 'cmxr-canvas-motion-backgrounds' ); ?></th><td><code><?php echo esc_html( $system['detect_url'] ); ?></code></td></tr>
 				<tr><th><?php esc_html_e( 'Public CSS', 'cmxr-canvas-motion-backgrounds' ); ?></th><td><code><?php echo esc_html( $system['css_url'] ); ?></code></td></tr>
 			</tbody>
@@ -55,9 +56,9 @@
 					<div class="cmxr-debug-anim-header">
 						<strong><?php echo esc_html( $anim['title'] ); ?></strong>
 						<code>#<?php echo esc_html( $anim['anim_id'] ); ?></code>
+						<span><?php echo esc_html( $anim['effect_type'] ); ?></span>
 						<span class="cmxr-status-badge"><?php echo $anim['active'] ? esc_html__( 'Active', 'cmxr-canvas-motion-backgrounds' ) : esc_html__( 'Inactive', 'cmxr-canvas-motion-backgrounds' ); ?></span>
-						<?php /* translators: %d: number of shapes */ ?>
-						<span><?php echo esc_html( sprintf( _n( '%d shape', '%d shapes', $anim['orb_count'], 'cmxr-canvas-motion-backgrounds' ), $anim['orb_count'] ) ); ?></span>
+						<span><?php echo esc_html( $anim['count_label'] ); ?> <?php esc_html_e( 'orbs', 'cmxr-canvas-motion-backgrounds' ); ?></span>
 						<button class="button button-small cmxr-debug-toggle-json" data-target="json-<?php echo esc_attr( $anim['id'] ); ?>">
 							<?php esc_html_e( 'Show Config', 'cmxr-canvas-motion-backgrounds' ); ?>
 						</button>

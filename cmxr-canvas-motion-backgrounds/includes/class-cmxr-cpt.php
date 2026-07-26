@@ -59,7 +59,11 @@ class CMXR_CPT {
 			$config = json_decode( $raw, true );
 			if ( ! is_array( $config ) ) continue;
 			if ( empty( $config['active'] ) ) continue;
-			if ( empty( $config['animation_id'] ) ) continue;
+			if ( 2 === (int) ( $config['config_version'] ?? 1 ) ) {
+				if ( empty( $config['target']['selector'] ) ) continue;
+			} elseif ( empty( $config['animation_id'] ) ) {
+				continue;
+			}
 			$configs[] = $config;
 		}
 
@@ -87,6 +91,13 @@ class CMXR_CPT {
 	 */
 	public static function sanitize_config( $raw ) {
 		if ( ! is_array( $raw ) ) return false;
+		$version = isset( $raw['config_version'] ) ? (int) $raw['config_version'] : 1;
+		if ( 2 === $version ) return self::sanitize_config_v2( $raw );
+		if ( 1 !== $version ) return false;
+		return self::sanitize_config_v1( $raw );
+	}
+
+	private static function sanitize_config_v1( $raw ) {
 
 		$allowed_blend  = CMXR_Schema::BLEND_MODES;
 		$allowed_modes  = CMXR_Schema::INTERACTIVITY_MODES;
@@ -175,6 +186,252 @@ class CMXR_CPT {
 		}
 
 		return $config;
+	}
+
+	private static function sanitize_config_v2( $raw ) {
+		if ( 'procedural-orbs' !== ( $raw['effect_type'] ?? '' ) ) return false;
+
+		$template_slug = sanitize_key( $raw['template_slug'] ?? '' );
+		$definition    = class_exists( 'CMXR_Template_Registry' ) ? CMXR_Template_Registry::definition( $template_slug ) : null;
+		if ( ! $definition || 'procedural-orbs' !== ( $definition['effect_type'] ?? '' ) ) return false;
+
+		$target   = is_array( $raw['target'] ?? null ) ? $raw['target'] : array();
+		$selector = (string) ( $target['selector'] ?? '' );
+		if ( 'id' !== ( $target['mode'] ?? '' ) || 'attached' !== ( $target['placement'] ?? '' ) || ! self::is_valid_target_token( $selector ) ) {
+			return false;
+		}
+
+		$settings = is_array( $raw['settings'] ?? null ) ? $raw['settings'] : array();
+		$defaults = $definition['settings'];
+		$palette  = is_array( $settings['palette'] ?? null ) ? $settings['palette'] : array();
+		$pd       = $defaults['palette'];
+
+		$seed = $settings['seed'] ?? $defaults['seed'];
+		if ( null !== $seed ) {
+			$seed = substr( sanitize_text_field( (string) $seed ), 0, 64 );
+			if ( '' === $seed ) $seed = null;
+		}
+
+		$hue_min = self::clamp_int( $palette['hue_min'] ?? $pd['hue_min'], 0, 360 );
+		$hue_max = self::clamp_int( $palette['hue_max'] ?? $pd['hue_max'], $hue_min, 360 );
+		$offsets = array();
+		foreach ( array_slice( (array) ( $palette['hue_offsets'] ?? $pd['hue_offsets'] ), 0, 6 ) as $offset ) {
+			$offsets[] = self::clamp_int( $offset, -360, 360 );
+		}
+		if ( empty( $offsets ) ) $offsets = array( 0, 30, 60 );
+
+		$fixed_colors = array();
+		foreach ( array_slice( (array) ( $palette['fixed_colors'] ?? $pd['fixed_colors'] ?? array() ), 0, 6 ) as $color ) {
+			$hex = sanitize_hex_color( $color );
+			if ( $hex ) $fixed_colors[] = $hex;
+		}
+		if ( empty( $fixed_colors ) ) $fixed_colors = array( '#2AACE2', '#8062AA', '#EF4681' );
+
+		$counts = is_array( $settings['counts'] ?? null ) ? $settings['counts'] : array();
+		$cd     = $defaults['counts'];
+		$breakpoints = is_array( $settings['breakpoints'] ?? null ) ? $settings['breakpoints'] : array();
+		$bd          = $defaults['breakpoints'];
+		$tablet_bp   = self::clamp_int( $breakpoints['tablet'] ?? $bd['tablet'], 320, 2000 );
+		$desktop_bp  = self::clamp_int( $breakpoints['desktop'] ?? $bd['desktop'], $tablet_bp + 1, 3000 );
+
+		$scale = is_array( $settings['scale'] ?? null ) ? $settings['scale'] : array();
+		$sd    = $defaults['scale'];
+		$scale_min = self::clamp_float( $scale['min'] ?? $sd['min'], 0.1, 2.0 );
+		$scale_max = self::clamp_float( $scale['max'] ?? $sd['max'], $scale_min, 3.0 );
+
+		$blur = is_array( $settings['blur'] ?? null ) ? $settings['blur'] : array();
+		$bld  = $defaults['blur'];
+
+		$clean_settings = array(
+			'seed' => $seed,
+			'palette' => array(
+				'mode'         => self::sanitize_enum( $palette['mode'] ?? $pd['mode'], array( 'random-hsl', 'fixed' ), 'random-hsl' ),
+				'hue_min'      => $hue_min,
+				'hue_max'      => $hue_max,
+				'hue_offsets'  => $offsets,
+				'saturation'   => self::clamp_int( $palette['saturation'] ?? $pd['saturation'], 0, 100 ),
+				'lightness'    => self::clamp_int( $palette['lightness'] ?? $pd['lightness'], 0, 100 ),
+				'fixed_colors' => $fixed_colors,
+			),
+			'counts' => array(
+				'mobile'  => self::clamp_int( $counts['mobile'] ?? $cd['mobile'], 1, 20 ),
+				'tablet'  => self::clamp_int( $counts['tablet'] ?? $cd['tablet'], 1, 20 ),
+				'desktop' => self::clamp_int( $counts['desktop'] ?? $cd['desktop'], 1, 20 ),
+			),
+			'breakpoints' => array(
+				'tablet'  => $tablet_bp,
+				'desktop' => $desktop_bp,
+			),
+			'alpha'             => self::clamp_float( $settings['alpha'] ?? $defaults['alpha'], 0.0, 1.0 ),
+			'simplex_increment' => self::clamp_float( $settings['simplex_increment'] ?? $defaults['simplex_increment'], 0.0001, 0.02 ),
+			'scale'             => array( 'min' => $scale_min, 'max' => $scale_max ),
+			'blur'              => array(
+				'mobile'  => self::clamp_int( $blur['mobile'] ?? $bld['mobile'], 0, 200 ),
+				'tablet'  => self::clamp_int( $blur['tablet'] ?? $bld['tablet'], 0, 200 ),
+				'desktop' => self::clamp_int( $blur['desktop'] ?? $bld['desktop'], 0, 200 ),
+			),
+			'dpr_cap'      => self::clamp_float( $settings['dpr_cap'] ?? $defaults['dpr_cap'], 1.0, 2.0 ),
+			'minimum_size' => self::clamp_int( $settings['minimum_size'] ?? $defaults['minimum_size'], 100, 1000 ),
+		);
+
+		$clean_settings['radius'] = self::sanitize_responsive_radius( $settings['radius'] ?? array(), $defaults['radius'] );
+
+		if ( isset( $defaults['physics'] ) ) {
+			$bounds = is_array( $settings['bounds'] ?? null ) ? $settings['bounds'] : array();
+			$clean_settings['bounds'] = array(
+				'padding' => self::clamp_int( $bounds['padding'] ?? $defaults['bounds']['padding'], 0, 500 ),
+			);
+
+			$physics = is_array( $settings['physics'] ?? null ) ? $settings['physics'] : array();
+			$phd     = $defaults['physics'];
+			$clean_settings['physics'] = array(
+				'wander_force'     => self::clamp_float( $physics['wander_force'] ?? $phd['wander_force'], 0.0, 2.0 ),
+				'attraction'       => self::clamp_float( $physics['attraction'] ?? $phd['attraction'], 0.0, 2.0 ),
+				'attraction_radius'=> self::clamp_int( $physics['attraction_radius'] ?? $phd['attraction_radius'], 1, 2000 ),
+				'damping'          => self::clamp_float( $physics['damping'] ?? $phd['damping'], 0.5, 0.999 ),
+				'boundary_margin'  => self::clamp_int( $physics['boundary_margin'] ?? $phd['boundary_margin'], 0, 500 ),
+				'boundary_spring'  => self::clamp_float( $physics['boundary_spring'] ?? $phd['boundary_spring'], 0.0, 5.0 ),
+			);
+
+			$aura = is_array( $settings['aura'] ?? null ) ? $settings['aura'] : array();
+			$ad   = $defaults['aura'];
+			$clean_settings['aura'] = array(
+				'enabled' => isset( $aura['enabled'] ) ? ! empty( $aura['enabled'] ) : ! empty( $ad['enabled'] ),
+				'radius'  => self::clamp_int( $aura['radius'] ?? $ad['radius'], 1, 1000 ),
+				'color'   => self::sanitize_canvas_color( $aura['color'] ?? $ad['color'], $ad['color'] ),
+			);
+
+			$burst = is_array( $settings['burst'] ?? null ) ? $settings['burst'] : array();
+			$bud   = $defaults['burst'];
+			$clean_settings['burst'] = array(
+				'enabled'     => isset( $burst['enabled'] ) ? ! empty( $burst['enabled'] ) : ! empty( $bud['enabled'] ),
+				'force'       => self::clamp_float( $burst['force'] ?? $bud['force'], 0.0, 30.0 ),
+				'duration_ms' => self::clamp_int( $burst['duration_ms'] ?? $bud['duration_ms'], 50, 5000 ),
+			);
+
+			$ripple = is_array( $settings['ripple'] ?? null ) ? $settings['ripple'] : array();
+			$rd     = $defaults['ripple'];
+			$clean_settings['ripple'] = array(
+				'enabled'     => isset( $ripple['enabled'] ) ? ! empty( $ripple['enabled'] ) : ! empty( $rd['enabled'] ),
+				'duration_ms' => self::clamp_int( $ripple['duration_ms'] ?? $rd['duration_ms'], 50, 5000 ),
+				'max_radius'  => self::clamp_int( $ripple['max_radius'] ?? $rd['max_radius'], 1, 2000 ),
+				'alpha'       => self::clamp_float( $ripple['alpha'] ?? $rd['alpha'], 0.0, 1.0 ),
+				'line_width'  => self::clamp_float( $ripple['line_width'] ?? $rd['line_width'], 0.1, 20.0 ),
+				'color'       => self::sanitize_canvas_color( $ripple['color'] ?? $rd['color'], $rd['color'] ),
+			);
+
+			$touch = is_array( $settings['touch'] ?? null ) ? $settings['touch'] : array();
+			$td    = $defaults['touch'];
+			$clean_settings['touch'] = array(
+				'enabled' => isset( $touch['enabled'] ) ? ! empty( $touch['enabled'] ) : ! empty( $td['enabled'] ),
+				'passive' => true,
+			);
+		} else {
+			$clean_settings['bounds'] = self::sanitize_static_bounds( $settings['bounds'] ?? array(), $defaults['bounds'] );
+		}
+
+		return array(
+			'config_version' => 2,
+			'template_slug'  => $template_slug,
+			'effect_type'    => 'procedural-orbs',
+			'kind'           => 'background',
+			'active'         => ! empty( $raw['active'] ),
+			'target'         => array(
+				'mode'      => 'id',
+				'selector'  => $selector,
+				'placement' => 'attached',
+			),
+			'settings'       => $clean_settings,
+			'dependencies'   => array(),
+			'fallback'       => array(
+				'reduced_motion' => 'static',
+				'unsupported'    => 'static',
+			),
+		);
+	}
+
+	public static function is_valid_target_token( $token ) {
+		return is_string( $token ) && 1 === preg_match( '/^[A-Za-z][A-Za-z0-9_-]{0,99}$/', $token );
+	}
+
+	public static function config_target( $config ) {
+		if ( 2 === (int) ( $config['config_version'] ?? 1 ) ) {
+			return (string) ( $config['target']['selector'] ?? '' );
+		}
+		return (string) ( $config['animation_id'] ?? '' );
+	}
+
+	public static function target_in_use( $target, $exclude_post_id = 0 ) {
+		if ( ! self::is_valid_target_token( $target ) ) return false;
+		$ids = get_posts( array(
+			'post_type'      => 'cmxr_animation',
+			'post_status'    => array( 'publish', 'draft' ),
+			'numberposts'    => -1,
+			'fields'         => 'ids',
+			'no_found_rows'  => true,
+		) );
+		foreach ( $ids as $post_id ) {
+			if ( (int) $post_id === (int) $exclude_post_id ) continue;
+			$raw    = get_post_meta( $post_id, '_cmxr_config', true );
+			$config = $raw ? json_decode( $raw, true ) : array();
+			if ( is_array( $config ) && $target === self::config_target( $config ) ) return true;
+		}
+		return false;
+	}
+
+	public static function unique_target_token( $preferred, $exclude_post_id = 0 ) {
+		$base = self::is_valid_target_token( $preferred ) ? (string) $preferred : sanitize_title( $preferred );
+		if ( ! self::is_valid_target_token( $base ) ) $base = 'cmxr-animation';
+		if ( ! self::target_in_use( $base, $exclude_post_id ) ) return $base;
+		for ( $i = 2; $i < 10000; $i++ ) {
+			$suffix    = '-' . $i;
+			$candidate = substr( $base, 0, 100 - strlen( $suffix ) ) . $suffix;
+			if ( ! self::target_in_use( $candidate, $exclude_post_id ) ) return $candidate;
+		}
+		return 'cmxr-animation-' . wp_rand( 10000, 99999 );
+	}
+
+	private static function sanitize_static_bounds( $raw, $defaults ) {
+		$raw = is_array( $raw ) ? $raw : array();
+		$out = array();
+		foreach ( array( 'mobile', 'tablet', 'desktop' ) as $key ) {
+			$value = is_array( $raw[ $key ] ?? null ) ? $raw[ $key ] : array();
+			$def   = $defaults[ $key ];
+			$out[ $key ] = array(
+				'origin_x'         => self::clamp_float( $value['origin_x'] ?? $def['origin_x'], 0.0, 1.0 ),
+				'origin_y'         => self::clamp_float( $value['origin_y'] ?? $def['origin_y'], 0.0, 1.0 ),
+				'distance_basis'   => self::sanitize_enum( $value['distance_basis'] ?? $def['distance_basis'], array( 'width', 'height', 'min-dimension' ), $def['distance_basis'] ),
+				'distance_divisor' => self::clamp_float( $value['distance_divisor'] ?? $def['distance_divisor'], 0.5, 20.0 ),
+			);
+		}
+		return $out;
+	}
+
+	private static function sanitize_responsive_radius( $raw, $defaults ) {
+		$raw = is_array( $raw ) ? $raw : array();
+		$out = array();
+		foreach ( array( 'mobile', 'tablet', 'desktop' ) as $key ) {
+			$value = is_array( $raw[ $key ] ?? null ) ? array_values( $raw[ $key ] ) : array();
+			$def   = array_values( $defaults[ $key ] );
+			$min   = self::clamp_float( $value[0] ?? $def[0], 0.01, 2.0 );
+			$max   = self::clamp_float( $value[1] ?? $def[1], $min, 3.0 );
+			$out[ $key ] = array(
+				$min,
+				$max,
+				self::sanitize_enum( $value[2] ?? $def[2], array( 'width', 'height', 'min-dimension' ), $def[2] ),
+			);
+		}
+		return $out;
+	}
+
+	private static function sanitize_canvas_color( $value, $default ) {
+		$value = is_string( $value ) ? trim( $value ) : '';
+		$hex = sanitize_hex_color( $value );
+		if ( $hex ) return $hex;
+		if ( preg_match( '/^rgba?\(\s*(?:\d{1,3}\s*,\s*){2}\d{1,3}(?:\s*,\s*(?:0|1|0?\.\d+))?\s*\)$/i', $value ) ) {
+			return $value;
+		}
+		return $default;
 	}
 
 	/**

@@ -27,6 +27,7 @@ class CMXR_Public {
 		$payload = array(
 			'animations' => $configs,
 			'coreUrl'    => CMXR_PLUGIN_URL . 'public/js/cmxr-core.js?ver=' . CMXR_VERSION,
+			'renderersUrl' => CMXR_PLUGIN_URL . 'public/js/cmxr-renderers.js?ver=' . CMXR_VERSION,
 			'engineUrl'  => CMXR_PLUGIN_URL . 'public/js/cmxr-engine.js?ver=' . CMXR_VERSION,
 			'cssUrl'     => CMXR_PLUGIN_URL . 'public/css/cmxr.css?ver=' . CMXR_VERSION,
 			'settings'   => array(

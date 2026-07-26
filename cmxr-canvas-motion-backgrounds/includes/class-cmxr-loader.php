@@ -15,6 +15,7 @@ class CMXR_Loader {
 	private function load_dependencies() {
 		require_once CMXR_PLUGIN_DIR . 'includes/class-cmxr-schema.php';
 		require_once CMXR_PLUGIN_DIR . 'includes/class-cmxr-cpt.php';
+		require_once CMXR_PLUGIN_DIR . 'includes/class-cmxr-template-registry.php';
 		require_once CMXR_PLUGIN_DIR . 'includes/class-cmxr-rest.php';
 		require_once CMXR_PLUGIN_DIR . 'includes/class-cmxr-public.php';
 

@@ -9,6 +9,117 @@
 	position: relative;
 }
 
+.cmxr-procedural-configurator .cmxr-config-body {
+	min-height: 650px;
+}
+
+.cmxr-proc-controls {
+	overflow-y: auto;
+	padding: 0 16px 20px;
+}
+
+.cmxr-proc-controls h4 {
+	margin: 20px 0 8px;
+	padding-top: 14px;
+	border-top: 1px solid var(--cmxr-border);
+}
+
+.cmxr-proc-controls label {
+	display: grid;
+	gap: 5px;
+	color: var(--cmxr-text);
+	font-size: 12px;
+	font-weight: 600;
+}
+
+.cmxr-proc-controls input,
+.cmxr-proc-controls select {
+	width: 100%;
+}
+
+.cmxr-proc-inline {
+	display: grid;
+	grid-template-columns: 1fr auto;
+	gap: 6px;
+}
+
+.cmxr-proc-grid-2,
+.cmxr-proc-grid-3 {
+	display: grid;
+	gap: 10px;
+}
+
+.cmxr-proc-grid-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.cmxr-proc-grid-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+
+.cmxr-proc-radius-row {
+	display: grid;
+	grid-template-columns: 70px 1fr 1fr;
+	align-items: center;
+	gap: 7px;
+	margin-bottom: 8px;
+}
+
+.cmxr-proc-toggles {
+	display: grid;
+	grid-template-columns: 1fr 1fr;
+	gap: 10px;
+	margin-top: 14px;
+}
+
+.cmxr-proc-toggles label {
+	display: flex;
+	align-items: center;
+	gap: 7px;
+}
+
+.cmxr-proc-toggles input { width: auto; }
+.cmxr-proc-effect-values { margin-top: 14px; }
+.cmxr-proc-breakpoints { display: inline-flex; gap: 4px; margin-left: auto; }
+.cmxr-proc-colors { margin-top: 10px; }
+.cmxr-proc-colors input[type="color"] { min-height: 34px; padding: 2px; }
+
+.cmxr-proc-preview {
+	position: relative;
+	isolation: isolate;
+	width: 100%;
+	height: 100%;
+	min-height: 520px;
+	overflow: hidden;
+	background: #0a0b18;
+}
+
+.cmxr-proc-preview canvas {
+	position: absolute;
+	inset: 0;
+	z-index: -1;
+	width: 100%;
+	height: 100%;
+	pointer-events: none;
+}
+
+.cmxr-proc-preview-content {
+	position: relative;
+	z-index: 1;
+	display: grid;
+	place-content: center;
+	justify-items: center;
+	gap: 14px;
+	height: 100%;
+	padding: 20px;
+	color: #fff;
+	text-align: center;
+}
+
+.cmxr-proc-reduced {
+	display: inline-flex;
+	align-items: center;
+	gap: 5px;
+	margin-left: 8px;
+	font-size: 12px;
+	font-weight: 500;
+}
+
 /* ---- Studio brand strip ---- */
 .cmxr-studio-hero {
 	display: flex;

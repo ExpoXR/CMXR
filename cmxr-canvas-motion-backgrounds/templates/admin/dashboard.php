@@ -23,7 +23,8 @@
 				<tr>
 					<th><?php esc_html_e( 'Name', 'cmxr-canvas-motion-backgrounds' ); ?></th>
 					<th><?php esc_html_e( 'CSS ID', 'cmxr-canvas-motion-backgrounds' ); ?></th>
-					<th><?php esc_html_e( 'Shapes', 'cmxr-canvas-motion-backgrounds' ); ?></th>
+					<th><?php esc_html_e( 'Type', 'cmxr-canvas-motion-backgrounds' ); ?></th>
+					<th><?php esc_html_e( 'Orbs', 'cmxr-canvas-motion-backgrounds' ); ?></th>
 					<th><?php esc_html_e( 'Status', 'cmxr-canvas-motion-backgrounds' ); ?></th>
 					<th><?php esc_html_e( 'Actions', 'cmxr-canvas-motion-backgrounds' ); ?></th>
 				</tr>
@@ -46,7 +47,11 @@
 								<span class="cmxr-no-id"><?php esc_html_e( '— not set —', 'cmxr-canvas-motion-backgrounds' ); ?></span>
 							<?php endif; ?>
 						</td>
-						<td><?php echo esc_html( $anim['orb_count'] ); ?></td>
+						<td>
+							<strong><?php echo esc_html( ucwords( str_replace( '-', ' ', $anim['effect_type'] ) ) ); ?></strong>
+							<?php if ( $anim['template_slug'] ) : ?><br><small><?php echo esc_html( $anim['template_slug'] ); ?></small><?php endif; ?>
+						</td>
+						<td><?php echo esc_html( $anim['count_label'] ); ?></td>
 						<td>
 							<button class="cmxr-toggle-btn <?php echo $anim['active'] ? 'is-active' : ''; ?>"
 								data-post-id="<?php echo esc_attr( $anim['post']->ID ); ?>"

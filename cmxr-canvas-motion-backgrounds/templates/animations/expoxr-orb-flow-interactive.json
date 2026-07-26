@@ -1,0 +1,60 @@
+{
+  "config_version": 2,
+  "slug": "expoxr-orb-flow-interactive",
+  "title": "ExpoXR Orb Flow Interactive",
+  "priority": 1,
+  "kind": "background",
+  "effect_type": "procedural-orbs",
+  "variant": "interactive",
+  "renderer": "procedural-orbs",
+  "settings": {
+    "seed": null,
+    "palette": {
+      "mode": "random-hsl",
+      "hue_min": 220,
+      "hue_max": 360,
+      "hue_offsets": [0, 30, 60],
+      "saturation": 95,
+      "lightness": 50,
+      "fixed_colors": ["#2AACE2", "#8062AA", "#EF4681"]
+    },
+    "counts": {"mobile": 5, "tablet": 7, "desktop": 9},
+    "breakpoints": {"tablet": 768, "desktop": 1024},
+    "alpha": 0.78,
+    "simplex_increment": 0.0018,
+    "scale": {"min": 0.5, "max": 1},
+    "blur": {"mobile": 20, "tablet": 30, "desktop": 30},
+    "dpr_cap": 1.5,
+    "minimum_size": 200,
+    "bounds": {"padding": 60},
+    "radius": {
+      "mobile": [0.125, 0.25, "min-dimension"],
+      "tablet": [0.1667, 0.3333, "height"],
+      "desktop": [0.1667, 0.3333, "height"]
+    },
+    "physics": {
+      "wander_force": 0.12,
+      "attraction": 0.18,
+      "attraction_radius": 250,
+      "damping": 0.92,
+      "boundary_margin": 30,
+      "boundary_spring": 0.5
+    },
+    "aura": {"enabled": true, "radius": 110, "color": "rgba(255,255,255,0.20)"},
+    "burst": {"enabled": true, "force": 5, "duration_ms": 700},
+    "ripple": {
+      "enabled": true,
+      "duration_ms": 600,
+      "max_radius": 150,
+      "alpha": 0.65,
+      "line_width": 2.5,
+      "color": "rgba(255,255,255,0.95)"
+    },
+    "touch": {"enabled": true, "passive": true}
+  },
+  "markup": {},
+  "target": {"mode": "id", "selector": "expoxr-orb-flow-interactive", "placement": "attached"},
+  "dependencies": [],
+  "capabilities": ["simplex-motion", "responsive-counts", "pointer-attract", "tap-burst", "ripple"],
+  "fallback": {"reduced_motion": "static", "unsupported": "static"}
+}

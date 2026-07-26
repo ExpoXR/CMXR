@@ -3,12 +3,12 @@ Contributors: expoxr
 Tags: animation, canvas, background, shapes, elementor
 Requires at least: 6.0
 Tested up to: 7.0
-Stable tag: 1.1.0
+Stable tag: 1.2.0
 Requires PHP: 7.4
 License: GPL-2.0-or-later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
-Canvas Motion Background Made Easy. Create animated HTML5 canvas motion backgrounds with shapes, orbs, blobs, and interactive effects for WordPress, Elementor, Gutenberg, and any theme.
+Create animated canvas backgrounds with responsive orbs, shapes, and interactive effects for WordPress, Elementor, and Gutenberg.
 
 == Description ==
 
@@ -96,6 +96,11 @@ Up to 20 shapes per animation.
 
 == Changelog ==
 
+= 1.2.0 =
+* Added ExpoXR Orb Flow and Orb Flow Interactive templates.
+* Added versioned template configs, template REST routes, and shared renderer lifecycle.
+* Added template library, procedural editor, deterministic seeds, responsive counts, and reduced-motion previews.
+
 = 1.1.0 =
 * Fixed orb size in px units being silently clamped to 200px on save, causing frontend shape size to ignore the configured px width/height.
 
@@ -121,6 +126,9 @@ Up to 20 shapes per animation.
 * WordPress 6.0+ and PHP 7.4+ compatible
 
 == Upgrade Notice ==
+
+= 1.2.0 =
+Adds reusable Orb templates while preserving existing layered-shape animations.
 
 = 1.1.0 =
 Fixes px-unit orb sizing on the frontend. No manual upgrade steps required.
