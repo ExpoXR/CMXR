@@ -3,7 +3,7 @@ Contributors: expoxr
 Tags: animation, canvas, background, shapes, elementor
 Requires at least: 6.0
 Tested up to: 7.0
-Stable tag: 1.2.0
+Stable tag: 1.2.1
 Requires PHP: 7.4
 License: GPL-2.0-or-later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -95,6 +95,9 @@ Up to 20 shapes per animation.
 8. Different shape animation styles
 
 == Changelog ==
+
+= 1.2.1 =
+Minor fixes and improvements.
 
 = 1.2.0 =
 * Added ExpoXR Orb Flow and Orb Flow Interactive templates.
