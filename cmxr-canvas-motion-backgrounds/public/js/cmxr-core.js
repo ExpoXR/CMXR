@@ -323,12 +323,27 @@
 		return input;
 	}
 
-	// Resolve a sized value with unit to px within a container
-	function resolvePx(val, unit, containerW, containerH, axis) {
+	// Resolve a sized value with unit to px within a container.
+	// vpW/vpH is the viewport basis for vw/vh — the browser window on the
+	// frontend, the (device-sized) preview frame in the configurator. Falls
+	// back to the real window so existing frontend callers are unchanged.
+	function resolvePx(val, unit, containerW, containerH, axis, vpW, vpH) {
 		if (unit === 'percent') return (val / 100) * (axis === 'x' ? containerW : containerH);
-		if (unit === 'vw')      return (val / 100) * window.innerWidth;
-		if (unit === 'vh')      return (val / 100) * window.innerHeight;
+		if (unit === 'vw')      return (val / 100) * (vpW || window.innerWidth);
+		if (unit === 'vh')      return (val / 100) * (vpH || window.innerHeight);
 		return parseFloat(val); // px — use raw
+	}
+
+	// Inverse of resolvePx: convert a px measurement back into unit space.
+	// Used when switching an orb's unit so the visual size/position is kept.
+	function pxToUnit(px, unit, containerW, containerH, axis, vpW, vpH) {
+		if (unit === 'percent') {
+			var basis = axis === 'x' ? containerW : containerH;
+			return basis ? (px / basis) * 100 : 0;
+		}
+		if (unit === 'vw') { var w = vpW || window.innerWidth;  return w ? (px / w) * 100 : 0; }
+		if (unit === 'vh') { var h = vpH || window.innerHeight; return h ? (px / h) * 100 : 0; }
+		return px; // px — raw
 	}
 
 	// Memoised blur filter string (rebuilt only when the orb's blur changes)
@@ -563,17 +578,17 @@
 		return 1 + Math.sin(t * orb.animation.frequency_x + (orb.animation.phase || 0)) * (orb.animation.amplitude_x / 100);
 	}
 
-	function computeOrbPos(orb, seed, t, w, h, safeMarginPct, mx, my, hover, interMode, interStrength, interRadius) {
+	function computeOrbPos(orb, seed, t, w, h, safeMarginPct, mx, my, hover, interMode, interStrength, interRadius, vpW, vpH) {
 		var ax = resolvePx(orb.animation.amplitude_x, 'percent', w, h, 'x');
 		var ay = resolvePx(orb.animation.amplitude_y, 'percent', w, h, 'y');
 		var fx = orb.animation.frequency_x;
 		var fy = orb.animation.frequency_y;
 		var ph = orb.animation.phase || 0;
 
-		var baseX = resolvePx(orb.position.x, orb.position.unit, w, h, 'x');
-		var baseY = resolvePx(orb.position.y, orb.position.unit, w, h, 'y');
-		var bw    = resolvePx(orb.size.w, orb.size.unit, w, h, 'x') * 0.5; // half-width radius
-		var bh    = resolvePx(orb.size.h, orb.size.unit, w, h, 'y') * 0.5; // half-height radius
+		var baseX = resolvePx(orb.position.x, orb.position.unit, w, h, 'x', vpW, vpH);
+		var baseY = resolvePx(orb.position.y, orb.position.unit, w, h, 'y', vpW, vpH);
+		var bw    = resolvePx(orb.size.w, orb.size.unit, w, h, 'x', vpW, vpH) * 0.5; // half-width radius
+		var bh    = resolvePx(orb.size.h, orb.size.unit, w, h, 'y', vpW, vpH) * 0.5; // half-height radius
 
 		var ox = 0, oy = 0;
 		var type = orb.animation.type;
@@ -728,10 +743,6 @@
 	}
 
 	window.CMXRCore = {
-		PHI: PHI,
-		E: E,
-		clamp: clamp,
-		hexToRgba: hexToRgba,
 		blendOp: blendOp,
 		createPointerTracker: createPointerTracker,
 		createLocalInputTracker: createLocalInputTracker,
@@ -740,8 +751,7 @@
 		responsiveKey: responsiveKey,
 		hashSeed: hashSeed,
 		resolvePx: resolvePx,
-		blurFilter: blurFilter,
-		drawBlob: drawBlob,
+		pxToUnit: pxToUnit,
 		computeOrbScale: computeOrbScale,
 		computeOrbPos: computeOrbPos,
 		drawOrb: drawOrb,

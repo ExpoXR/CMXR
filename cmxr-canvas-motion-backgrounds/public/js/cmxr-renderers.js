@@ -166,11 +166,16 @@
 			}, { threshold: options.ioThreshold || 0.01 });
 			io.observe(surface);
 		}
+		// vw/vh orbs are keyed to the browser viewport, which can change without the
+		// surface box changing — so watch window resize on the frontend regardless of
+		// ResizeObserver support. onWindowResize is also the no-RO surface fallback.
+		function onWindowResize() { resize(false); }
 		if ('ResizeObserver' in window) {
 			ro = new ResizeObserver(function () { resize(false); });
 			ro.observe(surface);
+			if (environment === 'frontend') window.addEventListener('resize', onWindowResize, { passive: true });
 		} else {
-			window.addEventListener('resize', resize, { passive: true });
+			window.addEventListener('resize', onWindowResize, { passive: true });
 		}
 		if (media) {
 			if (media.addEventListener) media.addEventListener('change', onReducedChange);
@@ -213,7 +218,7 @@
 				if (resizeTimer) clearTimeout(resizeTimer);
 				if (io) io.disconnect();
 				if (ro) ro.disconnect();
-				window.removeEventListener('resize', resize);
+				window.removeEventListener('resize', onWindowResize);
 				document.removeEventListener('visibilitychange', onVisibility);
 				if (media) {
 					if (media.removeEventListener) media.removeEventListener('change', onReducedChange);
@@ -229,9 +234,21 @@
 	function layeredShapesFactory(surface, config, options) {
 		var pointer;
 		var time = 0;
-		var orbSeeds = (config.orbs || []).map(function (orb) {
-			return Core.hashSeed(orb.id || orb.color);
-		});
+		// cfg is swapped by previewPatch so the configurator can adopt a fresh
+		// config object (e.g. after save) without stranding this renderer.
+		var cfg = config;
+		// Preview surfaces (configurator, dashboard modal) simulate the viewport
+		// with their own frame so vw/vh is WYSIWYG; only the frontend uses the
+		// real browser viewport.
+		var isPreview = options.environment && options.environment !== 'frontend';
+
+		function reseed() {
+			orbSeeds = (cfg.orbs || []).map(function (orb) {
+				return Core.hashSeed(orb.id || orb.color);
+			});
+		}
+		var orbSeeds;
+		reseed();
 		var host;
 
 		var effect = {
@@ -240,24 +257,29 @@
 				pointer = Core.createPointerTracker(surface, host.resume, {
 					debug: !!options.debug,
 					scope: options.environment || 'frontend',
-					label: config.animation_id || 'layered-shapes',
+					label: cfg.animation_id || 'layered-shapes',
 				});
 			},
 			resize: function () {},
 			render: function (now, delta) {
 				var state = host.state;
 				var ctx = host.context;
-				var speed = (config.global && config.global.speed) || 1;
+				var speed = (cfg.global && cfg.global.speed) || 1;
 				time += delta * 0.001 * speed * (1 + pointer.hover * 0.35);
 				pointer.update();
 				ctx.setTransform(state.dpr, 0, 0, state.dpr, 0, 0);
 				ctx.clearRect(0, 0, state.w, state.h);
 
-				var global = config.global || {};
+				// Viewport basis for vw/vh: the preview frame stands in for the
+				// viewport in the configurator (WYSIWYG); the real window elsewhere.
+				var vpW = isPreview ? state.w : window.innerWidth;
+				var vpH = isPreview ? state.h : window.innerHeight;
+
+				var global = cfg.global || {};
 				var interact = global.interactivity || {};
 				var enabled = interact.enabled !== false && interact.mode !== 'none';
 				ctx.globalCompositeOperation = Core.blendOp(global.blend_mode || 'normal');
-				var orbs = config.orbs || [];
+				var orbs = cfg.orbs || [];
 				for (var i = orbs.length - 1; i >= 0; i--) {
 					var orb = orbs[i];
 					var seed = orbSeeds[i] || 0;
@@ -274,18 +296,24 @@
 						pointer.hover,
 						enabled ? interact.mode : 'none',
 						interact.strength || 0.5,
-						interact.radius || 30
+						interact.radius || 30,
+						vpW,
+						vpH
 					);
 					Core.drawOrb(ctx, orb, pos, scale, time, seed);
 				}
 				ctx.globalCompositeOperation = 'source-over';
+			},
+			previewPatch: function (next) {
+				if (next) cfg = next;
+				reseed();
 			},
 			destroy: function () {
 				if (pointer) pointer.dispose();
 			},
 			minimumSize: function () { return 0; },
 			dprCap: function () { return options.dprCap || 1.75; },
-			debugState: function () { return { orbCount: (config.orbs || []).length }; },
+			debugState: function () { return { orbCount: (cfg.orbs || []).length }; },
 		};
 		return createHost(surface, config, effect, options);
 	}

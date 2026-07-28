@@ -52,7 +52,6 @@
 	config.orbs = config.orbs || [];
 
 	var selectedOrbIdx = -1;
-	var previewEngine  = null;
 	// Guards the wpColorPicker change callback while we set a value programmatically,
 	// so syncing the picker to the selected orb doesn't echo back into config.
 	var suppressColorChange = false;
@@ -287,6 +286,18 @@
 
 	function handleSaveSuccess(data) {
 		if (!data || !data.id) throw data || {};
+		// Adopt the server-sanitized config so the editor mirrors what was stored
+		// (e.g. unit-aware clamps). Reassigning `config` is safe: refreshPreview
+		// swaps the engine's reference via previewPatch, and every handler reads
+		// the outer `config` var. Without this the preview would drift from the DB
+		// and the divergence would only surface on reload.
+		if (data.config && typeof data.config === 'object') {
+			config = data.config;
+			config.orbs = config.orbs || [];
+			refreshPreview();
+			renderOrbList();
+			if (selectedOrbIdx >= 0 && selectedOrbIdx < config.orbs.length) selectOrb(selectedOrbIdx);
+		}
 		showStatus(cmxrText('savedStatus', 'Saved!'));
 		setSaveButtonState('saved');
 		debugLog('save success', { postId: data.id, isNew: isNew, animationId: config.animation_id });
@@ -354,10 +365,6 @@
 			obj = obj[keys[i]];
 		}
 		obj[keys[keys.length - 1]] = val;
-	}
-
-	function getPath(obj, path) {
-		return path.split('.').reduce(function (o, k) { return o && o[k]; }, obj);
 	}
 
 	bindSliderPair('cmxr-speed', 'cmxr-speed-num', 'global.speed');
@@ -947,6 +954,31 @@
 		updateSliderRange('cmxr-orb-y', 'cmxr-orb-y-num', 0, max);
 	}
 
+	// Current preview surface size — the basis for unit conversion. In the
+	// configurator the preview frame stands in for both container and viewport.
+	function previewBasis() {
+		var el = previewFrameEl || previewContainerEl;
+		if (!el) return { w: 0, h: 0 };
+		var rect = el.getBoundingClientRect();
+		return { w: el.clientWidth || rect.width || 0, h: el.clientHeight || rect.height || 0 };
+	}
+
+	// Re-express obj[key] values so the orb keeps its visual size/position when
+	// the unit changes (e.g. 50% of an 800px frame -> 400px). Conversion is
+	// relative to the current preview frame, so it approximates the live site.
+	function convertUnitValues(obj, axes, newUnit, min) {
+		if (!Core || !Core.pxToUnit) return;
+		var oldUnit = obj.unit || 'percent';
+		if (oldUnit === newUnit) return;
+		var b = previewBasis();
+		if (!b.w || !b.h) return; // no measured surface yet — leave the raw value
+		axes.forEach(function (a) {
+			var px = Core.resolvePx(obj[a.key], oldUnit, b.w, b.h, a.axis, b.w, b.h);
+			var val = Core.pxToUnit(px, newUnit, b.w, b.h, a.axis, b.w, b.h);
+			obj[a.key] = Math.max(min, Math.round(val));
+		});
+	}
+
 	function bindOrbField(sliderId, numId, orbPath, isInt) {
 		var slider = document.getElementById(sliderId);
 		var num    = document.getElementById(numId);
@@ -1081,9 +1113,12 @@
 		sizeUnitEl.addEventListener('change', function () {
 			var orb = config.orbs[selectedOrbIdx];
 			if (!orb) return;
+			convertUnitValues(orb.size, [{ key: 'w', axis: 'x' }, { key: 'h', axis: 'y' }], sizeUnitEl.value, 1);
 			orb.size.unit = sizeUnitEl.value;
-			updateUnitLabels('.cmxr-unit-label', sizeUnitEl.value);
 			sizeUnitRanges(sizeUnitEl.value);
+			setValue('cmxr-orb-w', 'cmxr-orb-w-num', orb.size.w);
+			setValue('cmxr-orb-h', 'cmxr-orb-h-num', orb.size.h);
+			updateUnitLabels('.cmxr-unit-label', sizeUnitEl.value);
 			refreshPreview();
 		});
 	}
@@ -1094,9 +1129,12 @@
 		posUnitEl.addEventListener('change', function () {
 			var orb = config.orbs[selectedOrbIdx];
 			if (!orb) return;
+			convertUnitValues(orb.position, [{ key: 'x', axis: 'x' }, { key: 'y', axis: 'y' }], posUnitEl.value, 0);
 			orb.position.unit = posUnitEl.value;
-			updateUnitLabels('.cmxr-pos-unit-label', posUnitEl.value);
 			posUnitRanges(posUnitEl.value);
+			setValue('cmxr-orb-x', 'cmxr-orb-x-num', orb.position.x);
+			setValue('cmxr-orb-y', 'cmxr-orb-y-num', orb.position.y);
+			updateUnitLabels('.cmxr-pos-unit-label', posUnitEl.value);
 			refreshPreview();
 		});
 	}
@@ -1137,107 +1175,24 @@
 	});
 
 	/* ------------------------------------------------------------------ */
-	/* Preview engine (mirrors public engine logic, simplified)            */
+	/* Live preview — delegated to the shared CMXRRenderers engine          */
+	/* cmxr-configurator depends on cmxr-renderers (a hard script dep), so   */
+	/* window.CMXRRenderers is always present here; the engine owns the rAF  */
+	/* loop, canvas sizing, DPR, pointer tracking and IntersectionObserver.  */
 	/* ------------------------------------------------------------------ */
 
-	var previewCanvas  = document.getElementById('cmxr-preview-canvas');
-	var previewCtx     = previewCanvas ? previewCanvas.getContext('2d', { alpha: true }) : null;
-	var SharedRenderers = window.CMXRRenderers;
+	var previewCanvas       = document.getElementById('cmxr-preview-canvas');
+	var SharedRenderers     = window.CMXRRenderers;
 	var sharedPreviewEngine = null;
-	var previewRaf     = 0;
-	var previewState   = { w: 0, h: 0, dpr: 1, time: 0, lastTime: 0, running: false };
 
-	var previewPointerSurface = previewFrameEl || previewCanvas;
-	function getPreviewDebugState() {
-		var inter = (config.global && config.global.interactivity) || {};
-		return {
-			animationId: config.animation_id || '',
-			orbs: (config.orbs || []).length,
-			canvas: { width: previewState.w, height: previewState.h, dpr: previewState.dpr },
-			interactivity: {
-				enabled: inter.enabled !== false,
-				mode: inter.mode || 'parallax',
-				strength: inter.strength || 0.5,
-				radius: inter.radius || 30,
-			},
-		};
-	}
-
-	var ptr = (!SharedRenderers && Core && Core.createPointerTracker && previewPointerSurface)
-		? Core.createPointerTracker(previewPointerSurface, refreshPreview, {
-			debug: DEBUG,
-			scope: 'configurator',
-			label: 'live-preview',
-			getState: getPreviewDebugState,
-		})
-		: { mx: 0, my: 0, tx: 0, ty: 0, hover: 0, targetHover: 0, update: function () {} };
-
-	function resizePreview() {
-		if (!previewCanvas) return;
-		var parent = previewCanvas.parentElement;
-		var w = parent.clientWidth;
-		var h = parent.clientHeight;
-		previewState.w = w;
-		previewState.h = h;
-		previewState.dpr = Math.min(window.devicePixelRatio || 1, 1.75);
-		previewCanvas.width  = Math.round(w * previewState.dpr);
-		previewCanvas.height = Math.round(h * previewState.dpr);
-		previewCanvas.style.width  = w + 'px';
-		previewCanvas.style.height = h + 'px';
-		debugLog('preview resize', getPreviewDebugState());
-	}
-
-	function tickPreview(now) {
-		if (!previewCtx || !Core) return;
-		var state = previewState;
-		var dt = Math.min(40, Math.max(0, now - (state.lastTime || now)));
-		state.lastTime = now;
-
-		ptr.update();
-
-		var speed = (config.global && config.global.speed) || 1.0;
-		state.time += dt * 0.001 * speed * (1 + ptr.hover * 0.35);
-
-		var w = state.w, h = state.h, t = state.time;
-		previewCtx.setTransform(state.dpr, 0, 0, state.dpr, 0, 0);
-		previewCtx.clearRect(0, 0, w, h);
-
-		var blendMode = Core.blendOp((config.global && config.global.blend_mode) || 'normal');
-		var safeMargin = (config.global && config.global.safe_margin) || 0;
-
-		// Interactivity — mirrors cmxr-engine.js draw()
-		var inter    = (config.global && config.global.interactivity) || {};
-		var iEnabled = (inter.enabled !== false) && inter.mode !== 'none';
-		var iMode    = iEnabled ? inter.mode : 'none';
-		var iStr     = inter.strength || 0.5;
-		var iRad     = inter.radius || 30;
-		var mx       = ptr.mx;
-		var my       = ptr.my;
-		var hover    = ptr.hover;
-
-		previewCtx.globalCompositeOperation = blendMode;
-
-		var orbs = config.orbs || [];
-		for (var i = orbs.length - 1; i >= 0; i--) {
-			var orb   = orbs[i];
-			var seed  = Core.hashSeed(orb.id);
-			var scale = Core.computeOrbScale(orb, t);
-			var pos   = Core.computeOrbPos(orb, seed, t, w, h, safeMargin, mx, my, hover, iMode, iStr, iRad);
-			Core.drawOrb(previewCtx, orb, pos, scale, t, seed);
-		}
-
-		previewCtx.globalCompositeOperation = 'source-over';
-		previewRaf = requestAnimationFrame(tickPreview);
-	}
-
+	// Push the live config into the running engine (edit / add / remove / reorder / save).
 	function refreshPreview() {
-		if (sharedPreviewEngine) {
-			sharedPreviewEngine.previewPatch(config.global ? config : config.settings);
-			return;
-		}
-		if (!previewRaf) {
-			previewRaf = requestAnimationFrame(tickPreview);
-		}
+		if (sharedPreviewEngine) sharedPreviewEngine.previewPatch(config);
+	}
+
+	// Re-measure the preview surface after a preview-size / device change.
+	function resizePreview() {
+		if (sharedPreviewEngine) sharedPreviewEngine.resize();
 	}
 
 	function startPreview() {
@@ -1248,15 +1203,7 @@
 				dprCap: 1.75,
 				debug: DEBUG,
 			});
-			return;
 		}
-		resizePreview();
-		refreshPreview();
-	}
-
-	// Resize observer for preview
-	if (!SharedRenderers && typeof ResizeObserver !== 'undefined' && previewCanvas) {
-		new ResizeObserver(function () { resizePreview(); }).observe(previewCanvas.parentElement);
 	}
 
 	/* ------------------------------------------------------------------ */

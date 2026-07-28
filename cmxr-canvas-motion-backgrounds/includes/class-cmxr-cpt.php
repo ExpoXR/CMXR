@@ -149,6 +149,11 @@ class CMXR_CPT {
 			$size_unit = self::sanitize_enum( $size['unit'] ?? 'percent', $allowed_units, 'percent' );
 			$size_max  = ( 'px' === $size_unit ) ? 2000 : 200;
 
+			$pos_unit = self::sanitize_enum( $pos['unit'] ?? 'percent', $allowed_units, 'percent' );
+			// px positions are absolute pixels (matches the client posUnitRanges max);
+			// percent/vw/vh are viewport/container fractions and stay 0–100.
+			$pos_max  = ( 'px' === $pos_unit ) ? 3000 : 100;
+
 			$sanitized_orb = array(
 				'id'         => sanitize_key( $orb['id'] ?? uniqid( 'o' ) ),
 				'shape'      => self::sanitize_enum( $orb['shape'] ?? 'circle', $allowed_shapes, 'circle' ),
@@ -163,9 +168,9 @@ class CMXR_CPT {
 					'unit' => $size_unit,
 				),
 				'position' => array(
-					'x'    => self::clamp_float( $pos['x'] ?? 50, 0, 100 ),
-					'y'    => self::clamp_float( $pos['y'] ?? 50, 0, 100 ),
-					'unit' => self::sanitize_enum( $pos['unit'] ?? 'percent', $allowed_units, 'percent' ),
+					'x'    => self::clamp_float( $pos['x'] ?? 50, 0, $pos_max ),
+					'y'    => self::clamp_float( $pos['y'] ?? 50, 0, $pos_max ),
+					'unit' => $pos_unit,
 				),
 				'blur'    => self::clamp_int( $orb['blur'] ?? 72, 0, 200 ),
 				'opacity' => self::clamp_float( $orb['opacity'] ?? 0.8, 0.0, 1.0 ),
