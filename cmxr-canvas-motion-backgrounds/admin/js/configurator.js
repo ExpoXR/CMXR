@@ -467,6 +467,23 @@
 					c.classList.toggle('is-active', active);
 					c.setAttribute('aria-checked', active ? 'true' : 'false');
 				});
+				// Anchor is global but position sliders are per-orb: re-range the
+				// open orb and clamp its px values into the new per-axis range so the
+				// slider thumb and stored value stay in agreement.
+				var orb = config.orbs[selectedOrbIdx];
+				if (orb && orb.position) {
+					var unit = orb.position.unit || 'percent';
+					posUnitRanges(unit);
+					if (unit === 'px') {
+						var parts = config.global.anchor.split('-'); // [vertical, horizontal]
+						var xMax = posAxisMax(unit, parts[1] === 'center');
+						var yMax = posAxisMax(unit, parts[0] === 'center');
+						orb.position.x = Math.max(-xMax, Math.min(xMax, orb.position.x));
+						orb.position.y = Math.max(-yMax, Math.min(yMax, orb.position.y));
+						setValue('cmxr-orb-x', 'cmxr-orb-x-num', orb.position.x);
+						setValue('cmxr-orb-y', 'cmxr-orb-y-num', orb.position.y);
+					}
+				}
 				refreshPreview();
 			});
 		});
@@ -967,11 +984,23 @@
 		updateSliderRange('cmxr-orb-h', 'cmxr-orb-h-num', 1, max);
 	}
 
+	// Max magnitude for a px position axis, by whether that axis is centered.
+	// Mirrors CMXR_Schema::POS_PX_MAX_CENTER / POS_PX_MAX_EDGE — keep in sync.
+	function posAxisMax(unit, isCenter) {
+		if (unit !== 'px') return 100;
+		return isCenter ? 2000 : 500;
+	}
+
 	function posUnitRanges(unit) {
-		var max = (unit === 'px') ? 3000 : 100;
-		// Negative min lets a shape sit past the anchored edge (off-container).
-		updateSliderRange('cmxr-orb-x', 'cmxr-orb-x-num', -max, max);
-		updateSliderRange('cmxr-orb-y', 'cmxr-orb-y-num', -max, max);
+		// Anchor is per-animation; the axis anchored to 'center' gets the wide
+		// range, an edge-anchored axis a smaller one. Negative min lets a shape
+		// sit past the anchored edge (off-container).
+		var anchor = (config.global && config.global.anchor) || 'top-left';
+		var parts  = anchor.split('-'); // [vertical, horizontal]
+		var xMax = posAxisMax(unit, parts[1] === 'center');
+		var yMax = posAxisMax(unit, parts[0] === 'center');
+		updateSliderRange('cmxr-orb-x', 'cmxr-orb-x-num', -xMax, xMax);
+		updateSliderRange('cmxr-orb-y', 'cmxr-orb-y-num', -yMax, yMax);
 	}
 
 	// Current preview surface size — the basis for unit conversion. In the

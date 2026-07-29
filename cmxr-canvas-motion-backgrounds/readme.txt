@@ -3,7 +3,7 @@ Contributors: expoxr
 Tags: animation, canvas, background, shapes, elementor
 Requires at least: 6.0
 Tested up to: 7.0
-Stable tag: 1.3.0
+Stable tag: 1.3.1
 Requires PHP: 7.4
 License: GPL-2.0-or-later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -21,7 +21,7 @@ Canvas Motion Background Made Easy. CMXR lets you build and manage animated canv
 * **Layer badges** — each shape shows its layer number (1 = topmost)
 * **6 animation types** — Drift, Orbit, Pulse, Wave, Fixed, Figure-8 (Lissajous)
 * **Interactivity modes** — Parallax, Repel, Attract, or Off
-* **Anchor point** — a per-animation 3×3 anchor (top-left … bottom-right) that sets which point of the container shape positions are measured from
+* **Anchor point** — a per-animation 3×3 anchor (top-left … bottom-right) that sets which point of the container shape positions are measured from. The px position range follows the anchor per axis: a centered axis spans ±2000px (full-4K travel from center), an edge axis ±500px
 * **Flexible units** — size and position in %, px, vw, or vh, with values auto-converting when you switch units
 * **12 shapes** — Soft Orbs (Circle, Double, Triple, Blob, Outline, Ring), Geometry (Box, Box Outline, Capsule, Capsule Outline), and Lines (Line, Wave Line)
 * **Blend modes** — Screen, Normal, Multiply, Overlay, Lighten, Hard-Light
@@ -97,6 +97,9 @@ Up to 20 shapes per animation.
 8. Different shape animation styles
 
 == Changelog ==
+
+= 1.3.1 =
+* Anchor-dependent px position range: a shape axis anchored to center now spans ±2000px (full-4K travel, slider centered on 0), while an edge-anchored axis is limited to ±500px. Switching the anchor re-ranges the sliders and clamps px values into the new range.
 
 = 1.3.0 =
 * Added a per-animation Anchor point (3x3 grid) so shape positions can be measured from any corner or edge of the container; defaults to top-left so existing animations are unchanged.
