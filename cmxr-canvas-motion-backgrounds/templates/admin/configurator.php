@@ -65,6 +65,7 @@
 				<button type="button" class="cmxr-global-tab is-active" data-gtab="background" role="tab" aria-selected="true"><?php esc_html_e( 'Background', 'cmxr-canvas-motion-backgrounds' ); ?></button>
 				<button type="button" class="cmxr-global-tab" data-gtab="motion" role="tab" aria-selected="false"><?php esc_html_e( 'Motion', 'cmxr-canvas-motion-backgrounds' ); ?></button>
 				<button type="button" class="cmxr-global-tab" data-gtab="interaction" role="tab" aria-selected="false"><?php esc_html_e( 'Interaction', 'cmxr-canvas-motion-backgrounds' ); ?></button>
+				<button type="button" class="cmxr-global-tab" data-gtab="anchors" role="tab" aria-selected="false"><?php esc_html_e( 'Anchors', 'cmxr-canvas-motion-backgrounds' ); ?></button>
 			</div>
 
 			<div class="cmxr-global-panes">
@@ -126,8 +127,8 @@
 						<label>
 							<?php esc_html_e( 'Mode', 'cmxr-canvas-motion-backgrounds' ); ?>
 							<select id="cmxr-interact-mode">
-								<?php foreach ( CMXR_Schema::INTERACTIVITY_MODES as $m ) : ?>
-									<option value="<?php echo esc_attr( $m ); ?>" <?php selected( $config['global']['interactivity']['mode'] ?? 'parallax', $m ); ?>><?php echo esc_html( ucfirst( $m ) ); ?></option>
+								<?php foreach ( CMXR_Schema::get_interactivity_mode_labels() as $cmxr_mode => $cmxr_mode_label ) : // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound ?>
+									<option value="<?php echo esc_attr( $cmxr_mode ); ?>" <?php selected( $config['global']['interactivity']['mode'] ?? 'parallax', $cmxr_mode ); ?>><?php echo esc_html( $cmxr_mode_label ); ?></option>
 								<?php endforeach; ?>
 							</select>
 						</label>
@@ -147,6 +148,24 @@
 						</label>
 						<p class="cmxr-hint"><?php esc_html_e( 'Move your mouse over the preview to test interaction.', 'cmxr-canvas-motion-backgrounds' ); ?></p>
 					</div>
+				</div>
+
+				<!-- Anchors pane -->
+				<div class="cmxr-global-pane" data-gpane="anchors" role="tabpanel">
+					<?php $cmxr_anchor = $config['global']['anchor'] ?? 'top-left'; // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound ?>
+					<label><?php esc_html_e( 'Anchor Point', 'cmxr-canvas-motion-backgrounds' ); ?></label>
+					<div class="cmxr-anchor-grid" role="radiogroup" aria-label="<?php esc_attr_e( 'Anchor point', 'cmxr-canvas-motion-backgrounds' ); ?>">
+						<?php foreach ( CMXR_Schema::get_anchor_labels() as $cmxr_anchor_value => $cmxr_anchor_label ) : // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound ?>
+							<button type="button"
+								class="cmxr-anchor-cell<?php echo ( $cmxr_anchor === $cmxr_anchor_value ) ? ' is-active' : ''; ?>"
+								data-anchor="<?php echo esc_attr( $cmxr_anchor_value ); ?>"
+								role="radio"
+								aria-checked="<?php echo ( $cmxr_anchor === $cmxr_anchor_value ) ? 'true' : 'false'; ?>"
+								title="<?php echo esc_attr( $cmxr_anchor_label ); ?>"
+								aria-label="<?php echo esc_attr( $cmxr_anchor_label ); ?>"><span class="cmxr-anchor-dot"></span></button>
+						<?php endforeach; ?>
+					</div>
+					<p class="cmxr-hint"><?php esc_html_e( 'Shape positions are measured from this point of the container. Motion still follows the viewport.', 'cmxr-canvas-motion-backgrounds' ); ?></p>
 				</div>
 
 			</div>
@@ -332,16 +351,16 @@
 							<div class="cmxr-field">
 								<label><?php esc_html_e( 'X Position', 'cmxr-canvas-motion-backgrounds' ); ?></label>
 								<div class="cmxr-slider-row">
-									<input type="range" id="cmxr-orb-x" min="0" max="100" step="1" value="50">
-									<input type="number" class="cmxr-num" id="cmxr-orb-x-num" min="0" max="100" step="1" value="50">
+									<input type="range" id="cmxr-orb-x" min="-100" max="100" step="1" value="50">
+									<input type="number" class="cmxr-num" id="cmxr-orb-x-num" min="-100" max="100" step="1" value="50">
 									<span class="cmxr-pos-unit-label">%</span>
 								</div>
 							</div>
 							<div class="cmxr-field">
 								<label><?php esc_html_e( 'Y Position', 'cmxr-canvas-motion-backgrounds' ); ?></label>
 								<div class="cmxr-slider-row">
-									<input type="range" id="cmxr-orb-y" min="0" max="100" step="1" value="50">
-									<input type="number" class="cmxr-num" id="cmxr-orb-y-num" min="0" max="100" step="1" value="50">
+									<input type="range" id="cmxr-orb-y" min="-100" max="100" step="1" value="50">
+									<input type="number" class="cmxr-num" id="cmxr-orb-y-num" min="-100" max="100" step="1" value="50">
 									<span class="cmxr-pos-unit-label">%</span>
 								</div>
 							</div>

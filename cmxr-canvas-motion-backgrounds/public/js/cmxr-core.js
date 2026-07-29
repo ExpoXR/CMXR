@@ -323,12 +323,46 @@
 		return input;
 	}
 
-	// Resolve a sized value with unit to px within a container
-	function resolvePx(val, unit, containerW, containerH, axis) {
+	// Resolve a sized value with unit to px within a container.
+	// vpW/vpH is the viewport basis for vw/vh — the browser window on the
+	// frontend, the (device-sized) preview frame in the configurator. Falls
+	// back to the real window so existing frontend callers are unchanged.
+	function resolvePx(val, unit, containerW, containerH, axis, vpW, vpH) {
 		if (unit === 'percent') return (val / 100) * (axis === 'x' ? containerW : containerH);
-		if (unit === 'vw')      return (val / 100) * window.innerWidth;
-		if (unit === 'vh')      return (val / 100) * window.innerHeight;
+		if (unit === 'vw')      return (val / 100) * (vpW || window.innerWidth);
+		if (unit === 'vh')      return (val / 100) * (vpH || window.innerHeight);
 		return parseFloat(val); // px — use raw
+	}
+
+	// Grid factors for a per-animation anchor point. x/y in {0, 0.5, 1} map to
+	// left/center/right and top/center/bottom of the container. Unknown/missing
+	// anchors fall back to top-left, which reproduces the original origin (0,0).
+	function anchorFactors(anchor) {
+		var x = 0, y = 0;
+		switch (anchor) {
+			case 'top-center':    x = 0.5; y = 0;   break;
+			case 'top-right':     x = 1;   y = 0;   break;
+			case 'center-left':   x = 0;   y = 0.5; break;
+			case 'center-center': x = 0.5; y = 0.5; break;
+			case 'center-right':  x = 1;   y = 0.5; break;
+			case 'bottom-left':   x = 0;   y = 1;   break;
+			case 'bottom-center': x = 0.5; y = 1;   break;
+			case 'bottom-right':  x = 1;   y = 1;   break;
+			default:              x = 0;   y = 0;   break; // top-left
+		}
+		return { x: x, y: y };
+	}
+
+	// Inverse of resolvePx: convert a px measurement back into unit space.
+	// Used when switching an orb's unit so the visual size/position is kept.
+	function pxToUnit(px, unit, containerW, containerH, axis, vpW, vpH) {
+		if (unit === 'percent') {
+			var basis = axis === 'x' ? containerW : containerH;
+			return basis ? (px / basis) * 100 : 0;
+		}
+		if (unit === 'vw') { var w = vpW || window.innerWidth;  return w ? (px / w) * 100 : 0; }
+		if (unit === 'vh') { var h = vpH || window.innerHeight; return h ? (px / h) * 100 : 0; }
+		return px; // px — raw
 	}
 
 	// Memoised blur filter string (rebuilt only when the orb's blur changes)
@@ -563,17 +597,25 @@
 		return 1 + Math.sin(t * orb.animation.frequency_x + (orb.animation.phase || 0)) * (orb.animation.amplitude_x / 100);
 	}
 
-	function computeOrbPos(orb, seed, t, w, h, safeMarginPct, mx, my, hover, interMode, interStrength, interRadius) {
+	function computeOrbPos(orb, seed, t, w, h, safeMarginPct, mx, my, hover, interMode, interStrength, interRadius, vpW, vpH, anchor) {
 		var ax = resolvePx(orb.animation.amplitude_x, 'percent', w, h, 'x');
 		var ay = resolvePx(orb.animation.amplitude_y, 'percent', w, h, 'y');
 		var fx = orb.animation.frequency_x;
 		var fy = orb.animation.frequency_y;
 		var ph = orb.animation.phase || 0;
 
-		var baseX = resolvePx(orb.position.x, orb.position.unit, w, h, 'x');
-		var baseY = resolvePx(orb.position.y, orb.position.unit, w, h, 'y');
-		var bw    = resolvePx(orb.size.w, orb.size.unit, w, h, 'x') * 0.5; // half-width radius
-		var bh    = resolvePx(orb.size.h, orb.size.unit, w, h, 'y') * 0.5; // half-height radius
+		// Anchor moves the origin the shape center is measured from. top-left
+		// (default) keeps the original (0,0) origin so legacy configs are
+		// unchanged; edge/corner anchors inset the position inward.
+		var af = anchorFactors(anchor);
+		var anchorX = af.x, anchorY = af.y;
+		var dirX = anchorX <= 0.5 ? 1 : -1;
+		var dirY = anchorY <= 0.5 ? 1 : -1;
+
+		var baseX = anchorX * w + dirX * resolvePx(orb.position.x, orb.position.unit, w, h, 'x', vpW, vpH);
+		var baseY = anchorY * h + dirY * resolvePx(orb.position.y, orb.position.unit, w, h, 'y', vpW, vpH);
+		var bw    = resolvePx(orb.size.w, orb.size.unit, w, h, 'x', vpW, vpH) * 0.5; // half-width radius
+		var bh    = resolvePx(orb.size.h, orb.size.unit, w, h, 'y', vpW, vpH) * 0.5; // half-height radius
 
 		var ox = 0, oy = 0;
 		var type = orb.animation.type;
@@ -593,11 +635,15 @@
 		}
 		// 'pulse' and 'fixed' use no positional offset
 
-		// Safe margin clamp — orb center stays within safeMarginPct% of container edge
+		// Safe margin clamp — bounds the animation drift, but honors an explicitly
+		// placed base even when it sits outside the margin (negative / off-edge
+		// positions). A base inside the normal window keeps the original behavior.
 		var smX  = w * (safeMarginPct / 100);
 		var smY  = h * (safeMarginPct / 100);
-		var posX = clamp(baseX + ox, smX, w - smX);
-		var posY = clamp(baseY + oy, smY, h - smY);
+		var loX  = Math.min(smX, baseX), hiX = Math.max(w - smX, baseX);
+		var loY  = Math.min(smY, baseY), hiY = Math.max(h - smY, baseY);
+		var posX = clamp(baseX + ox, loX, hiX);
+		var posY = clamp(baseY + oy, loY, hiY);
 
 		// Interactivity offset
 		var direction = orb.interaction_direction === 'reverse' ? -1 : 1;
@@ -728,10 +774,6 @@
 	}
 
 	window.CMXRCore = {
-		PHI: PHI,
-		E: E,
-		clamp: clamp,
-		hexToRgba: hexToRgba,
 		blendOp: blendOp,
 		createPointerTracker: createPointerTracker,
 		createLocalInputTracker: createLocalInputTracker,
@@ -740,8 +782,7 @@
 		responsiveKey: responsiveKey,
 		hashSeed: hashSeed,
 		resolvePx: resolvePx,
-		blurFilter: blurFilter,
-		drawBlob: drawBlob,
+		pxToUnit: pxToUnit,
 		computeOrbScale: computeOrbScale,
 		computeOrbPos: computeOrbPos,
 		drawOrb: drawOrb,

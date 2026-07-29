@@ -122,6 +122,7 @@ class CMXR_CPT {
 				'speed'       => self::clamp_float( $global['speed'] ?? 1.0, 0.1, 10.0 ),
 				'safe_margin' => self::clamp_int( $global['safe_margin'] ?? 5, 0, 30 ),
 				'blend_mode'  => self::sanitize_enum( $global['blend_mode'] ?? 'normal', $allowed_blend, 'normal' ),
+				'anchor'      => self::sanitize_enum( $global['anchor'] ?? 'top-left', CMXR_Schema::ANCHOR_POINTS, 'top-left' ),
 				'preview_bg'  => self::sanitize_preview_bg( $global['preview_bg'] ?? 'transparent' ),
 				'preview_w'   => self::sanitize_preview_dim( $global['preview_w'] ?? null, 3000 ),
 				'preview_h'   => self::sanitize_preview_dim( $global['preview_h'] ?? null, 2000 ),
@@ -149,6 +150,11 @@ class CMXR_CPT {
 			$size_unit = self::sanitize_enum( $size['unit'] ?? 'percent', $allowed_units, 'percent' );
 			$size_max  = ( 'px' === $size_unit ) ? 2000 : 200;
 
+			$pos_unit = self::sanitize_enum( $pos['unit'] ?? 'percent', $allowed_units, 'percent' );
+			// px positions are absolute pixels (matches the client posUnitRanges max);
+			// percent/vw/vh are viewport/container fractions and stay 0–100.
+			$pos_max  = ( 'px' === $pos_unit ) ? 3000 : 100;
+
 			$sanitized_orb = array(
 				'id'         => sanitize_key( $orb['id'] ?? uniqid( 'o' ) ),
 				'shape'      => self::sanitize_enum( $orb['shape'] ?? 'circle', $allowed_shapes, 'circle' ),
@@ -163,9 +169,10 @@ class CMXR_CPT {
 					'unit' => $size_unit,
 				),
 				'position' => array(
-					'x'    => self::clamp_float( $pos['x'] ?? 50, 0, 100 ),
-					'y'    => self::clamp_float( $pos['y'] ?? 50, 0, 100 ),
-					'unit' => self::sanitize_enum( $pos['unit'] ?? 'percent', $allowed_units, 'percent' ),
+					// Negative values place the shape past the anchored edge; range is symmetric with $pos_max.
+					'x'    => self::clamp_float( $pos['x'] ?? 50, -$pos_max, $pos_max ),
+					'y'    => self::clamp_float( $pos['y'] ?? 50, -$pos_max, $pos_max ),
+					'unit' => $pos_unit,
 				),
 				'blur'    => self::clamp_int( $orb['blur'] ?? 72, 0, 200 ),
 				'opacity' => self::clamp_float( $orb['opacity'] ?? 0.8, 0.0, 1.0 ),

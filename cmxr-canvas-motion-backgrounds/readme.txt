@@ -3,7 +3,7 @@ Contributors: expoxr
 Tags: animation, canvas, background, shapes, elementor
 Requires at least: 6.0
 Tested up to: 7.0
-Stable tag: 1.2.1
+Stable tag: 1.3.0
 Requires PHP: 7.4
 License: GPL-2.0-or-later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -20,7 +20,9 @@ Canvas Motion Background Made Easy. CMXR lets you build and manage animated canv
 * **Drag-to-reorder layers** — drag shapes in the sidebar to control which one renders on top
 * **Layer badges** — each shape shows its layer number (1 = topmost)
 * **6 animation types** — Drift, Orbit, Pulse, Wave, Fixed, Figure-8 (Lissajous)
-* **Interactivity modes** — Parallax, Repel, Attract
+* **Interactivity modes** — Parallax, Repel, Attract, or Off
+* **Anchor point** — a per-animation 3×3 anchor (top-left … bottom-right) that sets which point of the container shape positions are measured from
+* **Flexible units** — size and position in %, px, vw, or vh, with values auto-converting when you switch units
 * **12 shapes** — Soft Orbs (Circle, Double, Triple, Blob, Outline, Ring), Geometry (Box, Box Outline, Capsule, Capsule Outline), and Lines (Line, Wave Line)
 * **Blend modes** — Screen, Normal, Multiply, Overlay, Lighten, Hard-Light
 * **REST API** — full programmatic control over animations
@@ -96,6 +98,16 @@ Up to 20 shapes per animation.
 
 == Changelog ==
 
+= 1.3.0 =
+* Added a per-animation Anchor point (3x3 grid) so shape positions can be measured from any corner or edge of the container; defaults to top-left so existing animations are unchanged.
+* Added an "Off" option to the Interaction mode selector.
+* Position X/Y can now be negative, letting shapes sit partly off the container edge (works with any anchor).
+* Fixed px position being clamped to 100 on save; px positions now persist up to the configured range.
+* Fixed vw/vh units resolving against the browser window in the editor; preview now uses the device frame and the frontend reflows on window resize.
+* Fixed the live preview drifting from saved values after save, which previously required a page reload.
+* Unit switches now auto-convert the value so shapes keep their visual size and position.
+* Removed duplicated dead preview render loops; the shared renderer is now the single rendering path.
+
 = 1.2.1 =
 Minor fixes and improvements.
 
@@ -129,6 +141,9 @@ Minor fixes and improvements.
 * WordPress 6.0+ and PHP 7.4+ compatible
 
 == Upgrade Notice ==
+
+= 1.3.0 =
+Adds a per-animation anchor point and an Interaction "Off" option, and fixes px/vw/vh sizing and positioning. Existing animations are unchanged (they use the top-left anchor). No manual upgrade steps required.
 
 = 1.2.0 =
 Adds reusable Orb templates while preserving existing layered-shape animations.

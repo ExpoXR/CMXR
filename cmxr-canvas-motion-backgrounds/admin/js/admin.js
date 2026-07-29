@@ -7,7 +7,6 @@
 	var nonce = api.nonce || '';
 	var strings = api.strings || {};
 	var DEBUG = !!(api.debugMode || api.wpDebug || api.scriptDebug);
-	var Core = window.CMXRCore;
 	var Renderers = window.CMXRRenderers;
 
 	window.CMXRDebug = window.CMXRDebug || {
@@ -216,9 +215,6 @@
 	/* Preview Modal                                                        */
 	/* ------------------------------------------------------------------ */
 
-	var _modalRaf = 0;
-	var _modalPointer = null;
-	var _modalResizeObserver = null;
 	var _modalRenderer = null;
 
 	function injectPreviewModal() {
@@ -278,9 +274,6 @@
 	function closePreviewModal() {
 		var modal = document.getElementById('cmxr-dash-modal');
 		if (modal) modal.style.display = 'none';
-		if (_modalRaf) { cancelAnimationFrame(_modalRaf); _modalRaf = 0; }
-		if (_modalPointer) { _modalPointer.dispose(); _modalPointer = null; }
-		if (_modalResizeObserver) { _modalResizeObserver.disconnect(); _modalResizeObserver = null; }
 		if (_modalRenderer) { _modalRenderer.destroy(); _modalRenderer = null; }
 	}
 
@@ -292,8 +285,6 @@
 		if (titleEl) titleEl.textContent = title;
 		if (loading) loading.style.display = 'flex';
 		modal.style.display = 'flex';
-
-		if (_modalRaf) { cancelAnimationFrame(_modalRaf); _modalRaf = 0; }
 
 		apiFetch('/animations/' + postId).then(function (data) {
 			if (!data || !data.config) return;
@@ -312,107 +303,22 @@
 	/* ---- Mini preview (shared CMXRCore rendering, with interactivity) ---- */
 
 	function startModalPreview(config) {
-		if (_modalRaf) { cancelAnimationFrame(_modalRaf); _modalRaf = 0; }
-		if (_modalPointer) { _modalPointer.dispose(); _modalPointer = null; }
-		if (_modalResizeObserver) { _modalResizeObserver.disconnect(); _modalResizeObserver = null; }
 		if (_modalRenderer) { _modalRenderer.destroy(); _modalRenderer = null; }
-		if (!Core) return;
 
 		var canvas = document.getElementById('cmxr-dash-modal-canvas');
 		var wrap = document.getElementById('cmxr-dash-modal-canvas-wrap');
-		if (!canvas || !wrap) return;
-		if (Renderers) {
-			var effectType = Number(config.config_version || 1) === 2 ? config.effect_type : 'layered-shapes';
-			if (Renderers.has(effectType)) {
-				_modalRenderer = Renderers.create(effectType, wrap, config, {
-					environment: 'dashboard',
-					canvas: canvas,
-					dprCap: 1.75,
-					debug: DEBUG,
-				});
-				return;
-			}
-		}
-		var ctx  = canvas.getContext('2d', { alpha: true });
+		if (!canvas || !wrap || !Renderers) return;
 
-		var ms = { w: 0, h: 0, dpr: 1, time: 0, lastTime: 0 };
-		var ptr = Core.createPointerTracker(wrap, null, {
+		// cmxr-admin depends on cmxr-renderers, so the shared engine is always
+		// present; it owns the rAF loop, canvas sizing, DPR and pointer tracking.
+		var effectType = Number(config.config_version || 1) === 2 ? config.effect_type : 'layered-shapes';
+		if (!Renderers.has(effectType)) return;
+		_modalRenderer = Renderers.create(effectType, wrap, config, {
+			environment: 'dashboard',
+			canvas: canvas,
+			dprCap: 1.75,
 			debug: DEBUG,
-			scope: 'dashboard-modal',
-			label: config.animation_id || 'preview',
-			getState: function () {
-				var inter = (config.global && config.global.interactivity) || {};
-				return {
-					animationId: config.animation_id || '',
-					orbs: (config.orbs || []).length,
-					canvas: { width: ms.w, height: ms.h, dpr: ms.dpr },
-					interactivity: {
-						enabled: inter.enabled !== false,
-						mode: inter.mode || 'parallax',
-						strength: inter.strength || 0.5,
-						radius: inter.radius || 30,
-					},
-				};
-			},
 		});
-		_modalPointer = ptr;
-
-		function resize() {
-			ms.w   = wrap.clientWidth  || 800;
-			ms.h   = wrap.clientHeight || 500;
-			ms.dpr = Math.min(window.devicePixelRatio || 1, 1.75);
-			canvas.width  = Math.round(ms.w * ms.dpr);
-			canvas.height = Math.round(ms.h * ms.dpr);
-			window.CMXRDebug.log('[CMXR dashboard-modal] resize', { width: ms.w, height: ms.h, dpr: ms.dpr });
-		}
-
-		function tick(now) {
-			var dt = Math.min(40, Math.max(0, now - (ms.lastTime || now)));
-			ms.lastTime = now;
-
-			ptr.update();
-
-			var speed = (config.global && config.global.speed) || 1.0;
-			ms.time += dt * 0.001 * speed * (1 + ptr.hover * 0.35);
-
-			var w = ms.w, h = ms.h, t = ms.time;
-			ctx.setTransform(ms.dpr, 0, 0, ms.dpr, 0, 0);
-			ctx.clearRect(0, 0, w, h);
-
-			var blendMode  = Core.blendOp((config.global && config.global.blend_mode) || 'normal');
-			var safeMargin = (config.global && config.global.safe_margin) || 0;
-
-			var inter    = (config.global && config.global.interactivity) || {};
-			var iEnabled = (inter.enabled !== false) && inter.mode !== 'none';
-			var iMode    = iEnabled ? inter.mode : 'none';
-			var iStr     = inter.strength || 0.5;
-			var iRad     = inter.radius || 30;
-			var mx       = ptr.mx;
-			var my       = ptr.my;
-			var hover    = ptr.hover;
-
-			ctx.globalCompositeOperation = blendMode;
-
-			var orbs = config.orbs || [];
-			for (var i = orbs.length - 1; i >= 0; i--) {
-				var orb   = orbs[i];
-				var seed  = Core.hashSeed(orb.id);
-				var scale = Core.computeOrbScale(orb, t);
-				var pos   = Core.computeOrbPos(orb, seed, t, w, h, safeMargin, mx, my, hover, iMode, iStr, iRad);
-				Core.drawOrb(ctx, orb, pos, scale, t, seed);
-			}
-
-			ctx.globalCompositeOperation = 'source-over';
-			_modalRaf = requestAnimationFrame(tick);
-		}
-
-		resize();
-		if (typeof ResizeObserver !== 'undefined') {
-			_modalResizeObserver = new ResizeObserver(function () { resize(); });
-			_modalResizeObserver.observe(wrap);
-		}
-
-		_modalRaf = requestAnimationFrame(tick);
 	}
 
 	if (document.readyState === 'loading') {

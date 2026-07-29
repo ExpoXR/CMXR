@@ -433,6 +433,59 @@
 
 .cmxr-global-pane.is-active { display: flex; }
 
+/* Anchor point grid (3×3) */
+.cmxr-anchor-grid {
+	display: grid;
+	grid-template-columns: repeat(3, 1fr);
+	gap: 4px;
+	width: 96px;
+	height: 96px;
+}
+
+.cmxr-anchor-cell {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	padding: 0;
+	border: 1px solid var(--cmxr-border);
+	border-radius: var(--cmxr-radius);
+	background: var(--cmxr-surface);
+	cursor: pointer;
+	transition: border-color 0.15s ease, background 0.15s ease, box-shadow 0.15s ease;
+}
+
+.cmxr-anchor-cell:hover {
+	border-color: rgba(var(--cmxr-accent-rgb), 0.42);
+}
+
+.cmxr-anchor-dot {
+	width: 8px;
+	height: 8px;
+	border-radius: 50%;
+	background: var(--cmxr-border);
+	transition: background 0.15s ease, transform 0.15s ease;
+}
+
+.cmxr-anchor-cell:hover .cmxr-anchor-dot {
+	background: rgba(var(--cmxr-accent-rgb), 0.55);
+}
+
+.cmxr-anchor-cell.is-active {
+	border-color: var(--cmxr-accent);
+	background: var(--cmxr-accent-muted);
+	box-shadow: 0 0 0 2px rgba(var(--cmxr-accent-rgb), 0.12);
+}
+
+.cmxr-anchor-cell.is-active .cmxr-anchor-dot {
+	background: var(--cmxr-accent);
+	transform: scale(1.25);
+}
+
+.cmxr-anchor-cell:focus-visible {
+	outline: none;
+	box-shadow: 0 0 0 3px rgba(var(--cmxr-accent-rgb), 0.18);
+}
+
 .cmxr-global-bar label {
 	display: flex;
 	align-items: center;
