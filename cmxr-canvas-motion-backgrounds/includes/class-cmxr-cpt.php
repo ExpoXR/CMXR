@@ -136,6 +136,12 @@ class CMXR_CPT {
 			'orbs' => array(),
 		);
 
+		// Per-axis position range depends on the anchor (already sanitized above):
+		// a centered axis spans ±POS_PX_MAX_CENTER, an edge axis ±POS_PX_MAX_EDGE.
+		$anchor_parts = explode( '-', $config['global']['anchor'] ); // [vertical, horizontal]
+		$x_center = isset( $anchor_parts[1] ) && 'center' === $anchor_parts[1];
+		$y_center = isset( $anchor_parts[0] ) && 'center' === $anchor_parts[0];
+
 		$raw_orbs = array_slice( (array) ( $raw['orbs'] ?? array() ), 0, 20 );
 		foreach ( $raw_orbs as $orb ) {
 			$anim = $orb['animation'] ?? array();
@@ -151,9 +157,11 @@ class CMXR_CPT {
 			$size_max  = ( 'px' === $size_unit ) ? 2000 : 200;
 
 			$pos_unit = self::sanitize_enum( $pos['unit'] ?? 'percent', $allowed_units, 'percent' );
-			// px positions are absolute pixels (matches the client posUnitRanges max);
-			// percent/vw/vh are viewport/container fractions and stay 0–100.
-			$pos_max  = ( 'px' === $pos_unit ) ? 3000 : 100;
+			// px positions are absolute pixels; the max is anchor-dependent per axis
+			// (matches the client posUnitRanges max). percent/vw/vh are
+			// viewport/container fractions and stay 0–100.
+			$pos_x_max = ( 'px' === $pos_unit ) ? ( $x_center ? CMXR_Schema::POS_PX_MAX_CENTER : CMXR_Schema::POS_PX_MAX_EDGE ) : 100;
+			$pos_y_max = ( 'px' === $pos_unit ) ? ( $y_center ? CMXR_Schema::POS_PX_MAX_CENTER : CMXR_Schema::POS_PX_MAX_EDGE ) : 100;
 
 			$sanitized_orb = array(
 				'id'         => sanitize_key( $orb['id'] ?? uniqid( 'o' ) ),
@@ -169,9 +177,9 @@ class CMXR_CPT {
 					'unit' => $size_unit,
 				),
 				'position' => array(
-					// Negative values place the shape past the anchored edge; range is symmetric with $pos_max.
-					'x'    => self::clamp_float( $pos['x'] ?? 50, -$pos_max, $pos_max ),
-					'y'    => self::clamp_float( $pos['y'] ?? 50, -$pos_max, $pos_max ),
+					// Negative values place the shape past the anchored edge; range is symmetric per axis.
+					'x'    => self::clamp_float( $pos['x'] ?? 50, -$pos_x_max, $pos_x_max ),
+					'y'    => self::clamp_float( $pos['y'] ?? 50, -$pos_y_max, $pos_y_max ),
 					'unit' => $pos_unit,
 				),
 				'blur'    => self::clamp_int( $orb['blur'] ?? 72, 0, 200 ),

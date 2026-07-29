@@ -18,6 +18,13 @@ class CMXR_Schema {
 	const INTERACTIVITY_MODES = array( 'parallax', 'repel', 'attract', 'none' );
 	const INTERACTION_DIRECTIONS = array( 'normal', 'reverse' );
 
+	// Max magnitude (in px) for an orb position axis, chosen by the animation
+	// anchor. A centered axis travels a full-4K span from container center; an
+	// edge axis only needs a nudge off that edge. Mirrored in configurator.js
+	// posAxisMax() — keep the two in sync.
+	const POS_PX_MAX_CENTER = 2000; // axis anchored to center
+	const POS_PX_MAX_EDGE   = 500;  // axis anchored to an edge
+
 	public static function get_shape_groups() {
 		return array(
 			array(
