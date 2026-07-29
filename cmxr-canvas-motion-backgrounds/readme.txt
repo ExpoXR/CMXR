@@ -20,7 +20,9 @@ Canvas Motion Background Made Easy. CMXR lets you build and manage animated canv
 * **Drag-to-reorder layers** — drag shapes in the sidebar to control which one renders on top
 * **Layer badges** — each shape shows its layer number (1 = topmost)
 * **6 animation types** — Drift, Orbit, Pulse, Wave, Fixed, Figure-8 (Lissajous)
-* **Interactivity modes** — Parallax, Repel, Attract
+* **Interactivity modes** — Parallax, Repel, Attract, or Off
+* **Anchor point** — a per-animation 3×3 anchor (top-left … bottom-right) that sets which point of the container shape positions are measured from
+* **Flexible units** — size and position in %, px, vw, or vh, with values auto-converting when you switch units
 * **12 shapes** — Soft Orbs (Circle, Double, Triple, Blob, Outline, Ring), Geometry (Box, Box Outline, Capsule, Capsule Outline), and Lines (Line, Wave Line)
 * **Blend modes** — Screen, Normal, Multiply, Overlay, Lighten, Hard-Light
 * **REST API** — full programmatic control over animations
@@ -138,6 +140,9 @@ Minor fixes and improvements.
 * WordPress 6.0+ and PHP 7.4+ compatible
 
 == Upgrade Notice ==
+
+= 1.3.0 =
+Adds a per-animation anchor point and an Interaction "Off" option, and fixes px/vw/vh sizing and positioning. Existing animations are unchanged (they use the top-left anchor). No manual upgrade steps required.
 
 = 1.2.0 =
 Adds reusable Orb templates while preserving existing layered-shape animations.
