@@ -3,7 +3,7 @@ Contributors: expoxr
 Tags: animation, canvas, background, shapes, elementor
 Requires at least: 6.0
 Tested up to: 7.0
-Stable tag: 1.3.1
+Stable tag: 1.3.0
 Requires PHP: 7.4
 License: GPL-2.0-or-later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -98,11 +98,9 @@ Up to 20 shapes per animation.
 
 == Changelog ==
 
-= 1.3.1 =
-* Anchor-dependent px position range: a shape axis anchored to center now spans ±2000px (full-4K travel, slider centered on 0), while an edge-anchored axis is limited to ±500px. Switching the anchor re-ranges the sliders and clamps px values into the new range.
-
 = 1.3.0 =
 * Added a per-animation Anchor point (3x3 grid) so shape positions can be measured from any corner or edge of the container; defaults to top-left so existing animations are unchanged.
+* Anchor-dependent px position range: a shape axis anchored to center spans ±2000px (full-4K travel, slider centered on 0), while an edge-anchored axis is limited to ±500px. Switching the anchor re-ranges the sliders and clamps px values into the new range.
 * Added an "Off" option to the Interaction mode selector.
 * Position X/Y can now be negative, letting shapes sit partly off the container edge (works with any anchor).
 * Fixed px position being clamped to 100 on save; px positions now persist up to the configured range.
