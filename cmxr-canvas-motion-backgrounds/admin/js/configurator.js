@@ -969,8 +969,9 @@
 
 	function posUnitRanges(unit) {
 		var max = (unit === 'px') ? 3000 : 100;
-		updateSliderRange('cmxr-orb-x', 'cmxr-orb-x-num', 0, max);
-		updateSliderRange('cmxr-orb-y', 'cmxr-orb-y-num', 0, max);
+		// Negative min lets a shape sit past the anchored edge (off-container).
+		updateSliderRange('cmxr-orb-x', 'cmxr-orb-x-num', -max, max);
+		updateSliderRange('cmxr-orb-y', 'cmxr-orb-y-num', -max, max);
 	}
 
 	// Current preview surface size — the basis for unit conversion. In the
@@ -993,8 +994,9 @@
 		if (!b.w || !b.h) return; // no measured surface yet — leave the raw value
 		axes.forEach(function (a) {
 			var px = Core.resolvePx(obj[a.key], oldUnit, b.w, b.h, a.axis, b.w, b.h);
-			var val = Core.pxToUnit(px, newUnit, b.w, b.h, a.axis, b.w, b.h);
-			obj[a.key] = Math.max(min, Math.round(val));
+			var val = Math.round(Core.pxToUnit(px, newUnit, b.w, b.h, a.axis, b.w, b.h));
+			// min === null skips the floor so position values may stay negative.
+			obj[a.key] = (min === null || min === undefined) ? val : Math.max(min, val);
 		});
 	}
 
@@ -1148,7 +1150,7 @@
 		posUnitEl.addEventListener('change', function () {
 			var orb = config.orbs[selectedOrbIdx];
 			if (!orb) return;
-			convertUnitValues(orb.position, [{ key: 'x', axis: 'x' }, { key: 'y', axis: 'y' }], posUnitEl.value, 0);
+			convertUnitValues(orb.position, [{ key: 'x', axis: 'x' }, { key: 'y', axis: 'y' }], posUnitEl.value, null);
 			orb.position.unit = posUnitEl.value;
 			posUnitRanges(posUnitEl.value);
 			setValue('cmxr-orb-x', 'cmxr-orb-x-num', orb.position.x);

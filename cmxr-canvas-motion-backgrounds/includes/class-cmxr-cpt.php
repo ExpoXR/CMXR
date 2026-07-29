@@ -169,8 +169,9 @@ class CMXR_CPT {
 					'unit' => $size_unit,
 				),
 				'position' => array(
-					'x'    => self::clamp_float( $pos['x'] ?? 50, 0, $pos_max ),
-					'y'    => self::clamp_float( $pos['y'] ?? 50, 0, $pos_max ),
+					// Negative values place the shape past the anchored edge; range is symmetric with $pos_max.
+					'x'    => self::clamp_float( $pos['x'] ?? 50, -$pos_max, $pos_max ),
+					'y'    => self::clamp_float( $pos['y'] ?? 50, -$pos_max, $pos_max ),
 					'unit' => $pos_unit,
 				),
 				'blur'    => self::clamp_int( $orb['blur'] ?? 72, 0, 200 ),

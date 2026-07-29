@@ -101,6 +101,7 @@ Up to 20 shapes per animation.
 = 1.3.0 =
 * Added a per-animation Anchor point (3x3 grid) so shape positions can be measured from any corner or edge of the container; defaults to top-left so existing animations are unchanged.
 * Added an "Off" option to the Interaction mode selector.
+* Position X/Y can now be negative, letting shapes sit partly off the container edge (works with any anchor).
 * Fixed px position being clamped to 100 on save; px positions now persist up to the configured range.
 * Fixed vw/vh units resolving against the browser window in the editor; preview now uses the device frame and the frontend reflows on window resize.
 * Fixed the live preview drifting from saved values after save, which previously required a page reload.

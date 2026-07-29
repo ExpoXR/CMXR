@@ -635,11 +635,15 @@
 		}
 		// 'pulse' and 'fixed' use no positional offset
 
-		// Safe margin clamp — orb center stays within safeMarginPct% of container edge
+		// Safe margin clamp — bounds the animation drift, but honors an explicitly
+		// placed base even when it sits outside the margin (negative / off-edge
+		// positions). A base inside the normal window keeps the original behavior.
 		var smX  = w * (safeMarginPct / 100);
 		var smY  = h * (safeMarginPct / 100);
-		var posX = clamp(baseX + ox, smX, w - smX);
-		var posY = clamp(baseY + oy, smY, h - smY);
+		var loX  = Math.min(smX, baseX), hiX = Math.max(w - smX, baseX);
+		var loY  = Math.min(smY, baseY), hiY = Math.max(h - smY, baseY);
+		var posX = clamp(baseX + ox, loX, hiX);
+		var posY = clamp(baseY + oy, loY, hiY);
 
 		// Interactivity offset
 		var direction = orb.interaction_direction === 'reverse' ? -1 : 1;

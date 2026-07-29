@@ -351,16 +351,16 @@
 							<div class="cmxr-field">
 								<label><?php esc_html_e( 'X Position', 'cmxr-canvas-motion-backgrounds' ); ?></label>
 								<div class="cmxr-slider-row">
-									<input type="range" id="cmxr-orb-x" min="0" max="100" step="1" value="50">
-									<input type="number" class="cmxr-num" id="cmxr-orb-x-num" min="0" max="100" step="1" value="50">
+									<input type="range" id="cmxr-orb-x" min="-100" max="100" step="1" value="50">
+									<input type="number" class="cmxr-num" id="cmxr-orb-x-num" min="-100" max="100" step="1" value="50">
 									<span class="cmxr-pos-unit-label">%</span>
 								</div>
 							</div>
 							<div class="cmxr-field">
 								<label><?php esc_html_e( 'Y Position', 'cmxr-canvas-motion-backgrounds' ); ?></label>
 								<div class="cmxr-slider-row">
-									<input type="range" id="cmxr-orb-y" min="0" max="100" step="1" value="50">
-									<input type="number" class="cmxr-num" id="cmxr-orb-y-num" min="0" max="100" step="1" value="50">
+									<input type="range" id="cmxr-orb-y" min="-100" max="100" step="1" value="50">
+									<input type="number" class="cmxr-num" id="cmxr-orb-y-num" min="-100" max="100" step="1" value="50">
 									<span class="cmxr-pos-unit-label">%</span>
 								</div>
 							</div>
