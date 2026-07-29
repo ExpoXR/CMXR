@@ -122,6 +122,7 @@ class CMXR_CPT {
 				'speed'       => self::clamp_float( $global['speed'] ?? 1.0, 0.1, 10.0 ),
 				'safe_margin' => self::clamp_int( $global['safe_margin'] ?? 5, 0, 30 ),
 				'blend_mode'  => self::sanitize_enum( $global['blend_mode'] ?? 'normal', $allowed_blend, 'normal' ),
+				'anchor'      => self::sanitize_enum( $global['anchor'] ?? 'top-left', CMXR_Schema::ANCHOR_POINTS, 'top-left' ),
 				'preview_bg'  => self::sanitize_preview_bg( $global['preview_bg'] ?? 'transparent' ),
 				'preview_w'   => self::sanitize_preview_dim( $global['preview_w'] ?? null, 3000 ),
 				'preview_h'   => self::sanitize_preview_dim( $global['preview_h'] ?? null, 2000 ),

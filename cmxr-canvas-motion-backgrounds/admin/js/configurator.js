@@ -453,6 +453,25 @@
 	bindSliderPair('cmxr-interact-strength', 'cmxr-interact-strength-num', 'global.interactivity.strength');
 	bindSliderPair('cmxr-interact-radius', 'cmxr-interact-radius-num', 'global.interactivity.radius');
 
+	/* ---- Anchor point (per-animation, one 3×3 grid) ---- */
+	config.global = config.global || {};
+	config.global.anchor = config.global.anchor || 'top-left';
+	var anchorCells = document.querySelectorAll('.cmxr-anchor-cell');
+	if (anchorCells.length) {
+		anchorCells.forEach(function (cell) {
+			cell.addEventListener('click', function () {
+				config.global = config.global || {};
+				config.global.anchor = cell.getAttribute('data-anchor') || 'top-left';
+				anchorCells.forEach(function (c) {
+					var active = c === cell;
+					c.classList.toggle('is-active', active);
+					c.setAttribute('aria-checked', active ? 'true' : 'false');
+				});
+				refreshPreview();
+			});
+		});
+	}
+
 	/* ------------------------------------------------------------------ */
 	/* Preview background                                                   */
 	/* ------------------------------------------------------------------ */

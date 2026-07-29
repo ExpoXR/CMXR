@@ -298,7 +298,8 @@
 						interact.strength || 0.5,
 						interact.radius || 30,
 						vpW,
-						vpH
+						vpH,
+						global.anchor
 					);
 					Core.drawOrb(ctx, orb, pos, scale, time, seed);
 				}

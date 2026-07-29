@@ -12,6 +12,7 @@ class CMXR_Schema {
 	const SHAPES             = array( 'circle', 'double', 'triple', 'blob', 'circle-outline', 'ring', 'line', 'wave-line', 'rect', 'rect-outline', 'capsule', 'capsule-outline' );
 	const ANIM_TYPES         = array( 'drift', 'orbit', 'pulse', 'wave', 'fixed', 'figure8' );
 	const UNITS              = array( 'percent', 'px', 'vw', 'vh' );
+	const ANCHOR_POINTS      = array( 'top-left', 'top-center', 'top-right', 'center-left', 'center-center', 'center-right', 'bottom-left', 'bottom-center', 'bottom-right' );
 	const COLOR_MODES        = array( 'solid', 'dual', 'gradient' );
 	const COLOR_ANIMATIONS   = array( 'none', 'left-right', 'right-left', 'top-bottom', 'bottom-top', 'both' );
 	const INTERACTIVITY_MODES = array( 'parallax', 'repel', 'attract', 'none' );
@@ -73,6 +74,37 @@ class CMXR_Schema {
 			'px'      => __( 'px', 'cmxr-canvas-motion-backgrounds' ),
 			'vw'      => __( 'vw', 'cmxr-canvas-motion-backgrounds' ),
 			'vh'      => __( 'vh', 'cmxr-canvas-motion-backgrounds' ),
+		);
+	}
+
+	/**
+	 * Anchor point labels for the 3×3 grid. Keys match ANCHOR_POINTS and are
+	 * ordered so a straight foreach lays out top row → middle row → bottom row.
+	 */
+	public static function get_anchor_labels() {
+		return array(
+			'top-left'      => __( 'Top Left', 'cmxr-canvas-motion-backgrounds' ),
+			'top-center'    => __( 'Top Center', 'cmxr-canvas-motion-backgrounds' ),
+			'top-right'     => __( 'Top Right', 'cmxr-canvas-motion-backgrounds' ),
+			'center-left'   => __( 'Center Left', 'cmxr-canvas-motion-backgrounds' ),
+			'center-center' => __( 'Center', 'cmxr-canvas-motion-backgrounds' ),
+			'center-right'  => __( 'Center Right', 'cmxr-canvas-motion-backgrounds' ),
+			'bottom-left'   => __( 'Bottom Left', 'cmxr-canvas-motion-backgrounds' ),
+			'bottom-center' => __( 'Bottom Center', 'cmxr-canvas-motion-backgrounds' ),
+			'bottom-right'  => __( 'Bottom Right', 'cmxr-canvas-motion-backgrounds' ),
+		);
+	}
+
+	/**
+	 * Interactivity mode labels. Mirrors INTERACTIVITY_MODES; 'none' is surfaced
+	 * as "Off" in the UI without changing the stored enum value.
+	 */
+	public static function get_interactivity_mode_labels() {
+		return array(
+			'parallax' => __( 'Parallax', 'cmxr-canvas-motion-backgrounds' ),
+			'repel'    => __( 'Repel', 'cmxr-canvas-motion-backgrounds' ),
+			'attract'  => __( 'Attract', 'cmxr-canvas-motion-backgrounds' ),
+			'none'     => __( 'Off', 'cmxr-canvas-motion-backgrounds' ),
 		);
 	}
 
