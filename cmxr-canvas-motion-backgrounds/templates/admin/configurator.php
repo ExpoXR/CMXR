@@ -5,10 +5,9 @@
 	<hr class="wp-header-end">
 
 	<div class="cmxr-studio-hero">
-			<div>
-				<span class="cmxr-studio-kicker"><?php esc_html_e( 'ExpoXR', 'cmxr-canvas-motion-backgrounds' ); ?></span>
-				<h2><?php echo $is_new ? esc_html__( 'New Animation', 'cmxr-canvas-motion-backgrounds' ) : esc_html__( 'Edit Animation', 'cmxr-canvas-motion-backgrounds' ); ?></h2>
-			</div>
+		<div>
+			<span class="cmxr-studio-kicker"><?php esc_html_e( 'ExpoXR', 'cmxr-canvas-motion-backgrounds' ); ?></span>
+			<h2><?php echo $is_new ? esc_html__( 'New Animation', 'cmxr-canvas-motion-backgrounds' ) : esc_html__( 'Edit Animation', 'cmxr-canvas-motion-backgrounds' ); ?></h2>
 		</div>
 		<div class="cmxr-studio-meta">
 			<span><?php esc_html_e( 'Canvas Background Builder', 'cmxr-canvas-motion-backgrounds' ); ?></span>
